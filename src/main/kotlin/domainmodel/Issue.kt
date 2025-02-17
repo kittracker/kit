@@ -1,0 +1,11 @@
+package edu.kitt.domainmodel
+
+data class Issue(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val status: IssueStatus,
+    val createdBy: User,
+    val comments: MutableList<Comment>,
+    val links: MutableList<Issue>
+);

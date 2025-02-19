@@ -2,6 +2,9 @@ package edu.kitt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import edu.kitt.domainmodel.Issue
+import edu.kitt.domainmodel.Project
+import edu.kitt.domainmodel.User
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -19,7 +22,21 @@ import kotlinx.serialization.Serializable
 fun Route.projectRoutes() {
     route("/projects") {
         get {
-            call.respond(listOf("Project 1", "Project 2", "Project 3"))
+            var jack = User(0, "Jack", "<EMAIL>")
+            call.respond(
+                listOf(
+                    Project(
+                        1,
+                        "Test Project",
+                        "ooga booga",
+                        false,
+                        jack,
+                        mutableListOf<User>(),
+                        mutableListOf<Issue>()
+                    ),
+                    Project(2, "Test Project", "ooga booga", false, jack, mutableListOf<User>(), mutableListOf<Issue>())
+                )
+            )
         }
 
         post {

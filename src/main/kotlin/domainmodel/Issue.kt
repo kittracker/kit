@@ -1,5 +1,8 @@
 package edu.kitt.domainmodel
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Issue(
     val id: Int,
     val title: String,

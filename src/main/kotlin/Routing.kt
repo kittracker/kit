@@ -108,7 +108,7 @@ fun Route.issueRoutes() {
 fun Route.userRoutes() {
     route("/users") {
         get {
-
+            call.respond(userRepository.getAllUsers())
         }
 
         post {
@@ -116,7 +116,19 @@ fun Route.userRoutes() {
         }
 
         get("/{id}") {
+            val uid = call.parameters["id"]?.toIntOrNull()
+            if (uid == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be a number")
+                return@get
+            }
 
+            val user = userRepository.getUserByID(uid)
+            if (user == null) {
+                call.respond(HttpStatusCode.NotFound, "User not found")
+                return@get
+            }
+
+            call.respond(user)
         }
     }
 }

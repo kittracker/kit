@@ -11,6 +11,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 val userRepository: UserRepository = InMemoryUserRepository()
 val commentRepository: CommentRepository = InMemoryCommentRepository()
 val issueRepository: IssueRepository = InMemoryIssueRepository()
+val projectRepository: ProjectRepository = InMemoryProjectRepository()
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)

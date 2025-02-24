@@ -22,21 +22,7 @@ import kotlinx.serialization.Serializable
 fun Route.projectRoutes() {
     route("/projects") {
         get {
-            var jack = User(0, "Jack", "<EMAIL>")
-            call.respond(
-                listOf(
-                    Project(
-                        1,
-                        "Test Project",
-                        "ooga booga",
-                        false,
-                        jack,
-                        mutableListOf<User>(),
-                        mutableListOf<Issue>()
-                    ),
-                    Project(2, "Test Project", "ooga booga", false, jack, mutableListOf<User>(), mutableListOf<Issue>())
-                )
-            )
+            call.respond(projectRepository.getAllProjects())
         }
 
         post {
@@ -50,8 +36,14 @@ fun Route.projectRoutes() {
                 return@get
             }
 
-            val issues = issueRepository.getIssuesByProjectID(projectID)
-            call.respond(issues)
+            var project = projectRepository.getProjectByID(projectID)
+            if (project == null) {
+                call.respond(HttpStatusCode.NotFound, "Project not found")
+                return@get
+            }
+
+            project.issues = issueRepository.getIssuesByProjectID(projectID).toMutableList()
+            call.respond(project)
         }
 
         put("/{id}") {

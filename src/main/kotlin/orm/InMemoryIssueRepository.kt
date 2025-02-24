@@ -21,7 +21,7 @@ class InMemoryIssueRepository : IssueRepository {
         return issues.filter { it.projectID == id }
     }
 
-    override fun getIssues() : List<Issue> {
+    override fun getAllIssues() : List<Issue> {
         return issues
     }
 }

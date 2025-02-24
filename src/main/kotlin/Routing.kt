@@ -44,7 +44,14 @@ fun Route.projectRoutes() {
         }
 
         get("/{id}") {
+            val projectID = call.parameters["id"]?.toIntOrNull()
+            if (projectID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@get
+            }
 
+            val issues = issueRepository.getIssuesByProjectID(projectID)
+            call.respond(issues)
         }
 
         put("/{id}") {

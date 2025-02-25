@@ -1,0 +1,7 @@
+package edu.kitt.orm.entries
+
+data class UserEntry(
+    val id: Int,
+    val emailAddress: String,
+    val username: String
+)

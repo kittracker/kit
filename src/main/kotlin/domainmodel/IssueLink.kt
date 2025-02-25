@@ -3,8 +3,7 @@ package edu.kitt.domainmodel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Comment(
+data class IssueLink(
     val id: Int,
-    val author: User,
-    val text: String
+    val title: String,
 )

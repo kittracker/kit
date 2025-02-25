@@ -1,23 +1,8 @@
 package edu.kitt
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import edu.kitt.domainmodel.Issue
-import edu.kitt.domainmodel.Project
-import edu.kitt.domainmodel.User
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
-import java.sql.Connection
-import java.sql.DriverManager
-import kotlinx.serialization.Serializable
 
 fun Route.projectRoutes() {
     route("/projects") {
@@ -36,13 +21,12 @@ fun Route.projectRoutes() {
                 return@get
             }
 
-            var project = projectRepository.getProjectByID(projectID)
+            val project = projectRepository.getProjectByID(projectID)
             if (project == null) {
                 call.respond(HttpStatusCode.NotFound, "Project not found")
                 return@get
             }
 
-            project.issues = issueRepository.getIssuesByProjectID(projectID).toMutableList()
             call.respond(project)
         }
 
@@ -67,7 +51,7 @@ fun Route.projectRoutes() {
 fun Route.issueRoutes() {
     route("/issues") {
         get {
-
+            call.respond(issueRepository.getAllIssues())
         }
 
         post {
@@ -75,7 +59,19 @@ fun Route.issueRoutes() {
         }
 
         get("/{id}") {
+            val issueID = call.parameters["id"]?.toIntOrNull()
+            if (issueID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@get
+            }
 
+            val issue = issueRepository.getIssueByID(issueID)
+            if (issue == null) {
+                call.respond(HttpStatusCode.NotFound, "Issue not found")
+                return@get
+            }
+
+            call.respond(issue)
         }
 
         put("/{id}") {

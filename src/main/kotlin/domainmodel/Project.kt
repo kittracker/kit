@@ -10,5 +10,5 @@ data class Project(
     val archived: Boolean,
     val owner: User,
     val collaborators: MutableList<User>,
-    var issues: MutableList<Issue>
+    val issues: MutableList<Issue>
 )

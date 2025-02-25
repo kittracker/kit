@@ -3,6 +3,7 @@ package edu.kitt
 import edu.kitt.orm.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.plugins.calllogging.*
@@ -29,9 +30,10 @@ fun Application.module() {
         userRoutes()
         issueRoutes()
 
-        get("/") {
-            call.respondText("Hello World!")
-        }
+        staticResources("/", "static")
+        // get("/") {
+        //     call.respondText("Hello World!")
+        // }
     }
 
 }

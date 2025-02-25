@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import java.io.File
 
 val userRepository: UserRepository = InMemoryUserRepository()
 val commentRepository: CommentRepository = InMemoryCommentRepository()
@@ -30,7 +31,10 @@ fun Application.module() {
         userRoutes()
         issueRoutes()
 
-        staticResources("/", "static")
+        // TODO: switch these lines at the end of development
+        staticFiles("/", File("src/main/resources/static"))
+        // staticResources("/", "static")
+
         // get("/") {
         //     call.respondText("Hello World!")
         // }

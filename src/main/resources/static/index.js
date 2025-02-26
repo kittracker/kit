@@ -1,4 +1,5 @@
 window.onload = (event) => {
+    homepage();
 }
 
 function issue(id) {
@@ -35,25 +36,59 @@ function issue(id) {
     fetch("issues/" + id, "GET", callback);
 }
 
-function projects() {
-    document.getElementById("title-bar").innerText = "Projects";
+function homepage() {
     const callback = (data) => {
         console.log(data);
-        let list = "";
+        let content = "";
+
+        content += "<div class='standard-dialog inner-border'>";
+        content += "<h1 class='heading center'>Projects</h1>";
+        content += "</div>";
+        content += "<br/>";
+
         $.each(data, (_, val) => {
-            list += "<div class=\"standard-dialog center scale-down\">";
-            list += "<h1 class=\"dialog-text\">" + val.name + "</h1>";
-            list += "<div class=\"separator\"></div>";
-            list += "<h5 class=\"dialog-text\"><i>Owner:</i> " + val.owner.username + "</h5>";
-            list += "<h5 class=\"dialog-text\"><i>ID:</i> " + val.id + "</h5>";
-            list += "<h5 class=\"dialog-text\"><i>Description:</i> " + val.description + "</h5>";
-            list += "<h5 class=\"dialog-text\"><i>Archived:</i> " + val.archived + "</h5>";
-            list += "</div><br/>"
+            content += "<div class='standard-dialog project' onclick='project(" + val.id + ")' id='project_" + val.id + "'>";
+            content += "<h4>" + val.name + "</h4>";
+            content += "<div class='separator'></div>"
+            content += "<p>" + val.description + "</p>";
+            content += "</div>";
+            content += "<br/>";
         });
-        document.getElementById("content-list").innerHTML = list;
+
+        document.getElementById("page").innerHTML = content;
     }
 
     fetch("projects", "GET", callback);
+}
+
+function project(id) {
+    const callback = (data) => {
+        console.log(data);
+        let content = "";
+
+        content += "<div class='container'>";
+        content += "<div class='layout'>";
+
+        content += "<aside class='window sidebar'>";
+        content += "<div class='title-bar'>";
+        content += "<button aria-label='Close' class='close'></button>";
+        content += "<h1 class='title'>Collaborators</h1>";
+        content += "<button aria-label='Resize' class='resize'></button>";
+        content += "</aside>";
+
+        content += "<div class='standard-dialog'>";
+        content += "<h1 class='heading center'>" + data.name + "</h1>"
+        content += "<p class='desc center'>" + data.description + "</p>"
+        content += "<div class=\"separator\"></div>";
+        content += "</div>";
+
+        content += "</div>"
+        content += "</div>";
+
+        document.getElementById("page").innerHTML = content;
+    }
+
+    fetch("projects/" + id, "GET", callback);
 }
 
 function fetch(url, method, callback) {

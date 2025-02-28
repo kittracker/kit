@@ -7,6 +7,38 @@ div.project:hover {
   cursor: pointer;
 }
 
+li.collaborator:hover {
+  text-decoration: underline;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+p.text {
+  font-family: Chicago;
+  font-size: 1em;
+  color: gray;
+}
+
+.number {
+  width: 16px;
+  height: 16px;
+  text-align: center;
+}
+
+.img {
+  overflow: visible;
+  width: 16px;
+  height: 16px;
+  fill: gray;
+}
+
+.hbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  height: fit-content;
+}
+
 /* Layout: */
 
 .col-main {
@@ -37,6 +69,7 @@ html {
 h3 {
   font-family: Chicago;
   font-size: 1.5em;
+  height: fit-content;
 }
 
 .heading {
@@ -79,13 +112,13 @@ h3 {
 
 p {
   font-family: Geneva;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 blockquote {
   margin: 0 0 20px;
   padding: 20px;
-  width: 80%;
+  width: 100%;
   font-size: 14px;
   border: 1px solid black;
 }
@@ -114,17 +147,17 @@ blockquote footer {
 }
 
 .menu-items {
-  padding: 0;
+  padding: 10px;
   font-size: 14px;
 }
 
 /* responsive shiz */
 @media only screen and (min-width: 640px) {
   .layout {
+    padding: 10px;
     display: flex;
   }
   .standard-dialog {
-    margin-right: 20px;
     margin-top: 18px;
     width: 100%;
   }

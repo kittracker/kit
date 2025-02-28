@@ -5,29 +5,21 @@ class State {
         this.id = id;
         this.lastId = lastId;
     }
-
-    isInvalid() {
-        return this.page === undefined ||
-               this.lastPage === undefined ||
-               this.id === undefined ||
-               this.lastId === undefined;
-    }
 }
 
-const defaultState = new State("homepage", "homepage", -1, -1);
-let state = new State("homepage", "homepage", -1, -1);
+const state = new State("homepage", [], -1, []);
 
 window.onload = (_) => {
-    state.page = Cookies.get("kit-page");
-    state.lastPage = Cookies.get("kit-lastPage");
-    state.id = Cookies.get("kit-id");
-    state.lastId = Cookies.get("kit-lastId");
+    let temp1 = Cookies.get("kit-page");
+    let temp2 = Cookies.get("kit-id");
+    let temp3 = Cookies.get("kit-lastPage");
+    let temp4 = Cookies.get("kit-lastId");
 
-    if (state.isInvalid()) {
-        state.page = defaultState.page;
-        state.lastPage = defaultState.lastPage;
-        state.id = defaultState.id;
-        state.lastId = defaultState.lastId;
+    if (temp1 !== undefined && temp2 !== undefined && temp3 !== undefined && temp4 !== undefined) {
+        state.page = temp1;
+        state.id = temp2;
+        state.lastPage = temp3.split(",");
+        state.lastId = temp4.split(",");
     }
 
     let id = Number(state.id);
@@ -55,31 +47,46 @@ window.onload = (_) => {
 }
 
 window.onbeforeunload = (_) => {
-    // Cookies.set("kit-page", String(state.page));
-    // Cookies.set("kit-lastPage", String(state.lastPage));
-    // Cookies.set("kit-id", String(state.id));
-    // Cookies.set("kit-lastId", String(state.lastId));
+    if (state.lastPage.length <= 1) {
+        Cookies.remove("kit-page");
+        Cookies.remove("kit-lastPage");
+        Cookies.remove("kit-id");
+        Cookies.remove("kit-lastId");
+        return;
+    }
+
+    Cookies.set("kit-page", String(state.page));
+    Cookies.set("kit-lastPage", String(state.lastPage.join()));
+    Cookies.set("kit-id", String(state.id));
+    Cookies.set("kit-lastId", String(state.lastId.join()));
 }
 
 function navbar() {
     let bar = "";
 
     bar += "<ul style='padding: 10px; justify-content: center;' role='menu-bar'>";
-    bar += "<li role='menu-item' tabIndex='0' aria-haspopup='false' onclick='" + state.lastPage + "(" + state.lastId + ")" + "'>BACK</li>";
+
+    let page = "undefined";
+    if (state.lastPage.length >= 2) page = state.lastPage[state.lastPage.length - 2];
+    let id = "undefined";
+    if (state.lastId.length >= 2) id = state.lastId[state.lastPage.length - 2];
+
+    bar += "<li role='menu-item' tabIndex='0' aria-haspopup='false' onclick='goto(" + page + ", " + id + ")" + "'>BACK</li>";
     bar += "<li role='menu-item' tabIndex='0' aria-haspopup='false' onclick='homepage(-1)'>PROJECTS</li>";
     bar += "</ul>";
 
     return bar;
 }
 
-function homepage(_) {
-    state.lastPage = state.page;
-    state.lastId = state.id;
+function homepage(_, goingBack = false) {
     state.page = "homepage";
     state.id = _;
+    if (!goingBack && state.lastPage[state.lastPage.length - 1] !== state.page) {
+        state.lastPage.push(state.page);
+        state.lastId.push(state.id);
+    }
 
     const callback = (data) => {
-        console.log(data);
         let content = "";
 
         content += "<div class='standard-dialog inner-border'>";
@@ -102,14 +109,15 @@ function homepage(_) {
     fetch("projects", "GET", callback);
 }
 
-function project(id) {
-    state.lastPage = state.page;
-    state.lastId = state.id;
+function project(id, goingBack = false) {
     state.page = "project";
     state.id = id;
+    if (!goingBack && state.lastPage[state.lastPage.length - 1] !== state.page) {
+        state.lastPage.push(state.page);
+        state.lastId.push(state.id);
+    }
 
     const callback = (data) => {
-        console.log(data);
         let content = "";
 
         content += "<div class='container'>";
@@ -166,11 +174,13 @@ function project(id) {
     fetch("projects/" + id, "GET", callback);
 }
 
-function issue(id) {
-    state.lastPage = state.page;
-    state.lastId = state.id;
+function issue(id, goingBack = false) {
     state.page = "issue";
     state.id = id;
+    if (!goingBack && state.lastPage[state.lastPage.length - 1] !== state.page) {
+        state.lastPage.push(state.page);
+        state.lastId.push(state.id);
+    }
 
     const callback = (data) => {
         let content = "";
@@ -219,14 +229,15 @@ function issue(id) {
     fetch("issues/" + id, "GET", callback);
 }
 
-function user(id) {
-    state.lastPage = state.page;
-    state.lastId = state.id;
+function user(id, goingBack = false) {
     state.page = "user";
     state.id = id;
+    if (!goingBack && state.lastPage[state.lastPage.length - 1] !== state.page) {
+        state.lastPage.push(state.page);
+        state.lastId.push(state.id);
+    }
 
     const callback = (data) => {
-        console.log(data);
         let content = "";
 
         content += "<div class='standard-dialog'>";
@@ -238,6 +249,13 @@ function user(id) {
     };
 
     fetch("users/" + id, "GET", callback);
+}
+
+function goto(func, id) {
+    if (func === undefined) return;
+    state.lastPage.pop();
+    state.lastId.pop();
+    func(id, true);
 }
 
 function fetch(url, method, callback) {

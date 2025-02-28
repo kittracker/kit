@@ -13,7 +13,7 @@ function homepage() {
         content += "<br/>";
 
         $.each(data, (_, val) => {
-            content += "<div class='standard-dialog project' onclick='project(" + val.id + ")' id='project_" + val.id + "'>";
+            content += "<div class='standard-dialog item' onclick='project(" + val.id + ")' id='project_" + val.id + "'>";
             content += "<h4>" + val.name + "</h4>";
             content += "<div class='separator'></div>"
             content += "<p>" + val.description + "</p>";
@@ -36,14 +36,14 @@ function project(id) {
         content += "<div class='layout'>";
         // --- main
         content += "<div class='standard-dialog'>";
-        content += "<h1 class='heading center'>" + data.name + "</h1>"
-        content += "<p class='desc center'>" + data.description + "</p>"
+        content += "<h1 class='heading center'>" + data.name + "</h1>";
+        content += "<p class='desc center'>" + data.description + "</p>";
         content += "<div class='separator'></div>";
         content += "<br/>";
         $.each(data.issues, (_, val) => {
             let text = "#" + val.id + " " + val.createdBy.username + " " + val.status;
 
-            content += "<blockquote onclick='issue(" + val.id + ")'>";
+            content += "<blockquote class='item' onclick='issue(" + val.id + ")'>";
             content += "<h3>" + val.title + "</h3>";
             content += "<div class='hbox'>";
             content += "<p class='dialog-text text'>" + text + "</p>";
@@ -70,7 +70,7 @@ function project(id) {
         $.each(data.collaborators, (_, val) => {
             let user = val.username;
             if (val.username === data.owner.username) user += " (owner)";
-            content += "<li class='collaborator' onclick='user(" + val.id + ")'>" + user + "</li>";
+            content += "<li class='listItem' onclick='user(" + val.id + ")'>" + user + "</li>";
         });
         content += "</ul>";
         content += "</div>";
@@ -87,33 +87,46 @@ function project(id) {
 
 function issue(id) {
     const callback = (data) => {
-        document.getElementById("title-bar").innerText = data.title + " #" + data.id;
         let content = "";
-        content += "<div class=\"standard-dialog center scale-down\">";
-        content += "<h5 class=\"dialog-text\"><i>Description:</i> " + data.description + "</h5>";
-        content += "<h5 class=\"dialog-text\"><i>Status:</i> " + data.status + "</h5>";
-        content += "<h5 class=\"dialog-text\"><i>Created By:</i> " + data.createdBy.username + "</h5>";
-        content += "</div><br/>";
 
-        content += "<div class=\"standard-dialog center scale-down\">";
-        content += "<h1 class=\"modal-text\">Comments</h1>";
-        content += "<div class=\"separator\"></div>";
+        content += "<div class='container'>";
+        content += "<div class='layout'>";
+        // --- main
+        content += "<div class='standard-dialog'>";
+        content += "<h1 class='heading center'>" + data.title + "</h1>";
+        content += "<p class='desc center'>" + data.description + "</p>";
+        content += "<p class='desc center'>" + data.status + "</p>";
+        content += "<div class='separator'></div>";
+        content += "<br/>";
         $.each(data.comments, (_, val) => {
-            content += "<h4 class=\"dialog-text\">" + val.author.username + "</h4>"
-            content += "<h5 class=\"dialog-text\">" + val.text + "</h5>"
-            content += "<div class=\"separator\"></div>";
+            content += "<blockquote>";
+            content += "<h3>@" + val.author.username + "</h3>";
+            content += "<p class='dialog-text text'>" + val.text + "</p>";
+            content += "</blockquote>";
         });
-        content += "</div><br/>";
-
-        content += "<div class=\"standard-dialog center scale-down\">";
-        content += "<h1 class=\"modal-text\">Links</h1>";
-        content += "<div class=\"separator\"></div>";
+        // --- main
+        content += "</div>";
+        // --- sidebar
+        content += "<aside class='window sidebar'>";
+        content += "<div class='title-bar'>";
+        content += "<button aria-label='Close' class='close'></button>";
+        content += "<h1 class='title'>Links</h1>";
+        content += "<button aria-label='Resize' class='resize'></button>";
+        content += "</div>";
+        content += "<div class='window-pane'>";
+        content += "<ul class='menu-items'>";
         $.each(data.links, (_, val) => {
-            content += "<h4 class=\"dialog-text\">" + val.title + " #" + val.id  + "</h4>"
+            let link = val.title + " #" + val.id;
+            content += "<li class='listItem' onclick='issue(" + val.id + ")'>" + link + "</li>";
         });
-        content += "</div><br/>";
+        content += "</ul>";
+        content += "</div>";
+        content += "</aside>";
+        // --- sidebar
+        content += "</div>"
+        content += "</div>";
 
-        document.getElementById("content-list").innerHTML = content;
+        document.getElementById("page").innerHTML = content;
     };
 
     fetch("issues/" + id, "GET", callback);

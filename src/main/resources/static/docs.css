@@ -2,12 +2,12 @@
   box-sizing: border-box;
 }
 
-div.project:hover {
+.item:hover {
   background: #A0A0A0;
   cursor: pointer;
 }
 
-li.collaborator:hover {
+li.listItem:hover {
   text-decoration: underline;
   font-weight: bold;
   cursor: pointer;
@@ -16,7 +16,6 @@ li.collaborator:hover {
 p.text {
   font-family: Chicago;
   font-size: 1em;
-  color: gray;
 }
 
 .number {
@@ -29,7 +28,6 @@ p.text {
   overflow: visible;
   width: 16px;
   height: 16px;
-  fill: gray;
 }
 
 .hbox {

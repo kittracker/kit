@@ -18,6 +18,12 @@ p.text {
   font-size: 1em;
 }
 
+.navbar {
+  padding: 20px;
+  border: 3px solid black;
+  justify-content: center;
+}
+
 .number {
   width: 16px;
   height: 16px;
@@ -147,7 +153,7 @@ blockquote footer {
 
 .menu-items {
   padding: 10px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* responsive shiz */

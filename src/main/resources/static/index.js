@@ -1,25 +1,100 @@
-window.onload = (event) => {
-    homepage();
+class State {
+    constructor(page, lastPage, id, lastId) {
+        this.page = page;
+        this.lastPage = lastPage;
+        this.id = id;
+        this.lastId = lastId;
+    }
+
+    isInvalid() {
+        return this.page === undefined ||
+               this.lastPage === undefined ||
+               this.id === undefined ||
+               this.lastId === undefined;
+    }
 }
 
-function homepage() {
+const defaultState = new State("homepage", "homepage", -1, -1);
+let state = new State("homepage", "homepage", -1, -1);
+
+window.onload = (_) => {
+    state.page = Cookies.get("kit-page");
+    state.lastPage = Cookies.get("kit-lastPage");
+    state.id = Cookies.get("kit-id");
+    state.lastId = Cookies.get("kit-lastId");
+
+    if (state.isInvalid()) {
+        state.page = defaultState.page;
+        state.lastPage = defaultState.lastPage;
+        state.id = defaultState.id;
+        state.lastId = defaultState.lastId;
+    }
+
+    let id = Number(state.id);
+    switch (state.page) {
+        case "homepage":
+            homepage(id);
+            break;
+
+        case "project":
+            project(id);
+            break;
+
+        case "issue":
+            issue(id);
+            break;
+
+        case "user":
+            user(id);
+            break;
+
+        default:
+            console.error("Invalid cookie set for kit-page");
+            break;
+    }
+}
+
+window.onbeforeunload = (_) => {
+    // Cookies.set("kit-page", String(state.page));
+    // Cookies.set("kit-lastPage", String(state.lastPage));
+    // Cookies.set("kit-id", String(state.id));
+    // Cookies.set("kit-lastId", String(state.lastId));
+}
+
+function navbar() {
+    let bar = "";
+
+    bar += "<ul style='padding: 10px; justify-content: center;' role='menu-bar'>";
+    bar += "<li role='menu-item' tabIndex='0' aria-haspopup='false' onclick='" + state.lastPage + "(" + state.lastId + ")" + "'>BACK</li>";
+    bar += "<li role='menu-item' tabIndex='0' aria-haspopup='false' onclick='homepage(-1)'>PROJECTS</li>";
+    bar += "</ul>";
+
+    return bar;
+}
+
+function homepage(_) {
+    state.lastPage = state.page;
+    state.lastId = state.id;
+    state.page = "homepage";
+    state.id = _;
+
     const callback = (data) => {
         console.log(data);
         let content = "";
 
         content += "<div class='standard-dialog inner-border'>";
         content += "<h1 class='heading center'>Projects</h1>";
-        content += "</div>";
-        content += "<br/>";
-
+        content += navbar();
+        content += "<div class='separator'></div>"
         $.each(data, (_, val) => {
             content += "<div class='standard-dialog item' onclick='project(" + val.id + ")' id='project_" + val.id + "'>";
             content += "<h4>" + val.name + "</h4>";
-            content += "<div class='separator'></div>"
             content += "<p>" + val.description + "</p>";
             content += "</div>";
             content += "<br/>";
         });
+        content += "</div>";
+        content += "<br/>";
 
         document.getElementById("page").innerHTML = content;
     }
@@ -28,6 +103,11 @@ function homepage() {
 }
 
 function project(id) {
+    state.lastPage = state.page;
+    state.lastId = state.id;
+    state.page = "project";
+    state.id = id;
+
     const callback = (data) => {
         console.log(data);
         let content = "";
@@ -38,6 +118,7 @@ function project(id) {
         content += "<div class='standard-dialog'>";
         content += "<h1 class='heading center'>" + data.name + "</h1>";
         content += "<p class='desc center'>" + data.description + "</p>";
+        content += navbar();
         content += "<div class='separator'></div>";
         content += "<br/>";
         $.each(data.issues, (_, val) => {
@@ -86,6 +167,11 @@ function project(id) {
 }
 
 function issue(id) {
+    state.lastPage = state.page;
+    state.lastId = state.id;
+    state.page = "issue";
+    state.id = id;
+
     const callback = (data) => {
         let content = "";
 
@@ -96,6 +182,7 @@ function issue(id) {
         content += "<h1 class='heading center'>" + data.title + "</h1>";
         content += "<p class='desc center'>" + data.description + "</p>";
         content += "<p class='desc center'>" + data.status + "</p>";
+        content += navbar();
         content += "<div class='separator'></div>";
         content += "<br/>";
         $.each(data.comments, (_, val) => {
@@ -133,6 +220,11 @@ function issue(id) {
 }
 
 function user(id) {
+    state.lastPage = state.page;
+    state.lastId = state.id;
+    state.page = "user";
+    state.id = id;
+
     const callback = (data) => {
         console.log(data);
         let content = "";
@@ -140,7 +232,7 @@ function user(id) {
         content += "<div class='standard-dialog'>";
         content += "<h1 class='heading center'>@" + data.username + "</h1>";
         content += "<p class='desc center'>" + data.emailAddress + "</p>";
-        content += "<br/>";
+        content += navbar();
 
         document.getElementById("page").innerHTML = content;
     };

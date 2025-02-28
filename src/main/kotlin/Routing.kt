@@ -4,6 +4,9 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+// TODO: some routes are useless because the same info can be obtained in other ways
+// (e.g. GET /issues/{id}/comments -> GET /issues/{id})
+
 fun Route.projectRoutes() {
     route("/projects") {
         get {

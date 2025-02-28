@@ -31,8 +31,9 @@ p.text {
 }
 
 .hbox {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   height: fit-content;
 }

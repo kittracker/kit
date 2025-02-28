@@ -44,7 +44,7 @@ function project(id) {
             let text = "#" + val.id + " " + val.createdBy.username + " " + val.status;
 
             content += "<blockquote class='item' onclick='issue(" + val.id + ")'>";
-            content += "<h3>" + val.title + "</h3>";
+            content += "<h3 class='center'>" + val.title + "</h3>";
             content += "<div class='hbox'>";
             content += "<p class='dialog-text text'>" + text + "</p>";
             content += "<div style='display: inline-flex; align-items: center; gap: 5px;'>";

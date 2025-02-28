@@ -137,41 +137,10 @@ function user(id) {
         console.log(data);
         let content = "";
 
-        content += "<div class='container'>";
-        content += "<div class='layout'>";
-        // // --- main
         content += "<div class='standard-dialog'>";
         content += "<h1 class='heading center'>@" + data.username + "</h1>";
         content += "<p class='desc center'>" + data.emailAddress + "</p>";
-        // content += "<div class='separator'></div>";
         content += "<br/>";
-        // $.each(data.comments, (_, val) => {
-        //     content += "<blockquote>";
-        //     content += "<h3>@" + val.author.username + "</h3>";
-        //     content += "<p class='dialog-text text'>" + val.text + "</p>";
-        //     content += "</blockquote>";
-        // });
-        // // --- main
-        // content += "</div>";
-        // // --- sidebar
-        // content += "<aside class='window sidebar'>";
-        // content += "<div class='title-bar'>";
-        // content += "<button aria-label='Close' class='close'></button>";
-        // content += "<h1 class='title'>Links</h1>";
-        // content += "<button aria-label='Resize' class='resize'></button>";
-        // content += "</div>";
-        // content += "<div class='window-pane'>";
-        // content += "<ul class='menu-items'>";
-        // $.each(data.links, (_, val) => {
-        //     let link = val.title + " #" + val.id;
-        //     content += "<li class='listItem' onclick='issue(" + val.id + ")'>" + link + "</li>";
-        // });
-        // content += "</ul>";
-        // content += "</div>";
-        // content += "</aside>";
-        // // --- sidebar
-        content += "</div>"
-        content += "</div>";
 
         document.getElementById("page").innerHTML = content;
     };

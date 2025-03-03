@@ -1,7 +1,10 @@
 package edu.kitt.orm.entries
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CommentEntry(
-    val id: Int,
+    var id: Int,
     val author: Int,
     val text: String,
     val issueID: Int,

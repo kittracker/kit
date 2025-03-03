@@ -1,6 +1,9 @@
 package edu.kitt
 
+import edu.kitt.domainmodel.Comment
+import edu.kitt.orm.entries.CommentEntry
 import io.ktor.http.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -97,7 +100,20 @@ fun Route.issueRoutes() {
         }
 
         post("/{id}/comments") {
+            val comment = call.receive<CommentEntry>()
 
+            val issueID = call.parameters["id"]?.toIntOrNull()
+            if (issueID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@post
+            }
+
+            if (commentRepository.createComment(comment) == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to create comment")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.Created, "Created")
         }
 
         put("/{id}/comments") {

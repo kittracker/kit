@@ -1,5 +1,8 @@
 package edu.kitt.orm.entries
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProjectEntry(
     val id: Int,
     val name: String,

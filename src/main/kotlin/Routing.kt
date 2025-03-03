@@ -144,6 +144,34 @@ fun Route.issueRoutes() {
             call.respond(HttpStatusCode.Created, "Edited")
         }
 
+        delete("/{issueID}/comments/{commentID}") {
+            val issueID = call.parameters["issueID"]?.toIntOrNull()
+            if (issueID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@delete
+            }
+
+            val commentID = call.parameters["commentID"]?.toIntOrNull()
+            if (commentID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@delete
+            }
+
+            val comments = commentRepository.getCommentsByIssueID(issueID)
+            val comment = comments.firstOrNull { it.id == commentID }
+            if (comment == null) {
+                call.respond(HttpStatusCode.NotFound, "No matching comment was found")
+                return@delete
+            }
+
+            if (!commentRepository.removeCommentByID(commentID)) {
+                call.respond(HttpStatusCode.NotFound, "Unable to remove comment")
+                return@delete
+            }
+
+            call.respond("Removed")
+        }
+
         post("/{id}/links") {
 
         }

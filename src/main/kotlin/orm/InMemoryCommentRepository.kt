@@ -11,6 +11,10 @@ class InMemoryCommentRepository : CommentRepository {
         CommentEntry(3, 3, "this is a comment", 1),
     )
 
+    override fun removeCommentByID(id: Int): Boolean {
+        return comments.removeIf { it.id == id }
+    }
+
     override fun getCommentsByIssueID(id: Int): List<Comment> {
         return comments.filter { it.issueID == id }.map {
             val user = userRepository.getUserByID(it.author);

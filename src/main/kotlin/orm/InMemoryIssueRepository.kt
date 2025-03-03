@@ -25,7 +25,7 @@ class InMemoryIssueRepository : IssueRepository {
     override fun getIssuesByProjectID(id: Int): List<Issue> {
         return issues.filter { it.projectID == id }.map {
             // FIXME: this can throw
-            issueRepository.getIssueByID(it.id)!!
+            issueRepository.getIssueByID(it.id!!)!!
         }
     }
 
@@ -33,7 +33,7 @@ class InMemoryIssueRepository : IssueRepository {
         val issueEntry = issues.firstOrNull { it.id == id }
         if (issueEntry == null) return null
         return Issue(
-            issueEntry.id,
+            issueEntry.id!!,
             issueEntry.title,
             issueEntry.description,
             issueEntry.status,
@@ -52,6 +52,6 @@ class InMemoryIssueRepository : IssueRepository {
     }
 
     override fun getAllIssues() : List<Issue> {
-        return issues.map { issueRepository.getIssueByID(it.id)!! }
+        return issues.map { issueRepository.getIssueByID(it.id!!)!! }
     }
 }

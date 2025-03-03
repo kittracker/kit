@@ -31,7 +31,7 @@ class InMemoryProjectRepository : ProjectRepository {
         val projectEntry = projects.firstOrNull { it.id == id }
         if (projectEntry == null) return null
         return Project(
-            projectEntry.id,
+            projectEntry.id!!,
             projectEntry.name,
             projectEntry.description,
             projectEntry.archived,
@@ -45,11 +45,11 @@ class InMemoryProjectRepository : ProjectRepository {
     override fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return projectCollaborators.filter { it.projectID == projectId }.map {
             // FIXME: this can throw
-            userRepository.getUserByID(it.userID)!!
+            userRepository.getUserByID(it.userID!!)!!
         }
     }
 
     override fun getAllProjects(): List<Project> {
-        return projects.map { projectRepository.getProjectByID(it.id)!! }
+        return projects.map { projectRepository.getProjectByID(it.id!!)!! }
     }
 }

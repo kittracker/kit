@@ -1,10 +1,11 @@
 package edu.kitt.orm.entries
 
+import com.typesafe.config.Optional
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserEntry(
-    val id: Int,
+    @Optional val id: Int? = null,
     val emailAddress: String,
     val username: String
 )

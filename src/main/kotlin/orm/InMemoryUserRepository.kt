@@ -14,13 +14,13 @@ class InMemoryUserRepository : UserRepository {
         val userEntry = users.firstOrNull { it.id == uid }
         if (userEntry == null) return null
         return User(
-            userEntry.id,
+            userEntry.id!!,
             userEntry.emailAddress,
             userEntry.username,
         )
     }
 
     override fun getAllUsers(): List<User> {
-        return users.map { User(it.id, it.emailAddress, it.username) }
+        return users.map { User(it.id!!, it.emailAddress, it.username) }
     }
 }

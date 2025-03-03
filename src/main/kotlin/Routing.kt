@@ -88,17 +88,6 @@ fun Route.issueRoutes() {
 
         }
 
-        get("/{id}/comments") {
-            val issueID = call.parameters["id"]?.toIntOrNull()
-            if (issueID == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
-                return@get
-            }
-
-            val comments = commentRepository.getCommentsByIssueID(issueID)
-            call.respond(comments)
-        }
-
         post("/{id}/comments") {
             val comment = call.receive<CommentEntry>()
 
@@ -177,6 +166,22 @@ fun Route.issueRoutes() {
         }
 
         put("/{id}/links") {
+
+        }
+    }
+}
+
+fun Route.commentRoutes() {
+    route("/comments") {
+        post {
+
+        }
+
+        put {
+
+        }
+
+        delete("/{id}") {
 
         }
     }

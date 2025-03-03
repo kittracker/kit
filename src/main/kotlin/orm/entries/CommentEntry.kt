@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class CommentEntry(
     var id: Int,
     val author: Int,
-    val text: String,
+    var text: String,
     val issueID: Int,
 )
 

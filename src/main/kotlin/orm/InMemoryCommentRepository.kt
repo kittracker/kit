@@ -3,7 +3,6 @@ package edu.kitt.orm
 import edu.kitt.domainmodel.Comment
 import edu.kitt.orm.entries.CommentEntry
 import edu.kitt.userRepository
-import kotlinx.coroutines.processNextEventInCurrentThread
 
 class InMemoryCommentRepository : CommentRepository {
     private val comments = mutableListOf(
@@ -22,7 +21,7 @@ class InMemoryCommentRepository : CommentRepository {
 
     override fun getCommentsByUserID(id: Int): List<Comment> {
         return comments.filter { it.author == id }.map {
-            val user = userRepository.getUserByID(it.id);
+            val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
             Comment(it.id, user!!, it.text)
         }
@@ -34,5 +33,11 @@ class InMemoryCommentRepository : CommentRepository {
             return Comment(comment.id, userRepository.getUserByID(comment.author)!!, comment.text)
         }
         return null
+    }
+
+    override fun editComment(comment: CommentEntry): Comment? {
+        val stored = comments.find { it.id == comment.id && it.issueID == comment.issueID } ?: return null
+        stored.text = comment.text
+        return Comment(stored.id, userRepository.getUserByID(stored.author)!!, comment.text)
     }
 }

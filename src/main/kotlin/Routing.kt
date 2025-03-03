@@ -116,8 +116,32 @@ fun Route.issueRoutes() {
             call.respond(HttpStatusCode.Created, "Created")
         }
 
-        put("/{id}/comments") {
+        put("/{issueID}/comments/{commentID}") {
+            val comment = call.receive<CommentEntry>()
 
+            val issueID = call.parameters["issueID"]?.toIntOrNull()
+            if (issueID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@put
+            }
+
+            val commentID = call.parameters["commentID"]?.toIntOrNull()
+            if (commentID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@put
+            }
+
+            if (comment.id != commentID || comment.issueID != issueID) {
+                call.respond(HttpStatusCode.BadRequest, "Comment must be consistent with its URL")
+                return@put
+            }
+
+            if (commentRepository.editComment(comment) == null) {
+                call.respond(HttpStatusCode.NotFound, "Comment requested not found")
+                return@put
+            }
+
+            call.respond(HttpStatusCode.Created, "Edited")
         }
 
         post("/{id}/links") {

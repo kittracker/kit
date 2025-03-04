@@ -1,7 +1,7 @@
 package edu.kitt
 
-import edu.kitt.domainmodel.Comment
 import edu.kitt.orm.entries.CommentEntry
+import edu.kitt.orm.entries.IssueEntry
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -61,7 +61,14 @@ fun Route.issueRoutes() {
         }
 
         post {
+            val issue = call.receive<IssueEntry>()
+            val created = issueRepository.createIssue(issue)
+            if (created == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to create issue")
+                return@post
+            }
 
+            call.respond(HttpStatusCode.Created, created)
         }
 
         get("/{id}") {
@@ -80,80 +87,26 @@ fun Route.issueRoutes() {
             call.respond(issue)
         }
 
-        put("/{id}") {
+        put {
+            val entry = call.receive<IssueEntry>()
 
+            val edited = issueRepository.editIssue(entry)
+            if (edited == null) {
+                call.respond(HttpStatusCode.NotFound, "Issue not found")
+                return@put
+            }
+
+            call.respond(edited)
         }
 
         delete("/{id}") {
-
-        }
-
-        post("/{id}/comments") {
-            val comment = call.receive<CommentEntry>()
-
-            val issueID = call.parameters["id"]?.toIntOrNull()
-            if (issueID == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
-                return@post
-            }
-
-            if (commentRepository.createComment(comment) == null) {
-                call.respond(HttpStatusCode.InternalServerError, "Failed to create comment")
-                return@post
-            }
-
-            call.respond(HttpStatusCode.Created, "Created")
-        }
-
-        put("/{issueID}/comments/{commentID}") {
-            val comment = call.receive<CommentEntry>()
-
-            val issueID = call.parameters["issueID"]?.toIntOrNull()
-            if (issueID == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
-                return@put
-            }
-
-            val commentID = call.parameters["commentID"]?.toIntOrNull()
-            if (commentID == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
-                return@put
-            }
-
-            if (comment.id != commentID || comment.issueID != issueID) {
-                call.respond(HttpStatusCode.BadRequest, "Comment must be consistent with its URL")
-                return@put
-            }
-
-            if (commentRepository.editComment(comment) == null) {
-                call.respond(HttpStatusCode.NotFound, "Comment requested not found")
-                return@put
-            }
-
-            call.respond(HttpStatusCode.Created, "Edited")
-        }
-
-        delete("/{issueID}/comments/{commentID}") {
-            val issueID = call.parameters["issueID"]?.toIntOrNull()
-            if (issueID == null) {
+            val id = call.parameters["id"]?.toIntOrNull()
+            if (id == null) {
                 call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
                 return@delete
             }
 
-            val commentID = call.parameters["commentID"]?.toIntOrNull()
-            if (commentID == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
-                return@delete
-            }
-
-            val comments = commentRepository.getCommentsByIssueID(issueID)
-            val comment = comments.firstOrNull { it.id == commentID }
-            if (comment == null) {
-                call.respond(HttpStatusCode.NotFound, "No matching comment was found")
-                return@delete
-            }
-
-            if (!commentRepository.removeCommentByID(commentID)) {
+            if (!issueRepository.deleteIssue(id)) {
                 call.respond(HttpStatusCode.NotFound, "Unable to remove comment")
                 return@delete
             }
@@ -174,15 +127,42 @@ fun Route.issueRoutes() {
 fun Route.commentRoutes() {
     route("/comments") {
         post {
+            val comment = call.receive<CommentEntry>()
 
+            val created = commentRepository.createComment(comment)
+            if (created == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to create comment")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.Created, created)
         }
 
         put {
+            val comment = call.receive<CommentEntry>()
 
+            val edited = commentRepository.editComment(comment)
+            if (edited == null) {
+                call.respond(HttpStatusCode.NotFound, "Comment requested not found")
+                return@put
+            }
+
+            call.respond(edited)
         }
 
         delete("/{id}") {
+            val commentID = call.parameters["id"]?.toIntOrNull()
+            if (commentID == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@delete
+            }
 
+            if (!commentRepository.removeCommentByID(commentID)) {
+                call.respond(HttpStatusCode.NotFound, "Unable to remove comment")
+                return@delete
+            }
+
+            call.respond("Removed")
         }
     }
 }

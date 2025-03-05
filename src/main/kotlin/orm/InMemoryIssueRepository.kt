@@ -7,6 +7,7 @@ import edu.kitt.domainmodel.IssueStatus
 import edu.kitt.issueRepository
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.entries.IssueLinkEntry
+import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.userRepository
 
 class InMemoryIssueRepository : IssueRepository {
@@ -22,10 +23,17 @@ class InMemoryIssueRepository : IssueRepository {
         IssueEntry(3, "title", "description", IssueStatus.OPEN, 3, 1),
     )
 
-    override fun createIssue(issue: IssueEntry): Issue? {
-        issue.id = issues.last().id?.plus(1) ?: 1
-        issues.add(issue)
-        return getIssueByID(issue.id!!)
+    override fun createIssue(issue: IssueEntryRequest): Issue? {
+        val new = IssueEntry(
+            id = issues.last().id + 1,
+            title = issue.title ?: return null,
+            description = issue.description ?: return null,
+            status = IssueStatus.OPEN,
+            createdBy = issue.createdBy ?: return null,
+            projectID = issue.projectID ?: return null
+        )
+        issues.add(new)
+        return getIssueByID(new.id)
     }
 
     override fun getIssuesByProjectID(id: Int): List<Issue> {
@@ -61,18 +69,19 @@ class InMemoryIssueRepository : IssueRepository {
         return issues.map { issueRepository.getIssueByID(it.id!!)!! }
     }
 
-    override fun editIssue(issue: IssueEntry): Issue? {
+    override fun editIssue(issue: IssueEntryRequest): Issue? {
         val stored = issues.find { it.id == issue.id } ?: return null
-        val new = IssueEntry(
-            stored.id!!,
-            issue.title,
-            issue.description,
-            issue.status,
-            stored.createdBy,
-            stored.projectID,
+        val edited = stored.copy(
+            title = issue.title ?: stored.title,
+            description = issue.description ?: stored.description,
+            status = issue.status ?: stored.status,
         )
-        issues.replaceAll { if (it.id == issue.id) new else it }
-        return getIssueByID(stored.id!!)
+
+        // this moves the edited entry at the bottom, use index if its a problem
+        issues.remove(stored)
+        issues.add(edited)
+
+        return getIssueByID(edited.id)
     }
 
     override fun deleteIssue(id: Int): Boolean {

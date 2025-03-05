@@ -4,8 +4,7 @@ import com.typesafe.config.Optional
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserEntry(
-    @Optional val id: Int? = null,
-    val emailAddress: String,
-    val username: String
+data class CollaboratorEntry(
+    val userID: Int,
+    val projectID: Int,
 )

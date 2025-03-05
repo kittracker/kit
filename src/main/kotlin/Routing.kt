@@ -2,6 +2,9 @@ package edu.kitt
 
 import edu.kitt.orm.entries.CommentEntry
 import edu.kitt.orm.entries.IssueEntry
+import edu.kitt.orm.requests.CommentEntryRequest
+import edu.kitt.orm.requests.IssueEntryRequest
+import edu.kitt.orm.requests.IssueLinkEntryRequest
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -61,7 +64,7 @@ fun Route.issueRoutes() {
         }
 
         post {
-            val issue = call.receive<IssueEntry>()
+            val issue = call.receive<IssueEntryRequest>()
             val created = issueRepository.createIssue(issue)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to create issue")
@@ -88,7 +91,7 @@ fun Route.issueRoutes() {
         }
 
         put {
-            val entry = call.receive<IssueEntry>()
+            val entry = call.receive<IssueEntryRequest>()
 
             val edited = issueRepository.editIssue(entry)
             if (edited == null) {
@@ -127,7 +130,7 @@ fun Route.issueRoutes() {
 fun Route.commentRoutes() {
     route("/comments") {
         post {
-            val comment = call.receive<CommentEntry>()
+            val comment = call.receive<CommentEntryRequest>()
 
             val created = commentRepository.createComment(comment)
             if (created == null) {
@@ -139,7 +142,7 @@ fun Route.commentRoutes() {
         }
 
         put {
-            val comment = call.receive<CommentEntry>()
+            val comment = call.receive<CommentEntryRequest>()
 
             val edited = commentRepository.editComment(comment)
             if (edited == null) {

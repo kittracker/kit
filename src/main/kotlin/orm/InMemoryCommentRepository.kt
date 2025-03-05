@@ -2,6 +2,7 @@ package edu.kitt.orm
 
 import edu.kitt.domainmodel.Comment
 import edu.kitt.orm.entries.CommentEntry
+import edu.kitt.orm.requests.CommentEntryRequest
 import edu.kitt.userRepository
 
 class InMemoryCommentRepository : CommentRepository {
@@ -19,7 +20,7 @@ class InMemoryCommentRepository : CommentRepository {
         return comments.filter { it.issueID == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
-            Comment(it.id!!, user!!, it.text)
+            Comment(it.id, user!!, it.text)
         }
     }
 
@@ -27,21 +28,34 @@ class InMemoryCommentRepository : CommentRepository {
         return comments.filter { it.author == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
-            Comment(it.id!!, user!!, it.text)
+            Comment(it.id, user!!, it.text)
         }
     }
 
-    override fun createComment(comment: CommentEntry): Comment? {
-        comment.id = comments.last().id!! + 1
-        if (comments.add(comment)) {
-            return Comment(comment.id!!, userRepository.getUserByID(comment.author)!!, comment.text)
+    override fun createComment(comment: CommentEntryRequest): Comment? {
+        val new = CommentEntry(
+            id = comments.last().id + 1,
+            author = comment.author?: return null,
+            text = comment.text?: return null,
+            issueID = comment.issueID?: return null
+        )
+
+        if (comments.add(new)) {
+            return Comment(new.id, userRepository.getUserByID(new.author)!!, new.text)
         }
         return null
     }
 
-    override fun editComment(comment: CommentEntry): Comment? {
+    override fun editComment(comment: CommentEntryRequest): Comment? {
         val stored = comments.find { it.id == comment.id && it.issueID == comment.issueID } ?: return null
-        stored.text = comment.text
-        return Comment(stored.id!!, userRepository.getUserByID(stored.author)!!, comment.text)
+        val edited = stored.copy(
+            text = comment.text ?: stored.text
+        )
+
+        // this moves the edited entry at the bottom, use index if its a problem
+        comments.remove(stored)
+        comments.add(edited)
+
+        return Comment(edited.id, userRepository.getUserByID(edited.author)!!, edited.text)
     }
 }

@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class IssueEntry(
-    @Optional var id: Int? = null,
+    val id: Int,
     val title: String,
     val description: String,
-    @Optional val status: IssueStatus = IssueStatus.OPEN,
+    val status: IssueStatus = IssueStatus.OPEN,
     val createdBy: Int,
     val projectID: Int,
 )

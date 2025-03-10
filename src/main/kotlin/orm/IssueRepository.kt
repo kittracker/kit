@@ -13,4 +13,5 @@ interface IssueRepository {
     fun getAllIssues() : List<Issue>
     fun editIssue(issue: IssueEntryRequest): Issue?
     fun deleteIssue(id: Int): Boolean
+    fun linkIssues(issueID: Int, linkedIssueID: Int): IssueLink?
 }

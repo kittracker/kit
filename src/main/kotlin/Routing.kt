@@ -116,12 +116,16 @@ fun Route.issueRoutes() {
 
             call.respond("Removed")
         }
+    }
+}
 
-        post("/{id}/links") {
+fun Route.linkRoutes() {
+    route("/links") {
+        post {
 
         }
 
-        put("/{id}/links") {
+        put {
 
         }
     }

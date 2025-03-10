@@ -91,4 +91,16 @@ class InMemoryIssueRepository : IssueRepository {
         }
         return issues.removeIf { it.id == id }
     }
+
+    override fun linkIssues(issueID: Int, linkedIssueID: Int): IssueLink? {
+        if (issues.none { it.id == linkedIssueID }) return null
+        if (issueLinks.any { it.linker == issueID && it.linked == linkedIssueID }) return null //TODO: avoid duplicates
+
+        val new = IssueLinkEntry(
+            linker = issueID,
+            linked = linkedIssueID,
+        )
+         issueLinks.add(new)
+        return IssueLink(new.linked, issues.first { it.id == new.linked }.title)
+    }
 }

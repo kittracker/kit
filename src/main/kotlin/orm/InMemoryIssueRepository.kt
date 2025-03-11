@@ -79,8 +79,7 @@ class InMemoryIssueRepository : IssueRepository {
         )
 
         val index = issues.indexOf(stored)
-        issues.remove(stored)
-        issues.add(index, edited)
+        issues[index] = edited
 
         return getIssueByID(edited.id)
     }

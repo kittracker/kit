@@ -31,6 +31,7 @@ fun Application.module() {
         userRoutes()
         issueRoutes()
         commentRoutes()
+        linkRoutes()
 
         // TODO: switch these lines at the end of development
         staticFiles("/", File("src/main/resources/static"))

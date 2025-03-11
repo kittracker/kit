@@ -28,10 +28,13 @@ fun Application.module() {
 
     routing {
         projectRoutes()
-        userRoutes()
+        collaboratorRoutes()
+
         issueRoutes()
         commentRoutes()
         linkRoutes()
+
+        userRoutes()
 
         // TODO: switch these lines at the end of development
         staticFiles("/", File("src/main/resources/static"))

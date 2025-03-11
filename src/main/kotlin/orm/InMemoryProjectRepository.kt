@@ -1,5 +1,6 @@
 package edu.kitt.orm
 
+import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
 import edu.kitt.issueRepository
@@ -46,7 +47,7 @@ class InMemoryProjectRepository : ProjectRepository {
     override fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return projectCollaborators.filter { it.projectID == projectId }.map {
             // FIXME: this can throw
-            userRepository.getUserByID(it.userID!!)!!
+            userRepository.getUserByID(it.userID)!!
         }
     }
 
@@ -84,6 +85,31 @@ class InMemoryProjectRepository : ProjectRepository {
         issueRepository.getIssuesByProjectID(id).forEach {
             issueRepository.deleteIssue(it.id)      // TODO: add method to issueRepository
         }
+        projectCollaborators.removeIf { it.projectID == id }
         return projects.removeIf { it.id == id }
+    }
+
+    override fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User? {
+        if (projects.none { it.id == collaborator.projectID }) return null
+
+        val existentCollaborator = projectCollaborators.find {
+            it.projectID == collaborator.projectID && it.userID == collaborator.userID
+        }
+        if (existentCollaborator != null) return userRepository.getUserByID(collaborator.userID)
+
+        if (userRepository.getUserByID(collaborator.userID) == null) return null
+
+        val new = CollaboratorEntry(
+            userID = collaborator.userID,
+            projectID = collaborator.projectID,
+        )
+        projectCollaborators.add(new)
+        // Asserting here is useless because the return type is the same, but technically
+        // it should never return null at this point
+        return userRepository.getUserByID(collaborator.userID)!!
+    }
+
+    override fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean {
+        return projectCollaborators.removeIf { it.userID == collaborator.userID && it.projectID == collaborator.projectID }
     }
 }

@@ -1,5 +1,6 @@
 package edu.kitt
 
+import CollaboratorEntryRequest
 import edu.kitt.orm.requests.CommentEntryRequest
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
@@ -68,13 +69,30 @@ fun Route.projectRoutes() {
 
             call.respond("Removed")
         }
+    }
+}
 
-        post("/{id}/collaborators") {
+fun Route.collaboratorRoutes() {
+    route("/collaborators") {
+        post {
+            val collaborator = call.receive<CollaboratorEntryRequest>()
+            val created = projectRepository.addCollaboratorToProject(collaborator)
+            if (created == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to add collaborator to project")
+                return@post
+            }
 
+            call.respond(HttpStatusCode.Created, created)
         }
 
-        put("/{id}/archive") {
+        delete {
+            val collaborator = call.receive<CollaboratorEntryRequest>()
+            if (!projectRepository.removeCollaboratorToProject(collaborator)) {
+                call.respond(HttpStatusCode.NotFound, "Project not found")
+                return@delete
+            }
 
+            call.respond("Removed")
         }
     }
 }

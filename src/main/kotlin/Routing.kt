@@ -3,6 +3,7 @@ package edu.kitt
 import edu.kitt.orm.requests.CommentEntryRequest
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
+import edu.kitt.orm.requests.ProjectEntryRequest
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -12,10 +13,6 @@ fun Route.projectRoutes() {
     route("/projects") {
         get {
             call.respond(projectRepository.getAllProjects())
-        }
-
-        post {
-
         }
 
         get("/{id}") {
@@ -34,12 +31,42 @@ fun Route.projectRoutes() {
             call.respond(project)
         }
 
-        put("/{id}") {
+        post {
+            val project = call.receive<ProjectEntryRequest>()
+            val created = projectRepository.createProject(project)
+            if (created == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to create project")
+                return@post
+            }
 
+            call.respond(HttpStatusCode.Created, created)
+        }
+
+        put {
+            val entry = call.receive<ProjectEntryRequest>()
+
+            val edited = projectRepository.editProject(entry)
+            if (edited == null) {
+                call.respond(HttpStatusCode.NotFound, "Project not found")
+                return@put
+            }
+
+            call.respond(edited)
         }
 
         delete("/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest, "ID must be an integer")
+                return@delete
+            }
 
+            if (!projectRepository.deleteProject(id)) {
+                call.respond(HttpStatusCode.NotFound, "Unable to remove project")
+                return@delete
+            }
+
+            call.respond("Removed")
         }
 
         post("/{id}/collaborators") {

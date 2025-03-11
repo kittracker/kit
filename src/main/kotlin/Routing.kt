@@ -1,7 +1,5 @@
 package edu.kitt
 
-import edu.kitt.orm.entries.CommentEntry
-import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.requests.CommentEntryRequest
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
@@ -9,9 +7,6 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-
-// TODO: some routes are useless because the same info can be obtained in other ways
-// (e.g. GET /issues/{id}/comments -> GET /issues/{id})
 
 fun Route.projectRoutes() {
     route("/projects") {
@@ -122,11 +117,25 @@ fun Route.issueRoutes() {
 fun Route.linkRoutes() {
     route("/links") {
         post {
+            val link = call.receive<IssueLinkEntryRequest>()
 
+            val created = issueRepository.linkIssues(link)
+            if (created == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to create link")
+                return@post
+            }
+
+            call.respond(HttpStatusCode.Created, created)
         }
 
         delete {
+            val link = call.receive<IssueLinkEntryRequest>()
+            if (!issueRepository.deleteLink(link)) {
+                call.respond(HttpStatusCode.NotFound, "Unable to remove link")
+                return@delete
+            }
 
+            call.respond("Removed")
         }
     }
 }

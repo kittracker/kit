@@ -47,7 +47,7 @@ class InMemoryIssueRepository : IssueRepository {
         val issueEntry = issues.firstOrNull { it.id == id }
         if (issueEntry == null) return null
         return Issue(
-            issueEntry.id!!,
+            issueEntry.id,
             issueEntry.title,
             issueEntry.description,
             issueEntry.status,
@@ -94,13 +94,22 @@ class InMemoryIssueRepository : IssueRepository {
 
     override fun linkIssues(issueID: Int, linkedIssueID: Int): IssueLink? {
         if (issues.none { it.id == linkedIssueID }) return null
-        if (issueLinks.any { it.linker == issueID && it.linked == linkedIssueID }) return null //TODO: avoid duplicates
+        val link = issueLinks.find { it.linker == issueID && it.linked == linkedIssueID }
+        if (link != null) {
+            // Asserting the existence of the issue because of the previous checks
+            val issue = getIssueByID(linkedIssueID)!!
+            return IssueLink(
+                id = issue.id,
+                title = issue.title,
+            )
+        }
 
         val new = IssueLinkEntry(
             linker = issueID,
             linked = linkedIssueID,
         )
-         issueLinks.add(new)
-        return IssueLink(new.linked, issues.first { it.id == new.linked }.title)
+        issueLinks.add(new)
+        // Asserting the existence of the issue because of the previous checks
+        return IssueLink(new.linked, getIssueByID(new.linked)!!.title)
     }
 }

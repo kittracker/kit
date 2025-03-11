@@ -125,7 +125,7 @@ fun Route.linkRoutes() {
 
         }
 
-        put {
+        delete {
 
         }
     }

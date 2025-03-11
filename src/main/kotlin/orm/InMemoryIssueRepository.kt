@@ -8,6 +8,7 @@ import edu.kitt.issueRepository
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.entries.IssueLinkEntry
 import edu.kitt.orm.requests.IssueEntryRequest
+import edu.kitt.orm.requests.IssueLinkEntryRequest
 import edu.kitt.userRepository
 
 class InMemoryIssueRepository : IssueRepository {
@@ -92,12 +93,12 @@ class InMemoryIssueRepository : IssueRepository {
         return issues.removeIf { it.id == id }
     }
 
-    override fun linkIssues(issueID: Int, linkedIssueID: Int): IssueLink? {
-        if (issues.none { it.id == linkedIssueID }) return null
-        val link = issueLinks.find { it.linker == issueID && it.linked == linkedIssueID }
-        if (link != null) {
+    override fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
+        if (issues.none { it.id == link.linked }) return null
+        val existentLink = issueLinks.find { it.linker == link.linker && it.linked == link.linked }
+        if (existentLink != null) {
             // Asserting the existence of the issue because of the previous checks
-            val issue = getIssueByID(linkedIssueID)!!
+            val issue = getIssueByID(link.linked)!!
             return IssueLink(
                 id = issue.id,
                 title = issue.title,
@@ -105,11 +106,15 @@ class InMemoryIssueRepository : IssueRepository {
         }
 
         val new = IssueLinkEntry(
-            linker = issueID,
-            linked = linkedIssueID,
+            linker = link.linker,
+            linked = link.linked,
         )
         issueLinks.add(new)
         // Asserting the existence of the issue because of the previous checks
         return IssueLink(new.linked, getIssueByID(new.linked)!!.title)
+    }
+
+    override fun deleteLink(link: IssueLinkEntryRequest): Boolean {
+        return issueLinks.removeIf { it.linker == link.linker && it.linked == link.linked }
     }
 }

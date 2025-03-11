@@ -4,6 +4,7 @@ import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.requests.IssueEntryRequest
+import edu.kitt.orm.requests.IssueLinkEntryRequest
 
 interface IssueRepository {
     fun createIssue(issue: IssueEntryRequest): Issue?
@@ -13,5 +14,6 @@ interface IssueRepository {
     fun getAllIssues() : List<Issue>
     fun editIssue(issue: IssueEntryRequest): Issue?
     fun deleteIssue(id: Int): Boolean
-    fun linkIssues(issueID: Int, linkedIssueID: Int): IssueLink?
+    fun linkIssues(link: IssueLinkEntryRequest): IssueLink?
+    fun deleteLink(link: IssueLinkEntryRequest): Boolean
 }

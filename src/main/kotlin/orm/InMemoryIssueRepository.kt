@@ -66,7 +66,7 @@ class InMemoryIssueRepository : IssueRepository {
     }
 
     override fun getAllIssues() : List<Issue> {
-        return issues.map { issueRepository.getIssueByID(it.id!!)!! }
+        return issues.map { issueRepository.getIssueByID(it.id)!! }
     }
 
     override fun editIssue(issue: IssueEntryRequest): Issue? {
@@ -77,9 +77,9 @@ class InMemoryIssueRepository : IssueRepository {
             status = issue.status ?: stored.status,
         )
 
-        // this moves the edited entry at the bottom, use index if its a problem
+        val index = issues.indexOf(stored)
         issues.remove(stored)
-        issues.add(edited)
+        issues.add(index, edited)
 
         return getIssueByID(edited.id)
     }

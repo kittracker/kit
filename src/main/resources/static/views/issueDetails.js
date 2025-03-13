@@ -1,6 +1,12 @@
 export default async ({ id }) => {
-    const response = await fetch(`/issues/${id}`);
-    if (!response.ok) return `<h2>Issue not found</h2>`;
+    const response = await fetch(`/api/issues/${id}`);
+    if (!response.ok) {
+        return `
+            <div class="text-center">
+                <h2>Issue Not Found</h2>
+            </div>
+        `;
+    }
 
     const issue = await response.json();
 
@@ -15,34 +21,45 @@ export default async ({ id }) => {
     };
 
     return `
-        <div class="container mt-5">
-            <h1>${issue.title}</h1>
-            <p>${issue.description}</p>
+        <div class="d-flex container-fluid mt-5">
+            <div class="container-fluid h-100">
+                <div class="text-center">
+                    <h1>${issue.title}</h1>
+                    <br /> <br />
+                    <p>${issue.description}</p>
+                    <br />
+                    <p>${getStatusBadge(issue.status)}</p>
+                    <br />
+                    <p>@${issue.createdBy.username}</p>
+                </div>
+                
+                <br /> <br />
             
-            <p><strong>Status:</strong> ${getStatusBadge(issue.status)}</p>
-            <p><strong>Created by:</strong> ${issue.createdBy.username} (${issue.createdBy.emailAddress})</p>
-
-            <h4 class="mt-4">Comments</h4>
-            ${issue.comments.length > 0 ? `
-                <ul class="list-group">
-                    ${issue.comments.map(comment => `
-                        <li class="list-group-item">
-                            <strong>${comment.author.username}:</strong> ${comment.text}
-                        </li>
-                    `).join("")}
-                </ul>
-            ` : `<p>No comments yet.</p>`}
-
-            <h4 class="mt-4">Related Issues</h4>
-            ${issue.links.length > 0 ? `
-                <ul class="list-group">
+                ${issue.comments.length > 0 ? `
+                    <ul class="list-group text-center scrollarea">
+                        ${issue.comments.map(comment => `
+                            <li class="list-group-item">
+                                <strong>@${comment.author.username}</strong>
+                                <br /> <br />
+                                <p>${comment.text}</p>
+                            </li>
+                        `).join("")}
+                    </ul>
+                ` : `<div class="text-center"> <b>No Comments Yet</b> </div>` }
+            </div>
+            
+            <div class="d-flex flex-column align-items-stretch flex-shrink-0 h-100" style="width: 380px;">
+                <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+                    <span class="fs-5 fw-semibold">Related Issues</span>
+                </a>
+                <div class="list-group list-group-flush border-bottom scrollarea">
                     ${issue.links.map(link => `
-                        <li class="list-group-item"><a href="/issues/${link.id}" data-link>#${link.id} ${link.title}</a></li>
+                        <a href="/issues/${link.id}" class="list-group-item list-group-item-action py-3 lh-sm" data-link>
+                            <div class="col-10 mb-1 small"><b>#${link.id} ${link.title}</b></div>
+                        </a>
                     `).join("")}
-                </ul>
-            ` : `<p>No links available.</p>`}
-
-            <a href="/projects" data-link class="btn btn-secondary mt-3">Back to Projects</a>
+                </div>
+            </div>
         </div>
     `;
 }

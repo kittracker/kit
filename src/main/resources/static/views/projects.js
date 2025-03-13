@@ -1,15 +1,16 @@
 export default async ()=> {
-    const response = await fetch("/projects", { method: "GET" });
+    const response = await fetch("/api/projects", { method: "GET" });
     const projects = await response.json();
 
     return `
-        <div class="container mt-5">
-            <h1 class="mb-4">Projects</h1>
+        <div class="container-fluid mt-5">
             <ul class="list-group">
                 ${projects.map(project => `
                     <li class="list-group-item">
-                        <h5>${project.name}</h5>
+                        <h4>${project.name}</h4>
+                        <br />
                         <p>${project.description}</p>
+                        <br />
                         <a href="/projects/${project.id}" data-link class="btn btn-primary">View Details</a>
                     </li>
                 `).join("")}

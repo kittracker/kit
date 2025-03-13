@@ -45,10 +45,19 @@ async function router() {
 
     if (matched) {
         document.title = matched.route.title;
-        app.innerHTML = "<h2>Loading...</h2>"; // Show loading state
+        // Show loading state
+        app.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border" role="status"></div>
+            </div>
+        `;
         app.innerHTML = await matched.route.render(matched.params); // Pass params to render
     } else {
-        app.innerHTML = "<h2>404 - Page Not Found</h2>";
+        app.innerHTML = `
+            <div class="text-center">
+                <h2>404 - Page Not Found</h2>
+            </div>
+        `;
     }
 }
 

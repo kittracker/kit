@@ -1,5 +1,5 @@
 export default async () => {
-    const response = await fetch("/users", { method: "GET" }); // Corrected fetch
+    const response = await fetch("/api/users", { method: "GET" }); // Corrected fetch
     const users = await response.json(); // Parse JSON response
 
     console.log(users); // Debugging output

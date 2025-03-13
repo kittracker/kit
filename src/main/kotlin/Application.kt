@@ -27,14 +27,16 @@ fun Application.module() {
     }
 
     routing {
-        projectRoutes()
-        collaboratorRoutes()
+        route("/api") {
+            projectRoutes()
+            collaboratorRoutes()
 
-        issueRoutes()
-        commentRoutes()
-        linkRoutes()
+            issueRoutes()
+            commentRoutes()
+            linkRoutes()
 
-        userRoutes()
+            userRoutes()
+        }
 
         // TODO: switch these lines at the end of development
         // staticFiles("/", File("src/main/resources/static"))

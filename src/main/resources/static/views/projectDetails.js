@@ -1,6 +1,12 @@
-export default async ({ id })=> {
-    const response = await fetch(`/projects/${id}`);
-    if (!response.ok) return `<h2>Project not found</h2>`;
+export default async ({id}) => {
+    const response = await fetch(`/api/projects/${id}`);
+    if (!response.ok) {
+        return `
+            <div class="text-center">
+                <h2>Project Not Found</h2>
+            </div>
+        `;
+    }
 
     const project = await response.json();
 
@@ -15,37 +21,45 @@ export default async ({ id })=> {
     };
 
     return `
-        <div class="container mt-5">
-            <h1>${project.name}</h1>
-            <p>${project.description}</p>
+        <div class="d-flex container-fluid mt-5">
+            <div class="container-fluid h-100">
+                <div class="text-center">
+                    <h1>${project.name}</h1>
+                    <br /> <br />
+                    <h6>${project.description}</h6>
+                </div>
+                
+                <br /> <br />
 
-            <h4>Owner</h4>
-            <p>${project.owner.username} (${project.owner.emailAddress})</p>
-
-            <h4>Collaborators</h4>
-            <ul class="list-group">
-                ${project.collaborators.map(user => `
-                    <li class="list-group-item">${user.username} (${user.emailAddress})</li>
-                `).join("")}
-            </ul>
-
-            <h4 class="mt-4">Issues</h4>
-            ${project.issues.length > 0 ? `
-                <ul class="list-group">
-                    ${project.issues.map(issue => `
-                        <li class="list-group-item">
-                            <h5><a href="/issues/${issue.id}" data-link>${issue.title}</a></h5>
-                            <p>${issue.description}</p>
-                            <p><strong>Status:</strong> ${getStatusBadge(issue.status)}</p>
-                            <p><strong>Created by:</strong> ${issue.createdBy.username} (${issue.createdBy.emailAddress})</p>
-                            
-                            <h6>Comments: <strong>${issue.comments.length}</strong></h6>
-                        </li>
+                ${project.issues.length > 0 ? `
+                    <ul class="list-group text-center scrollarea">
+                        ${project.issues.map(issue => `
+                            <li class="list-group-item list-group-item-action" href="/issues/${issue.id}" data-link>
+                                <h5>${issue.title}</h5>
+                                <br />
+                                <p>${issue.description}</p>
+                                <p><i>@${issue.createdBy.username}</i> ${getStatusBadge(issue.status)} ✏️ ${issue.comments.length}</p>
+                            </li>
+                        `).join("")}
+                    </ul>
+                ` : `<div class="text-center"> <b>No Issues Yet</b> </div>` }
+            </div>
+            
+            <div class="d-flex flex-column align-items-stretch flex-shrink-0 h-100" style="width: 380px;">
+                <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+                    <span class="fs-5 fw-semibold">Collaborators</span>
+                </a>
+                <div class="list-group list-group-flush border-bottom scrollarea">
+                    ${project.collaborators.map(user => `
+                        <a class="list-group-item list-group-item-action py-3 lh-sm">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <strong class="mb-1">${user.username} ${project.owner.username === user.username ? "(owner)" : ""}</strong>
+                            </div>
+                            <div class="col-10 mb-1 small">${user.emailAddress}</div>
+                        </a>
                     `).join("")}
-                </ul>
-            ` : `<p>No issues found.</p>`}
-
-            <a href="/projects" data-link class="btn btn-secondary mt-3">Back to Projects</a>
+                </div>
+            </div>
         </div>
     `;
 }

@@ -1,6 +1,12 @@
 export default async function userDetails({ id }) {
-    const response = await fetch(`/users/${id}`);
-    if (!response.ok) return `<h2>User not found</h2>`;
+    const response = await fetch(`/api/users/${id}`);
+    if (!response.ok) {
+        return `
+            <div class="text-center">
+                <h2>Issue Not Found</h2>
+            </div>
+        `;
+    }
 
     const user = await response.json();
 

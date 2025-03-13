@@ -37,8 +37,14 @@ fun Application.module() {
         userRoutes()
 
         // TODO: switch these lines at the end of development
-        staticFiles("/", File("src/main/resources/static"))
+        // staticFiles("/", File("src/main/resources/static"))
         // staticResources("/", "static")
+
+        staticResources("*", "static/shared")
+        staticFiles(
+            "/",
+            File("src/main/resources/static/projects")
+        )
 
         // get("/") {
         //     call.respondText("Hello World!")

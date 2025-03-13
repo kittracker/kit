@@ -40,10 +40,9 @@ fun Application.module() {
         // staticFiles("/", File("src/main/resources/static"))
         // staticResources("/", "static")
 
-        staticResources("*", "static/shared")
         staticFiles(
             "/",
-            File("src/main/resources/static/projects")
+            File("src/main/resources/static")
         )
 
         // get("/") {

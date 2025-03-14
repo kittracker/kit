@@ -3,18 +3,17 @@ export default async ()=> {
     const projects = await response.json();
 
     return `
-        <div class="container-fluid mt-5">
-            <ul class="list-group">
-                ${projects.map(project => `
-                    <li class="list-group-item">
-                        <h4>${project.name}</h4>
-                        <br />
-                        <p>${project.description}</p>
-                        <br />
+        <div class="container">
+            ${projects.map(project => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${project.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">${project.owner.username}</h6>
+                        <p class="card-text">${project.description}</p>
                         <a href="/projects/${project.id}" data-link class="btn btn-primary">View Details</a>
-                    </li>
-                `).join("")}
-            </ul>
+                    </div>
+                </div>
+            `).join("")}
         </div>
     `;
 }

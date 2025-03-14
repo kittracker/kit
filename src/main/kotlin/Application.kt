@@ -47,6 +47,12 @@ fun Application.module() {
             File("src/main/resources/static")
         )
 
+        //singlePageApplication {
+        //    filesPath = "static"
+        //    defaultPage = "index.html"
+        //    useResources = true
+        //}
+
         // get("/") {
         //     call.respondText("Hello World!")
         // }

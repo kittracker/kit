@@ -1,0 +1,47 @@
+.nav-bg {
+    background: rgb(90,9,83);
+    background: radial-gradient(circle, rgba(90,9,83,1) 0%, rgba(212,18,78,1) 62%, rgba(232,81,30,1) 88%, rgba(254,171,43,1) 100%);
+}
+
+.nav-logo {
+    transition: ease-in-out 150ms;
+}
+
+.nav-logo:hover {
+    transform: scale(1.1);
+}
+
+.nav-link-grow {
+    transition: ease-in-out 10ms;
+}
+
+.nav-link-grow:hover {
+    transform: scale(1.1);
+}
+
+.nav-link-style {
+    text-decoration: none;
+    color: white;
+}
+
+.nav-link-style:hover {
+    color: #feab2b;
+}
+
+.project-card {
+    transition: transform 150ms;
+}
+
+.project-card:hover {
+    transform: scale(1.02);
+    background: rgba(232, 81, 30, 0.5);
+}
+
+.list-item-action {
+    transition: transform 150ms;
+}
+
+.list-item-action:hover {
+    transform: scale(1.02);
+    background: rgba(232, 81, 30, 0.5);
+}

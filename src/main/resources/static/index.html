@@ -5,20 +5,21 @@
     <title>Kit Projects</title>
     <link rel="stylesheet" href="/shared/bootstrap.css" />
     <link rel="stylesheet" href="/shared/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/shared/colors.css">
     <script type="module" src="/shared/bootstrap.js"></script>
 </head>
 <body>
-<div class="container-fluid">
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+<div class="container-fluid nav-bg">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4">
         <div class="col-md-3 mb-2 mb-md-0">
             <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-                <img class="navbar-brand" width="64" height="64" src="/shared/kit_logo_dark.png" alt="Kit Tracker" />
+                <img class="navbar-brand nav-logo" width="64" height="64" src="/shared/kit_logo_dark.png" alt="Kit Tracker" />
             </a>
         </div>
 
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li> <a class="nav-link" href="/users" data-link>USERS</a> </li>
-            <li> <a class="nav-link" href="/projects" data-link>PROJECTS</a> </li>
+            <li class="nav-link-grow"> <a class="nav-link-style px-2" href="/users" data-link> <b>USERS</b> </a> </li>
+            <li class="nav-link-grow"> <a class="nav-link-style px-2" href="/projects" data-link> <b>PROJECTS</b> </a> </li>
         </ul>
 
         <div class="col-md-3 text-end">

@@ -6,14 +6,16 @@ export default async () => {
 
     return `
         <div class="container mt-5">
-            <h1 class="mb-4">Users List</h1>
-            <ul class="list-group">
-                ${users.map(user => `
-                    <li class="list-group-item">
-                        <a href="/users/${user.id}" data-link>@${user.username}</a>
-                    </li>
-                `).join("")}
-            </ul>
+            <br />
+            <h1 class="mb-4">USERS</h1>
+            <br />
+            ${users.map(user => `
+                <div class="card mb-3 list-card" href="/users/${user.id}" data-link>
+                    <div class="card-body">
+                        <h5 class="card-title">@${user.username}</h5>
+                    </div>
+                </div>
+            `).join("")}
         </div>
     `;
 };

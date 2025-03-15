@@ -28,12 +28,30 @@
     color: #feab2b;
 }
 
-.project-card {
+.list-card {
     transition: transform 150ms;
 }
 
-.project-card:hover {
+.list-card:hover {
+    cursor: pointer;
     transform: scale(1.02);
+    background: rgba(232, 81, 30, 0.5);
+}
+
+.author-hover {
+    transition: transform 150ms;
+}
+
+.author-hover:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.section-bg {
+    background: rgba(254, 171, 43, 0.7);
+}
+
+.section-bg-2 {
     background: rgba(232, 81, 30, 0.5);
 }
 
@@ -42,6 +60,7 @@
 }
 
 .list-item-action:hover {
+    cursor: pointer;
     transform: scale(1.02);
     background: rgba(232, 81, 30, 0.5);
 }

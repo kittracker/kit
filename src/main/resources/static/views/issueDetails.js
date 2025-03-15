@@ -21,12 +21,18 @@ export default async ({ id }) => {
     };
 
     return `
-        <div class="container-fluid">
-            <div class="row border-bottom m-3">
-                <h1>${issue.title} #${issue.id}</h1>
-                <h3>${getStatusBadge(issue.status)}</h3>
-                <p class="m-2">${issue.description}</p>
-                <p>@${issue.createdBy.username}</p>
+        <div class="container h-100">
+        
+            <div class="row border-bottom m-3 gy-3" style="padding: 3%">
+                <div class="d-flex justify-content-between">
+                    <h1>${issue.title}</h1>
+                    <div class="d-flex align-items-center justify-content-end">
+                        <h1 class="text-body-tertiary">#${issue.id}</h1>
+                        <h3 class="px-4 author-hover" href="/users/${issue.createdBy.id}" data-link>@${issue.createdBy.username}</h3>
+                        <h3>${getStatusBadge(issue.status)}</h3>
+                    </div>
+                </div>
+                <p>${issue.description}</p>
             </div>
             
             <br />
@@ -36,8 +42,8 @@ export default async ({ id }) => {
                     ${issue.comments.length > 0 ? `
                             ${issue.comments.map(comment => `
                                 <div class="card mb-3">
-                                    <div class="card-header">
-                                        <strong>@${comment.author.username}</strong>
+                                    <div class="card-header align-middle section-bg-2">
+                                        <h5><strong class="author-hover" href="/users/${comment.author.id}" data-link>@${comment.author.username}</strong></h5>
                                     </div>
                                     <div class="card-body">
                                         <p class="card-text">${comment.text}</p>
@@ -48,13 +54,13 @@ export default async ({ id }) => {
                 </div>
                 
                 <div class="col-4">
-                    <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+                    <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none rounded-top section-bg">
                         <span class="fs-5 fw-semibold">Related Issues</span>
                     </a>
                     <div class="list-group list-group-flush border-bottom scrollarea">
                         ${issue.links.map(link => `
-                            <a href="/issues/${link.id}" class="list-group-item list-group-item-action py-3 lh-sm" data-link>
-                                <div class="col-10 mb-1 small"><b>#${link.id} ${link.title}</b></div>
+                            <a href="/issues/${link.id}" class="list-group-item py-3 lh-sm list-item-action" data-link>
+                                <div class="mb-1"><strong>#${link.id} ${link.title}</strong></div>
                             </a>
                         `).join("")}
                     </div>

@@ -18,15 +18,6 @@ export default async ({id}) => {
     const project = await response.json();
 
     // Function to get badge class based on status
-    const getStatusBadge = (status) => {
-        const statusMap = {
-            "OPEN": "success",
-            "CLOSED": "danger",
-            "IN_PROGRESS": "warning"
-        };
-        return `<span class="badge bg-${statusMap[status] || "secondary"}">${status}</span>`;
-    };
-
     const getStatusIcon = (status) => {
         const statusMap = {
             "OPEN": "<i class=\"bi bi-record-circle text-success\"></i>",
@@ -39,9 +30,9 @@ export default async ({id}) => {
     return `
         <div class="container h-100">
         
-            <div class="row border-bottom m-3" style="padding: 3%">
+            <div class="row border-bottom m-3 gy-3" style="padding: 3%">
                 <h1>${project.name}</h1>
-                <p class="m-2">${project.description}</p>
+                <p>${project.description}</p>
             </div>
             
             <div class="row m-3">
@@ -67,12 +58,12 @@ export default async ({id}) => {
                 </div> 
             
                 <div class="col-4">
-                    <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+                    <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none rounded-top section-bg">
                         <span class="fs-5 fw-semibold">Collaborators</span>
                     </a>
                     <div class="list-group list-group-flush border-bottom scrollarea">
                         ${project.collaborators.map(user => `
-                            <a class="list-group-item list-group-item-action py-3 lh-sm list-item-action">
+                            <a class="list-group-item py-3 lh-sm list-item-action" href="/users/${user.id}" data-link>
                                 <div class="d-flex w-100 align-items-center justify-content-between text-center">
                                     <strong class="mb-1">${user.username} ${project.owner.username === user.username ? "(owner)" : ""}</strong>
                                 </div>

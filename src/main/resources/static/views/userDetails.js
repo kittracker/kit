@@ -12,11 +12,13 @@ export default async function userDetails({ id }) {
 
     return `
         <div class="container mt-5">
-            <h1 class="mb-4">User Details</h1>
-            <div class="card p-4">
+            <br />
+            <h1 class="mb-4">USER DETAILS</h1>
+            <br />
+            <div class="border rounded p-4">
                 <h2>@${user.username}</h2>
-                <p>Email: ${user.emailAddress || "N/A"}</p>
-                <a href="/users" data-link class="btn btn-primary">Back to Users</a>
+                <br />
+                <p>${user.emailAddress || "N/A"}</p>
             </div>
         </div>
     `;

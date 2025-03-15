@@ -40,8 +40,7 @@ export default async ({id}) => {
                 ${project.issues.length > 0 ? `
                     <ul class="list-group scrollarea">
                         ${project.issues.map(issue => `
-                            <li class="list-group-item list-item-action" href="/issues/${issue.id}" data-link>
-                                <br />
+                            <li class="list-group-item list-item-action py-3" href="/issues/${issue.id}" data-link>
                                 <div class="d-flex justify-content-between">
                                     <h4>${getStatusIcon(issue.status)}</h4>
                                     <div class="container">
@@ -50,7 +49,6 @@ export default async ({id}) => {
                                     </div>
                                     <span class="badge text-bg-primary rounded-pill align-content-center">${issue.comments.length}</span>
                                 </div>
-                                <br />
                             </li>
                         `).join("")}
                     </ul>

@@ -1,10 +1,18 @@
-.nav-bg {
+.home-bg {
+    background: rgba(254, 171, 43, 0.7);
+}
+
+.nav-bg-old {
     background: rgb(90,9,83);
     background: radial-gradient(circle, rgba(90,9,83,1) 0%, rgba(212,18,78,1) 62%, rgba(232,81,30,1) 88%, rgba(254,171,43,1) 100%);
 }
 
+.nav-bg {
+    background: rgba(90, 9, 83, 0.9);
+}
+
 .nav-logo {
-    transition: ease-in-out 150ms;
+    transition: transform 150ms;
 }
 
 .nav-logo:hover {
@@ -12,7 +20,7 @@
 }
 
 .nav-link-grow {
-    transition: ease-in-out 10ms;
+    transition: transform 10ms;
 }
 
 .nav-link-grow:hover {
@@ -26,6 +34,15 @@
 
 .nav-link-style:hover {
     color: #feab2b;
+}
+
+.profile-img {
+    transition: transform 150ms;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
 .list-card {
@@ -63,4 +80,25 @@
     cursor: pointer;
     transform: scale(1.02);
     background: rgba(232, 81, 30, 0.5);
+}
+
+.button-dark {
+    border-color: rgba(90, 9, 83, 0.9);
+    border-width: 3px;
+}
+
+.button-dark:hover {
+    background: rgba(90, 9, 83, 0.9);
+    color: white;
+}
+
+.button-light {
+    color: white;
+    border-color: #feab2b;
+    border-width: 3px;
+}
+
+.button-light:hover {
+    background: #feab2b;
+    color: white;
 }

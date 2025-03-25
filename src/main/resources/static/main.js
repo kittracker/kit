@@ -18,7 +18,6 @@ const routes = {
     "/users/:id": { title: "User Details", render: userDetails },  // Dynamic ID
 };
 
-
 const app = document.getElementById("app");
 
 function matchRoute(path) {
@@ -45,6 +44,8 @@ async function router() {
 
     if (matched) {
         document.title = matched.route.title;
+        // Homepage set this class to the body, not necessary for other pages
+        document.body.classList.remove("home-bg");
         // Show loading state
         app.innerHTML = `
             <div class="text-center">

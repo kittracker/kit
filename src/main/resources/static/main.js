@@ -4,6 +4,7 @@ import userDetails from "./views/userDetails.js";
 import projects from "./views/projects.js";
 import projectDetails from "./views/projectDetails.js";
 import issueDetails from "./views/issueDetails.js";
+import IssueDetails from "./views/classIssueDetails.js";
 
 let placeholder = () => `
     <h1>This page is under construction</h1>
@@ -13,7 +14,7 @@ const routes = {
     "/": { title: "Home", render: home },
     "/projects": { title: "Projects", render: projects },
     "/projects/:id": { title: "Project Details", render: projectDetails },
-    "/issues/:id": { title: "Issue Details", render: issueDetails },
+    "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id) },
     "/users": { title: "Users", render: users },
     "/users/:id": { title: "User Details", render: userDetails },  // Dynamic ID
 };
@@ -52,7 +53,11 @@ async function router() {
                 <div class="spinner-border" role="status"></div>
             </div>
         `;
-        app.innerHTML = await matched.route.render(matched.params); // Pass params to render
+        if ("component" in matched.route) {
+            matched.route.component(matched.params).mount(app);
+        } else {
+            app.innerHTML = await matched.route.render(matched.params); // Pass params to render
+        }
     } else {
         app.innerHTML = `
             <div class="text-center">

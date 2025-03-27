@@ -81,7 +81,7 @@ export default class IssueDetails {
                 
                 <div class="row m-3">
                     <div class="col-8">
-                        <div class="row" id="comments-section">
+                        <div id="comments-section">
                             ${this.issue.comments.length > 0 ? `
                                     ${this.issue.comments.map(comment => `
                                         <div class="card mb-3">
@@ -95,7 +95,7 @@ export default class IssueDetails {
                                     `).join("")}
                             ` : `<div class="text-center"> <b>No Comments Yet</b> </div>`}
                         </div>
-                        <div class="row">
+                        <div class="col mt-3">
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <form>

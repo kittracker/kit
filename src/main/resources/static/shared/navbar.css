@@ -1,0 +1,43 @@
+.kit_navbar {
+    background: rgba(90, 9, 83, 100);
+    height: 70px;
+}
+
+.logo-container img.img-fluid {
+    max-height: 70px;
+    width: auto;
+}
+
+.logo-container:hover {
+    cursor: pointer;
+}
+
+@media(min-width: 768px) {
+    .kit_navbar {
+        height: 80px;
+    }
+
+    .logo-container img.img-fluid {
+        max-height: 80px;
+    }
+}
+
+@media(min-width: 992px) {
+    .kit_navbar {
+        height: 90px;
+    }
+
+    .logo-container img.img-fluid {
+        max-height: 90px;
+    }
+}
+
+@media(min-width: 1200px) {
+    .kit_navbar {
+        height: 100px;
+    }
+
+    .logo-container img.img-fluid {
+        max-height: 100px;
+    }
+}

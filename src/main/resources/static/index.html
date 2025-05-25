@@ -6,31 +6,25 @@
     <link rel="stylesheet" href="/shared/bootstrap.css" />
     <link rel="stylesheet" href="/shared/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/shared/colors.css">
+    <link rel="stylesheet" href="/shared/navbar.css">
+    <link rel="stylesheet" href="/shared/home.css">
     <script type="module" src="/shared/bootstrap.js"></script>
 </head>
 <body>
-<div class="container-fluid nav-bg">
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4">
-        <div class="col-md-3 mb-2 mb-md-0">
-            <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-                <img class="navbar-brand nav-logo" width="64" height="64" src="/shared/kit_logo_light.png" alt="Kit Tracker" />
-            </a>
-        </div>
 
-        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li class="nav-link-grow"> <a class="nav-link-style px-2" href="/users" data-link> <b>USERS</b> </a> </li>
-            <li class="nav-link-grow"> <a class="nav-link-style px-2" href="/projects" data-link> <b>PROJECTS</b> </a> </li>
-        </ul>
+<header class="kit_navbar bg-white"></header>
 
-        <div class="col-md-3 text-end">
-            <button type="button" class="button-light btn me-2">SIGN-IN</button>
-            <button type="button" class="button-light btn">SIGN-UP</button>
-        </div>
-    </header>
-</div>
+<header class="container-fluid m-0 p-0 fixed-top kit_navbar">
+    <div class="row">
+        <a class="col-4 mx-5 text-decoration-none logo-container" href="/">
+            <img class="img-fluid" src="/shared/kit_logo_wide_light.png" width="250" height="150" alt="Kit's logo">
+        </a>
+    </div>
+</header>
 
 <main id="app"></main>
 
 <script type="module" src="/main.js"></script>
+
 </body>
 </html>

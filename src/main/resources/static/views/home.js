@@ -1,9 +1,9 @@
 export default () => {
-    document.body.classList.add("home-bg");
+    document.body.classList.add("background");
 
     return `
-    <div class="px-4 py-5 my-5 text-center">
-        <img class="d-block mx-auto mb-4" src="/shared/kit_logo_light.png" alt="Kit Tracker" width="256" height="256">
+    <div class="px-4 py-5 mb-5 text-center">
+        <img class="d-block mx-auto mb-4" src="/shared/kit_logo_dark.png" alt="Kit Tracker" width="256" height="256">
         <h1 class="display-5 fw-bold">Kit Tracker</h1>
         <div class="col-lg-6 mx-auto py-3">
             <p class="lead mb-4">

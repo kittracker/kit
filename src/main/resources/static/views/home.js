@@ -1,4 +1,4 @@
-import { init } from "./../shared/canvas.js"
+import { init, resizeCanvas } from "./../shared/canvas.js"
 
 export default () => {
     const htmlContent = `
@@ -11,7 +11,7 @@ export default () => {
         </div>
     </section>
        
-    <section class="container-fluid bg-light">
+    <section class="container-fluid font-monospace bg-light">
         <div class="row py-5">
             <div class="col-lg-7 col-12">
                 <p class="py-5 ms-lg-5 px-lg-0 px-3 font-monospace">
@@ -26,11 +26,11 @@ export default () => {
                 <div class="d-flex gap-3 ms-lg-5 justify-content-lg-start justify-content-center">
                     <a class="btn btn-lg px-4 button" target="_blank" href="https://www.github.com/kittracker/kit">
                         <i class="bi bi-github"></i>
-                        <b class="font-monospace">GITHUB</b>
+                        <b>GITHUB</b>
                     </a>
                     <a class="btn btn-lg px-4 button">
                         <i class="bi bi-file-earmark-arrow-down"></i>
-                        <b class="font-monospace">REPORT</b>
+                        <b>REPORT</b>
                     </a>
                 </div>
             </div>
@@ -42,54 +42,66 @@ export default () => {
     
     <br> <br>
     
-    <div class="container-fluid text-center bg-light py-5">
-        <div class="row">
-            <div class="col-lg-4">
-                <a target="_blank" href="https://www.github.com/cardisk">
-                    <img class="profile-img my-3 rounded-circle" width="140" height="140" src="https://www.github.com/cardisk.png" alt="Github Avatar"/>
-                </a>
-                <h2 class="py-1">@cardisk</h2>
-                <p class="py-2"> <i>Matteo Cardinaletti</i> </p>
-                <p>
-                    <a class="button-dark btn" target="_blank" href="https://www.github.com/cardisk">
-                        <i class="bi bi-github"></i>
-                        <b>PROFILE</b>
+    <section class="container-fluid text-center font-monospace bg-light">
+        <div class="row py-5">
+            <article class="col-lg-4 col-12 my-lg-0 my-5">
+                <div class="d-flex gap-lg-0 gap-md-5 gap-0 flex-lg-column flex-md-row flex-column align-items-center justify-content-center">
+                    <a target="_blank" href="https://www.github.com/spectrev333">
+                        <img class="my-3 rounded-circle author-img" width="140" height="140" src="https://www.github.com/spectrev333.png" alt="Github Avatar"/>
                     </a>
-                </p>
-            </div>
-            <div class="col-lg-4">
-                <a target="_blank" href="https://www.github.com/spectrev333">
-                    <img class="profile-img my-3 rounded-circle" width="140" height="140" src="https://www.github.com/spectrev333.png" alt="Github Avatar"/>
-                </a>
-                <h2 class="py-1">@spectrev333</h2>
-                <p class="py-2"> <i>Leonardo Bessi</i> </p>
-                <p>
-                    <a class="button-dark btn" target="_blank" href="https://www.github.com/spectrev333">
-                        <i class="bi bi-github"></i>
-                        <b>PROFILE</b>
+                    <div class="d-flex flex-column gap-3 mt-2">
+                        <h4>@spectrev333</h4>
+                        <p> <i>Bessi Leonardo</i> </p>
+                        <a class="btn button px-5" target="_blank" href="https://www.github.com/spectrev333">
+                            <i class="bi bi-github"></i>
+                            <b>PROFILE</b>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            <article class="col-lg-4 col-12 my-lg-0 my-5">
+                <div class="d-flex gap-lg-0 gap-md-5 gap-0 flex-lg-column flex-md-row flex-column align-items-center justify-content-center">
+                    <a target="_blank" href="https://www.github.com/mircocaneschi">
+                        <img class="my-3 rounded-circle author-img" width="140" height="140" src="https://www.github.com/mircocaneschi.png" alt="Github Avatar"/>
                     </a>
-                </p>
-            </div>
-            <div class="col-lg-4">
-                <a target="_blank" href="https://www.github.com/mircocaneschi">
-                    <img class="profile-img my-3 rounded-circle" width="140" height="140" src="https://www.github.com/mircocaneschi.png" alt="Github Avatar"/>
-                </a>
-                <h2 class="py-1">@mircocaneschi</h2>
-                <p class="py-2"> <i>Mirco Caneschi</i> </p>
-                <p>
-                    <a class="button-dark btn" target="_blank" href="https://www.github.com/mircocaneschi">
-                        <i class="bi bi-github"></i>
-                        <b>PROFILE</b>
+                    <div class="d-flex flex-column gap-3 mt-2">
+                        <h4>@mircocaneschi</h4>
+                        <p> <i>Caneschi Mirco</i> </p>
+                        <a class="btn button px-5" target="_blank" href="https://www.github.com/mircocaneschi">
+                            <i class="bi bi-github"></i>
+                            <b>PROFILE</b>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            <article class="col-lg-4 col-12 my-lg-0 my-5">
+                <div class="d-flex gap-lg-0 gap-md-5 gap-0 flex-lg-column flex-md-row flex-column align-items-center justify-content-center">
+                    <a target="_blank" href="https://www.github.com/cardisk">
+                        <img class="my-3 rounded-circle author-img" width="140" height="140" src="https://www.github.com/cardisk.png" alt="Github Avatar"/>
                     </a>
-                </p>
-            </div>
+                    <div class="d-flex flex-column gap-3 mt-2">
+                        <h4>@cardisk</h4>
+                        <p> <i>Cardinaletti Matteo</i> </p>
+                        <a class="btn button px-5" target="_blank" href="https://www.github.com/cardisk">
+                            <i class="bi bi-github"></i>
+                            <b>PROFILE</b>
+                        </a>
+                    </div>
+                </div>
+            </article>
         </div>
-    </div>
+    </section>
+    
+    <br> <br>
     `;
 
     setTimeout(() => {
         init();
     }, 0);
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+    });
 
     return htmlContent;
 }

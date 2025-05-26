@@ -84,7 +84,7 @@ var F3 = 1 / 3;
 var G3 = 1 / 6;
 
 // 2D simplex noise
-noise.simplex2 = function (xin, yin) { // Ora è noise.simplex2
+noise.simplex2 = function (xin, yin) {
     var n0, n1, n2;
     var s = (xin + yin) * F2;
     var i = Math.floor(xin + s);
@@ -134,7 +134,7 @@ noise.simplex2 = function (xin, yin) { // Ora è noise.simplex2
 };
 
 // 3D simplex noise
-noise.simplex3 = function (xin, yin, zin) { // Ora è noise.simplex3
+noise.simplex3 = function (xin, yin, zin) {
     var n0, n1, n2, n3;
     var s = (xin + yin + zin) * F3;
     var i = Math.floor(xin + s);
@@ -221,7 +221,7 @@ function lerp(a, b, t) {
 }
 
 // 2D Perlin Noise
-noise.perlin2 = function (x, y) { // Ora è noise.perlin2
+noise.perlin2 = function (x, y) {
     var X = Math.floor(x), Y = Math.floor(y);
     x = x - X;
     y = y - Y;
@@ -239,7 +239,7 @@ noise.perlin2 = function (x, y) { // Ora è noise.perlin2
 };
 
 // 3D Perlin Noise
-noise.perlin3 = function (x, y, z) { // Ora è noise.perlin3
+noise.perlin3 = function (x, y, z) {
     var X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z);
     x = x - X;
     y = y - Y;
@@ -268,12 +268,19 @@ noise.perlin3 = function (x, y, z) { // Ora è noise.perlin3
         v);
 };
 
-
 let canvas, context, width, height;
 
 let z = Math.random() * 222; //random initial seed value
 let spd = 0.35; //speed variable, increase to go faster (1.85)
 let scale = 0.002; //how detailed the perlin map is going to be - value represents amount of detail (.0028) [0.0008 => 0.01]
+
+export const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    width = canvas.width;
+    height = canvas.height;
+}
 
 export const init = () => {
     canvas = document.getElementById("canvas");
@@ -281,9 +288,12 @@ export const init = () => {
         console.error("Error: id 'canvas' for canvas not found.");
         return;
     }
+
     context = canvas.getContext("2d");
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    resizeCanvas();
+
+    // width = canvas.width = window.innerWidth;
+    // height = canvas.height = window.innerHeight;
 
     noise.seed(z);
 

@@ -29,3 +29,12 @@
     background: #202020;
     color: rgb(255, 49, 49);
 }
+
+.author-img {
+    transition: transform 150ms;
+}
+
+.author-img:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}

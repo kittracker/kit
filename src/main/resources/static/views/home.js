@@ -1,6 +1,4 @@
 export default () => {
-    document.body.classList.add("background");
-
     return `
     <div class="px-4 py-5 mb-5 text-center">
         <img class="d-block mx-auto mb-4" src="/shared/kit_logo_dark.png" alt="Kit Tracker" width="256" height="256">

@@ -4,10 +4,9 @@ export default () => {
     const htmlContent = `
     <canvas id="canvas"></canvas>
     
-    <div class="container">
-        <div class="mb-5 text-center bg-primary">
+    <div class="container-md mt-5">
+        <div class="mb-5 text-center rounded rounded-5 bg-primary">
             <img class="d-block mx-auto mb-4" src="/shared/kit_logo_dark.png" alt="Kit Tracker" width="256" height="256">
-            <h1 class="display-5 fw-bold">Kit Tracker</h1>
             <div class="col-lg-6 mx-auto py-3">
                 <p class="lead mb-4">
                     Track, Resolve, Evolve.

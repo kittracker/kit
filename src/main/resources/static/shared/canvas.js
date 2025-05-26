@@ -14,7 +14,6 @@
  *
  */
 
-// Definiamo un oggetto noise localmente nel modulo
 const noise = {};
 
 function Grad(x, y, z) {
@@ -52,7 +51,6 @@ var p = [151, 160, 137, 91, 90, 15,
 var perm = new Array(512);
 var gradP = new Array(512);
 
-// Questa funzione seed ora è un metodo dell'oggetto noise
 noise.seed = function (seed) {
     if (seed > 0 && seed < 1) {
         seed *= 65536;
@@ -76,7 +74,7 @@ noise.seed = function (seed) {
     }
 };
 
-noise.seed(0); // Chiamata iniziale a seed
+noise.seed(0);
 
 // Skewing and unskewing factors for 2, 3, and 4 dimensions
 var F2 = 0.5 * (Math.sqrt(3) - 1);
@@ -271,27 +269,22 @@ noise.perlin3 = function (x, y, z) { // Ora è noise.perlin3
 };
 
 
-// Fine del codice della libreria noise
-
 let canvas, context, width, height;
 
 let z = Math.random() * 222; //random initial seed value
-let spd = 1.85 //speed variable, increase to go faster (1.85)
-let scale = 0.0028; //how detailed the perlin map is going to be - value represents amount of detail (.0028) [0.0008 => 0.01]
+let spd = 0.35; //speed variable, increase to go faster (1.85)
+let scale = 0.002; //how detailed the perlin map is going to be - value represents amount of detail (.0028) [0.0008 => 0.01]
 
-export const init = () => { // Ora esportiamo direttamente init
+export const init = () => {
     canvas = document.getElementById("canvas");
     if (!canvas) {
-        console.error("Errore: Elemento canvas con ID 'canvas' non trovato!");
+        console.error("Error: id 'canvas' for canvas not found.");
         return;
     }
     context = canvas.getContext("2d");
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
 
-    console.log("Canvas inizializzato!");
-
-    // Usiamo l'oggetto noise che abbiamo definito localmente all'inizio di questo modulo
     noise.seed(z);
 
     render();
@@ -313,7 +306,9 @@ let render = () => {
             let val = Math.abs(2 * value);
             context.arc(0, 0, val, 0, Math.PI * 2, true);
             value = Math.min(Math.abs(value), 1);
-            context.fillStyle = `hsl(311, 100%, ${Math.floor(100 * value)}%)`;
+
+            // Original hsl(311, 100%, ...)
+            context.fillStyle = `hsl(0, 100%, ${Math.floor(100 * value)}%)`;
             context.fill();
             context.restore();
         }

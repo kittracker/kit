@@ -4,26 +4,12 @@ export default () => {
     const htmlContent = `
     <canvas id="canvas"></canvas>
     
-    <div class="container-md mt-5">
-        <div class="mb-5 text-center rounded rounded-5 bg-primary">
-            <img class="d-block mx-auto mb-4" src="/shared/kit_logo_dark.png" alt="Kit Tracker" width="256" height="256">
-            <div class="col-lg-6 mx-auto py-3">
-                <p class="lead mb-4">
-                    Track, Resolve, Evolve.
-                </p>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center py-3">
-                    <a class="button-dark btn btn-lg px-4" target="_blank" href="https://www.github.com/kittracker/kit">
-                        <i class="bi bi-github"></i>
-                        <b>GITHUB</b>
-                    </a>
-                    <a class="button-dark btn btn-lg px-4">
-                        <i class="bi bi-file-earmark-arrow-down"></i>
-                        <b>REPORT</b>
-                    </a>
-                </div>
-            </div>
+    <section class="container-md text-center py-5 my-5">
+        <img class="img-fluid" src="/shared/kit_logo_stripped_dark.png" alt="Kit Tracker">
+        <div class="d-inline-block my-5">
+            <h1 class="px-5 py-2 slogan">TRACK - RESOLVE - EVOLVE</h1>
         </div>
-    </div>
+    </section>
     
     <div class="container-fluid text-center bg-light py-5">
         <div class="row">

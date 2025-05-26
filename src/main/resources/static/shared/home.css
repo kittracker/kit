@@ -11,11 +11,21 @@
 .slogan {
     font-family: 'Slant', sans-serif;
 
-    color: rgba(255, 41, 48);
+    color: rgba(255, 49, 49);
     background: rgba(20, 20, 20, 0.5);
 
     border-radius: 20px;
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+
+.button {
+    border-color: #202020;
+    border-width: 3px;
+}
+
+.button:hover {
+    background: #202020;
+    color: rgb(255, 49, 49);
 }

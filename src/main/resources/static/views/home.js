@@ -10,6 +10,37 @@ export default () => {
             <h1 class="px-5 py-2 slogan">TRACK - RESOLVE - EVOLVE</h1>
         </div>
     </section>
+       
+    <section class="container-fluid bg-light">
+        <div class="row py-5">
+            <div class="col-lg-7 col-12">
+                <p class="py-5 ms-lg-5 px-lg-0 px-3 font-monospace">
+                    This project focuses on developing an issue tracking system tailored for software projects. It
+                    allows users to create and manage multiple projects, which can be set as either private or
+                    public. The application runs on a centralized server managed by a single administrator.
+                    Users can invite collaborators to their projects, ensuring seamless teamwork. The system
+                    facilitates tracking and resolving issues by enabling users to create detailed issues with titles
+                    and descriptions. Additionally, collaborators can comment on open issues to provide
+                    updates, discuss solutions, or offer feedback.
+                </p>
+                <div class="d-flex gap-3 ms-lg-5 justify-content-lg-start justify-content-center">
+                    <a class="btn btn-lg px-4 button" target="_blank" href="https://www.github.com/kittracker/kit">
+                        <i class="bi bi-github"></i>
+                        <b class="font-monospace">GITHUB</b>
+                    </a>
+                    <a class="btn btn-lg px-4 button">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        <b class="font-monospace">REPORT</b>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 col-12 text-end d-lg-block d-none">
+                <img class="img-fluid" src="/shared/kit_features.png" width="512" height="512" alt="Kit Features">
+            </div>
+        </div>
+    </section>
+    
+    <br> <br>
     
     <div class="container-fluid text-center bg-light py-5">
         <div class="row">

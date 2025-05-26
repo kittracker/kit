@@ -1,0 +1,104 @@
+.home-bg {
+    background: rgba(254, 171, 43, 0.7);
+}
+
+.nav-bg-old {
+    background: rgb(90,9,83);
+    background: radial-gradient(circle, rgba(90,9,83,1) 0%, rgba(212,18,78,1) 62%, rgba(232,81,30,1) 88%, rgba(254,171,43,1) 100%);
+}
+
+.nav-bg {
+    background: rgba(90, 9, 83, 0.9);
+}
+
+.nav-logo {
+    transition: transform 150ms;
+}
+
+.nav-logo:hover {
+    transform: scale(1.1);
+}
+
+.nav-link-grow {
+    transition: transform 10ms;
+}
+
+.nav-link-grow:hover {
+    transform: scale(1.1);
+}
+
+.nav-link-style {
+    text-decoration: none;
+    color: white;
+}
+
+.nav-link-style:hover {
+    color: #feab2b;
+}
+
+.profile-img {
+    transition: transform 150ms;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.list-card {
+    transition: transform 150ms;
+}
+
+.list-card:hover {
+    cursor: pointer;
+    transform: scale(1.02);
+    background: rgba(232, 81, 30, 0.5);
+}
+
+.author-hover {
+    transition: transform 150ms;
+}
+
+.author-hover:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.section-bg {
+    background: rgba(254, 171, 43, 0.7);
+}
+
+.section-bg-2 {
+    background: rgba(232, 81, 30, 0.5);
+}
+
+.list-item-action {
+    transition: transform 150ms;
+}
+
+.list-item-action:hover {
+    cursor: pointer;
+    transform: scale(1.02);
+    background: rgba(232, 81, 30, 0.5);
+}
+
+.button-dark {
+    border-color: rgba(90, 9, 83, 0.9);
+    border-width: 3px;
+}
+
+.button-dark:hover {
+    background: rgba(90, 9, 83, 0.9);
+    color: white;
+}
+
+.button-light {
+    color: white;
+    border-color: #feab2b;
+    border-width: 3px;
+}
+
+.button-light:hover {
+    background: #feab2b;
+    color: white;
+}

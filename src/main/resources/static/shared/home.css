@@ -1,0 +1,40 @@
+@font-face {
+    font-family: 'Slant';
+    src: url('./fonts/Slant.woff2') format('woff2'),
+         url('./fonts/Slant.woff') format('woff'),
+         url('./fonts/Slant.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.slogan {
+    font-family: 'Slant', sans-serif;
+
+    color: rgba(255, 49, 49);
+    background: rgba(20, 20, 20, 0.5);
+
+    border-radius: 20px;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.button {
+    border-color: #202020;
+    border-width: 3px;
+}
+
+.button:hover {
+    background: #202020;
+    color: rgb(255, 49, 49);
+}
+
+.author-img {
+    transition: transform 150ms;
+}
+
+.author-img:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}

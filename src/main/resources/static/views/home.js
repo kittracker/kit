@@ -5,7 +5,7 @@ export default () => {
     <canvas id="canvas"></canvas>
     
     <section class="container-md text-center py-5 my-5">
-        <img class="img-fluid" src="/shared/kit_logo_stripped_dark.png" alt="Kit Tracker">
+        <img class="img-fluid" src="/shared/images/kit_logo_stripped_dark.png" alt="Kit Tracker">
         <div class="d-inline-block my-5">
             <h1 class="px-5 py-2 slogan">TRACK - RESOLVE - EVOLVE</h1>
         </div>
@@ -35,7 +35,7 @@ export default () => {
                 </div>
             </div>
             <div class="col-lg-5 col-12 text-end d-lg-block d-none">
-                <img class="img-fluid" src="/shared/kit_features.png" width="512" height="512" alt="Kit Features">
+                <img class="img-fluid" src="/shared/images/kit_features.png" width="512" height="512" alt="Kit Features">
             </div>
         </div>
     </section>

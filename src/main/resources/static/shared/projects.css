@@ -1,0 +1,29 @@
+.project-card {
+    border-color: #202020;
+    border-width: 3px;
+    border-radius: 20px;
+    border-style: solid;
+
+    transition: transform 150ms;
+}
+
+.project-card:hover {
+    border-color: rgb(255, 49, 49);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.filter-section {
+    border-color: #202020;
+    border-width: 3px;
+    border-radius: 20px;
+    border-style: solid;
+}
+
+.search-bar:focus {
+    outline: none !important;
+    box-shadow: none !important;
+
+    border-color: rgb(255, 49, 49);
+    border-width: 3px;
+}

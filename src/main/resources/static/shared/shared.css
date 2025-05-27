@@ -1,5 +1,17 @@
+.fg {
+    color: rgb(255, 49, 49);
+}
+
+.fg-dark {
+    color: #202020;
+}
+
 .bg {
     background: #202020;
+}
+
+.bg-reverse {
+    background: rgb(255, 49, 49);
 }
 
 .button {

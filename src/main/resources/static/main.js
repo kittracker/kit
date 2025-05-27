@@ -3,8 +3,8 @@ import users from "./views/users.js"
 import userDetails from "./views/userDetails.js";
 import projects from "./views/projects.js";
 import projectDetails from "./views/projectDetails.js";
-import issueDetails from "./views/issueDetails.js";
 import IssueDetails from "./views/classIssueDetails.js";
+import Projects from "./views/classProjects.js";
 
 let placeholder = () => `
     <h1>This page is under construction</h1>
@@ -12,7 +12,8 @@ let placeholder = () => `
 
 const routes = {
     "/": { title: "Home", render: home },
-    "/projects": { title: "Projects", render: projects },
+    // "/projects": { title: "Projects", render: projects },
+    "/projects": { title: "Project Details", component: (_) => new Projects() },
     "/projects/:id": { title: "Project Details", render: projectDetails },
     "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id) },
     "/users": { title: "Users", render: users },
@@ -45,8 +46,6 @@ async function router() {
 
     if (matched) {
         document.title = matched.route.title;
-        // Homepage set this class to the body, not necessary for other pages
-        document.body.classList.remove("home-bg");
         // Show loading state
         app.innerHTML = `
             <div class="text-center">
@@ -68,12 +67,12 @@ async function router() {
 }
 
 // Handle SPA navigation
-window.addEventListener("click", e => {
+window.addEventListener("click", async e => {
     const link = e.target.closest("[data-link]");
     if (link) {
         e.preventDefault();
         history.pushState({}, "", link.getAttribute("href"));
-        router();
+        await router();
     }
 });
 

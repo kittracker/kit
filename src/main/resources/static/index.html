@@ -15,6 +15,7 @@
 
     <link rel="stylesheet" href="/shared/home.css">
     <link rel="stylesheet" href="/shared/canvas.css">
+    <link rel="stylesheet" href="/shared/projects.css">
 
     <link rel="stylesheet" href="/shared/colors.css">
 </head>
@@ -26,7 +27,7 @@
     <section class="row m-0 p-0 g-0">
         <div class="d-flex justify-content-between align-items-center m-0 p-0 g-0 fixed-top kit_navbar">
             <a class="px-5 text-decoration-none logo-container" href="/">
-                <img class="img-fluid" src="/shared/kit_logo_wide_light.png" width="250" height="150" alt="Kit's logo">
+                <img class="img-fluid" src="/shared/images/kit_logo_wide_light.png" width="250" height="150" alt="Kit's logo">
             </a>
             <div class="d-md-none d-block px-5">
                 <button class="btn btn-lg button-reverse" type="button" data-bs-toggle="collapse" data-bs-target="#nav-actions" aria-expanded="false" aria-controls="nav-actions">
@@ -34,18 +35,18 @@
                 </button>
             </div>
             <div class="d-md-flex d-none gap-3 px-5 justify-content-end align-items-center">
-                <a class="btn px-4 button-reverse">
-                    <b>LOG-IN</b>
+                <a class="btn px-4 button-reverse" href="/projects" data-link>
+                    <b>SIGN-IN</b>
                 </a>
                 <a class="btn px-4 button-reverse">
-                    <b>SIGN-IN</b>
+                    <b>SIGN-UP</b>
                 </a>
             </div>
         </div>
     </section>
     <section class="row m-0 p-0 g-0 text-center collapse bg" id="nav-actions">
-        <p class="mt-3 py-3 link">LOG-IN</p>
-        <p class="py-3 link">SIGN-IN</p>
+        <p class="mt-3 py-3 link">SIGN-IN</p>
+        <p class="py-3 link">SIGN-UP</p>
     </section>
 </header>
 
@@ -53,7 +54,7 @@
 
 <script type="module" src="/main.js"></script>
 
-<footer class="container-fluid text-center text-white kit_footer">
+<footer class="container-fluid text-center kit_footer">
     <div class="d-flex flex-column gap-2">
         <p class="text-secondary">
             &copy; 2025 KIT Tracker. All rights reserved.

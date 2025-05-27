@@ -23,4 +23,10 @@ class InMemoryUserRepository : UserRepository {
     override fun getAllUsers(): List<User> {
         return users.map { User(it.id!!, it.emailAddress, it.username) }
     }
+
+    override fun getUser(username: String, password: String): User? {
+        val user = users.firstOrNull { it.username == username && it.username == password }
+        if (user == null) return null
+        return User(user.id!!, user.emailAddress, user.username)
+    }
 }

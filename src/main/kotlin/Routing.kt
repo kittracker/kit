@@ -6,6 +6,7 @@ import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import edu.kitt.orm.requests.ProjectEntryRequest
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

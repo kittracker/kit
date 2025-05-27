@@ -14,6 +14,9 @@
 }
 
 .filter-section {
+    position: sticky;
+    top: 110px;
+
     border-color: #202020;
     border-width: 3px;
     border-radius: 20px;
@@ -26,4 +29,22 @@
 
     border-color: rgb(255, 49, 49);
     border-width: 3px;
+}
+
+@media(min-width: 768px) {
+    .filter-section {
+        top: 120px;
+    }
+}
+
+@media(min-width: 992px) {
+    .filter-section {
+        top: 130px;
+    }
+}
+
+@media(min-width: 1200px) {
+    .filter-section {
+        top: 140px;
+    }
 }

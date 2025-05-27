@@ -20,16 +20,6 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
-.button {
-    border-color: #202020;
-    border-width: 3px;
-}
-
-.button:hover {
-    background: #202020;
-    color: rgb(255, 49, 49);
-}
-
 .author-img {
     transition: transform 150ms;
 }

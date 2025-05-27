@@ -1,0 +1,49 @@
+.bg {
+    background: #202020;
+}
+
+.button {
+    color: #202020;
+
+    border-color: #202020;
+    border-width: 3px;
+}
+
+.button:hover {
+    background: #202020;
+    color: rgb(255, 49, 49);
+}
+
+.button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.button-reverse {
+    color: #FFFFFF;
+
+    border-color: #FFFFFF;
+    border-width: 3px;
+}
+
+.button-reverse:hover {
+    background: #FFFFFF;
+    color: rgb(255, 49, 49);
+}
+
+.button-reverse:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.link {
+    color: #FFFFFF;
+    transition: transform 150ms;
+}
+
+.link:hover {
+    color: rgb(255, 49, 49);
+    background: #505050;
+
+    font-weight: bold;
+}

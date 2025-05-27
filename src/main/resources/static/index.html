@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/shared/bootstrap-icons.min.css">
 
     <!-- Custom css -->
+    <link rel="stylesheet" href="/shared/shared.css">
+
     <link rel="stylesheet" href="/shared/navbar.css">
     <link rel="stylesheet" href="/shared/footer.css">
 
@@ -16,23 +18,42 @@
 
     <link rel="stylesheet" href="/shared/colors.css">
 </head>
-<body>
+<body class="font-monospace">
 
-<header class="kit_navbar bg-white"></header>
+<header class="m-0 p-0 g-0 kit_navbar"></header>
 
-<header class="container-fluid m-0 p-0 fixed-top kit_navbar">
-    <div class="row">
-        <a class="col-4 mx-5 text-decoration-none logo-container" href="/">
-            <img class="img-fluid" src="/shared/kit_logo_wide_light.png" width="250" height="150" alt="Kit's logo">
-        </a>
-    </div>
+<header class="container-fluid m-0 p-0 g-0">
+    <section class="row m-0 p-0 g-0">
+        <div class="d-flex justify-content-between align-items-center m-0 p-0 g-0 fixed-top kit_navbar">
+            <a class="px-5 text-decoration-none logo-container" href="/">
+                <img class="img-fluid" src="/shared/kit_logo_wide_light.png" width="250" height="150" alt="Kit's logo">
+            </a>
+            <div class="d-md-none d-block px-5">
+                <button class="btn btn-lg button-reverse" type="button" data-bs-toggle="collapse" data-bs-target="#nav-actions" aria-expanded="false" aria-controls="nav-actions">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+            <div class="d-md-flex d-none gap-3 px-5 justify-content-end align-items-center">
+                <a class="btn px-4 button-reverse">
+                    <b>LOG-IN</b>
+                </a>
+                <a class="btn px-4 button-reverse">
+                    <b>SIGN-IN</b>
+                </a>
+            </div>
+        </div>
+    </section>
+    <section class="row m-0 p-0 g-0 text-center collapse bg" id="nav-actions">
+        <p class="mt-3 py-3 link">LOG-IN</p>
+        <p class="py-3 link">SIGN-IN</p>
+    </section>
 </header>
 
 <main id="app"></main>
 
 <script type="module" src="/main.js"></script>
 
-<footer class="container-fluid text-center text-white font-monospace kit_footer">
+<footer class="container-fluid text-center text-white kit_footer">
     <div class="d-flex flex-column gap-2">
         <p class="text-secondary">
             &copy; 2025 KIT Tracker. All rights reserved.

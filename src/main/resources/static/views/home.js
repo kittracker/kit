@@ -11,10 +11,10 @@ export default () => {
         </div>
     </section>
        
-    <section class="container-fluid font-monospace bg-light">
-        <div class="row py-5">
+    <section class="container-fluid m-0 p-0 g-0 bg-light">
+        <div class="row m-0 py-5 g-0">
             <div class="col-lg-7 col-12">
-                <p class="py-5 ms-lg-5 px-lg-0 px-3 font-monospace">
+                <p class="py-5 ms-lg-5 px-lg-0 px-3">
                     This project focuses on developing an issue tracking system tailored for software projects. It
                     allows users to create and manage multiple projects, which can be set as either private or
                     public. The application runs on a centralized server managed by a single administrator.
@@ -42,8 +42,8 @@ export default () => {
     
     <br> <br>
     
-    <section class="container-fluid text-center font-monospace bg-light">
-        <div class="row py-5">
+    <section class="container-fluid m-0 p-0 g-0 text-center bg-light">
+        <div class="row m-0 py-5 g-0">
             <article class="col-lg-4 col-12 my-lg-0 my-5">
                 <div class="d-flex gap-lg-0 gap-md-5 gap-0 flex-lg-column flex-md-row flex-column align-items-center justify-content-center">
                     <a target="_blank" href="https://www.github.com/spectrev333">

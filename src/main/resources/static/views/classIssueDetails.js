@@ -1,3 +1,5 @@
+import Notifier from "../shared/Notifier.js";
+
 export default class IssueDetails {
     constructor(issueId) {
         this.issueId = issueId;
@@ -57,8 +59,10 @@ export default class IssueDetails {
                 this.issue.comments.push(await res.json())
                 this.renderComments();
             }
+            commentInput.value = "";
+        }).catch((reason) => {
+            Notifier.danger("Error", reason);
         });
-        commentInput.value = "";
     }
 
     render() {

@@ -4,7 +4,7 @@
     border-radius: 20px;
     border-style: solid;
 
-    transition: transform 150ms;
+    transition: all 150ms;
 }
 
 .project-card:hover {

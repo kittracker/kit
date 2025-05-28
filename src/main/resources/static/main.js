@@ -56,7 +56,7 @@ async function router() {
                 <div class="spinner-border" role="status"></div>
             </div>
         `;
-        if (currentlyLoadedComponent) {
+        if (currentlyLoadedComponent && "unmount" in currentlyLoadedComponent) {
             currentlyLoadedComponent.unmount();
             currentlyLoadedComponent = null;
         }

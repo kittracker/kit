@@ -88,3 +88,10 @@ window.addEventListener("click", async e => {
 // Handle browser navigation
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", router);
+
+window.addEventListener("resize", () => {
+    const navActionsCollapse = document.getElementById("navActionsCollapse");
+    const collapse = bootstrap.Collapse.getInstance(navActionsCollapse);
+
+    if (collapse) collapse.hide();
+});

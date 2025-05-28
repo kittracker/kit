@@ -274,6 +274,10 @@ let z = Math.random() * 222; //random initial seed value
 let spd = 0.35; //speed variable, increase to go faster (1.85)
 let scale = 0.002; //how detailed the perlin map is going to be - value represents amount of detail (.0028) [0.0008 => 0.01]
 
+// Variabili per il ciclo di vita
+let running = false;
+let animationFrameId = null;
+
 export const resizeCanvas = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -292,12 +296,19 @@ export const init = () => {
     context = canvas.getContext("2d");
     resizeCanvas();
 
-    // width = canvas.width = window.innerWidth;
-    // height = canvas.height = window.innerHeight;
-
     noise.seed(z);
 
+    running = true;
     render();
+}
+
+// Ferma il rendering e cancella il frame corrente
+export const destroy = () => {
+    running = false;
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
 }
 
 let getValue = (x, y, z, scl) => {
@@ -305,6 +316,11 @@ let getValue = (x, y, z, scl) => {
 }
 
 let render = () => {
+    if (!running) return;
+    if (!canvas || !document.body.contains(canvas)) {
+        running = false;
+        return;
+    }
     context.clearRect(0, 0, width, height);
     let pos = 11;
     for (let x = 0; x < width; x += pos) {
@@ -324,5 +340,5 @@ let render = () => {
         }
     }
     z += spd;
-    requestAnimationFrame(render);
+    animationFrameId = requestAnimationFrame(render);
 }

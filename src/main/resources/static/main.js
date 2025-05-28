@@ -5,13 +5,15 @@ import projects from "./views/projects.js";
 import projectDetails from "./views/projectDetails.js";
 import IssueDetails from "./views/classIssueDetails.js";
 import Projects from "./views/classProjects.js";
+import Home from "./views/classHome.js"
 
 let placeholder = () => `
     <h1>This page is under construction</h1>
 `
 
 const routes = {
-    "/": { title: "Home", render: home },
+    //"/": { title: "Home", render: home },
+    "/": { title: "Home", component: (_) => new Home() },
     // "/projects": { title: "Projects", render: projects },
     "/projects": { title: "Project Details", component: (_) => new Projects() },
     "/projects/:id": { title: "Project Details", render: projectDetails },
@@ -40,6 +42,8 @@ function matchRoute(path) {
     return null;
 }
 
+let currentlyLoadedComponent = null;
+
 async function router() {
     const path = location.pathname;
     const matched = matchRoute(path);
@@ -52,8 +56,13 @@ async function router() {
                 <div class="spinner-border" role="status"></div>
             </div>
         `;
+        if (currentlyLoadedComponent) {
+            currentlyLoadedComponent.unmount();
+            currentlyLoadedComponent = null;
+        }
         if ("component" in matched.route) {
-            matched.route.component(matched.params).mount(app);
+            currentlyLoadedComponent = matched.route.component(matched.params) // calls constructor
+            currentlyLoadedComponent.mount(app);
         } else {
             app.innerHTML = await matched.route.render(matched.params); // Pass params to render
         }

@@ -1,9 +1,10 @@
-package edu.kitt.orm
+package edu.kitt.orm.inmemory
 
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
 import edu.kitt.issueRepository
+import edu.kitt.orm.ProjectRepository
 import edu.kitt.orm.entries.CollaboratorEntry
 import edu.kitt.orm.entries.ProjectEntry
 import edu.kitt.orm.requests.ProjectEntryRequest

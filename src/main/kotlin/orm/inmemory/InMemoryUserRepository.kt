@@ -1,6 +1,7 @@
-package edu.kitt.orm
+package edu.kitt.orm.inmemory
 
 import edu.kitt.domainmodel.User
+import edu.kitt.orm.UserRepository
 import edu.kitt.orm.entries.UserEntry
 
 class InMemoryUserRepository : UserRepository {

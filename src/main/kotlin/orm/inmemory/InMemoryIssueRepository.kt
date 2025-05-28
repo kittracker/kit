@@ -1,10 +1,11 @@
-package edu.kitt.orm
+package edu.kitt.orm.inmemory
 
 import edu.kitt.commentRepository
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
 import edu.kitt.issueRepository
+import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.entries.IssueLinkEntry
 import edu.kitt.orm.requests.IssueEntryRequest

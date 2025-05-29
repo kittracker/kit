@@ -183,7 +183,7 @@ export default class Projects {
                 </div>
                 <div>
                     <p>Description</p>
-                    <textarea class="form-control" id=${projectDescriptionModal} placeholder="Project Description" rows="4" ></textarea>
+                    <textarea class="form-control search-bar" id=${projectDescriptionModal} placeholder="Project Description" rows="4" ></textarea>
                 </div>
             </div>
         `;

@@ -28,3 +28,10 @@
     transform: scale(1.05);
     cursor: pointer;
 }
+
+.kit_modal {
+    border-color: #202020;
+    border-width: 3px;
+    border-radius: 20px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}

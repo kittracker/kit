@@ -6,6 +6,7 @@ import projectDetails from "./views/projectDetails.js";
 import IssueDetails from "./views/classIssueDetails.js";
 import Projects from "./views/classProjects.js";
 import Home from "./views/classHome.js"
+import Notifier from "./shared/Notifier.js"
 
 let placeholder = () => `
     <h1>This page is under construction</h1>
@@ -87,7 +88,11 @@ window.addEventListener("click", async e => {
 
 // Handle browser navigation
 window.addEventListener("popstate", router);
-window.addEventListener("DOMContentLoaded", router);
+window.addEventListener("DOMContentLoaded", () => {
+    const tray = document.getElementById("notification-tray");
+    Notifier.attach(tray);
+    router();
+});
 
 window.addEventListener("resize", () => {
     const navActionsCollapse = document.getElementById("navActionsCollapse");

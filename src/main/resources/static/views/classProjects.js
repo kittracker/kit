@@ -1,3 +1,5 @@
+import Notifier from "../shared/Notifier.js";
+
 const projectName = "projectName";
 const projectNameFilter = "projectNameFilter";
 const activeProjectNameFilter = "activeProjectNameFilter";
@@ -126,10 +128,16 @@ export default class Projects {
                 "name": projectName,
                 "description": projectDescription,
             })
-        }).then(async () => {
+        }).then(async (res) => {
             const modalElement = document.getElementById("modal");
             const modal = bootstrap.Modal.getInstance(modalElement);
             if (modal) modal.hide();
+
+            if (res.ok) {
+                Notifier.success(projectName, "Project created successfully");
+            } else {
+                Notifier.danger(projectName, await res.text());
+            }
 
             await this.fetchProjects();
         });

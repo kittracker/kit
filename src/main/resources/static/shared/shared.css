@@ -59,3 +59,25 @@
 
     font-weight: bold;
 }
+
+.kit_toast {
+    border-color: #202020;
+    border-width: 3px;
+
+    border-radius: 20px;
+
+    background: #FFFFFF;
+
+    overflow: hidden;
+}
+
+.kit_toast_err {
+    border-color: rgb(255, 49, 49);
+    border-width: 3px;
+
+    border-radius: 20px;
+
+    background: #FFFFFF;
+
+    overflow: hidden;
+}

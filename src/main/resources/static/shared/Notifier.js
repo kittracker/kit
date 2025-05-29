@@ -1,9 +1,9 @@
 export default class Notifier {
     static Icon = {
-        Information: `<i class="bi bi-info-square-fill text-primary"></i>`,
-        Success: `<i class="bi bi-check-circle-fill texy-success"></i>`,
-        Warning: `<i class="bi bi-exclamation-triangle-fill text-warning"></i>`,
-        Danger: `<i class="bi bi-exclamation-octagon-fill text-danger"></i>`
+        Information: `<i class="bi bi-info-square-fill text-primary me-2"></i>`,
+        Success: `<i class="bi bi-check-circle-fill text-success me-2"></i>`,
+        Warning: `<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>`,
+        Danger: `<i class="bi bi-exclamation-octagon-fill text-danger me-2"></i>`
     }
 
     static send(title, body, icon, options = {}) {
@@ -11,12 +11,13 @@ export default class Notifier {
             console.error("Notifier: notificationTray was not attached.");
             return;
         }
+
         const temp = document.createElement('div');
         temp.innerHTML = `
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast p-2" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     ${icon}
-                    <strong class="me-auto p-1">${title}</strong>
+                    <strong class="me-auto p-1 fg-dark">${title}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -24,17 +25,22 @@ export default class Notifier {
                 </div>
             </div>
         `;
+
+        if (icon === this.Icon.Danger) {
+            temp.firstElementChild.classList.add("kit_toast_err");
+        } else {
+            temp.firstElementChild.classList.add("kit_toast");
+        }
+
         const toast = temp.firstElementChild;
         this.notificationTray.appendChild(toast);
-        // Inizializza e mostra il toast con Bootstrap
+
         const bsToast = new bootstrap.Toast(toast, options);
         bsToast.show();
 
-        // gemini ha detto di aggiungere
         toast.addEventListener('hidden.bs.toast', () => {
-            toast.remove(); // Rimuove l'elemento dal DOM
+            toast.remove();
         });
-        // e io sono d'accordo
     }
 
     static info(title, body) {

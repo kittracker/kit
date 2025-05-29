@@ -5,6 +5,7 @@ import edu.kitt.orm.inmemory.InMemoryCommentRepository
 import edu.kitt.orm.inmemory.InMemoryIssueRepository
 import edu.kitt.orm.inmemory.InMemoryProjectRepository
 import edu.kitt.orm.inmemory.InMemoryUserRepository
+import edu.kitt.orm.sql.SqlUserRepository
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
@@ -24,12 +25,22 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-fun Application.initInMemoryRepositories() = Repositories(
-    userRepository = InMemoryUserRepository(),
-    commentRepository = InMemoryCommentRepository(),
-    issueRepository = InMemoryIssueRepository(),
-    projectRepository = InMemoryProjectRepository()
-)
+fun Application.initInMemoryRepositories(): Repositories {
+
+    val connection = connectToPostgres(embedded = false)
+
+    val userRepository = SqlUserRepository(connection)
+    val commentRepository = InMemoryCommentRepository(userRepository)
+    val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
+    val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
+
+    return Repositories(
+        userRepository = userRepository,
+        commentRepository = commentRepository,
+        issueRepository = issueRepository,
+        projectRepository = projectRepository
+    )
+}
 
 fun Application.module() {
 

@@ -91,3 +91,12 @@ fun Application.connectToPostgres(embedded: Boolean): Connection {
         return DriverManager.getConnection(url, user, password)
     }
 }
+
+fun Application.initDbSchema(connection: Connection) {
+    val schema = this::class.java.classLoader.getResource("dbSchema.sql")?.readText()
+        ?: throw IllegalStateException("Schema file not found")
+
+    connection.createStatement().use { statement ->
+        statement.execute(schema)
+    }
+}

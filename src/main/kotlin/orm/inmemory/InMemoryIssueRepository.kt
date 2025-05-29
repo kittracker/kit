@@ -1,18 +1,17 @@
 package edu.kitt.orm.inmemory
 
-import edu.kitt.commentRepository
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.issueRepository
 import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.entries.IssueLinkEntry
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
-import edu.kitt.userRepository
+import edu.kitt.orm.CommentRepository
+import edu.kitt.orm.UserRepository
 
-class InMemoryIssueRepository : IssueRepository {
+class InMemoryIssueRepository(val commentRepository: CommentRepository, val userRepository: UserRepository) : IssueRepository {
     private val issueLinks = mutableListOf(
         IssueLinkEntry(1, 2),
         IssueLinkEntry(2, 1),
@@ -41,7 +40,7 @@ class InMemoryIssueRepository : IssueRepository {
     override fun getIssuesByProjectID(id: Int): List<Issue> {
         return issues.filter { it.projectID == id }.map {
             // FIXME: this can throw
-            issueRepository.getIssueByID(it.id!!)!!
+            this.getIssueByID(it.id!!)!!
         }
     }
 
@@ -56,7 +55,7 @@ class InMemoryIssueRepository : IssueRepository {
             // FIXME: this can throw
             userRepository.getUserByID(issueEntry.createdBy)!!,
             commentRepository.getCommentsByIssueID(issueEntry.id!!).toMutableList(),
-            issueRepository.getIssueLinks(issueEntry.id!!).toMutableList()
+            this.getIssueLinks(issueEntry.id!!).toMutableList()
         )
     }
 
@@ -68,7 +67,7 @@ class InMemoryIssueRepository : IssueRepository {
     }
 
     override fun getAllIssues() : List<Issue> {
-        return issues.map { issueRepository.getIssueByID(it.id)!! }
+        return issues.map { this.getIssueByID(it.id)!! }
     }
 
     override fun editIssue(issue: IssueEntryRequest): Issue? {

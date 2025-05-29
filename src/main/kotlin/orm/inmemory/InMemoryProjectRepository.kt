@@ -3,15 +3,14 @@ package edu.kitt.orm.inmemory
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
-import edu.kitt.issueRepository
+import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.ProjectRepository
+import edu.kitt.orm.UserRepository
 import edu.kitt.orm.entries.CollaboratorEntry
 import edu.kitt.orm.entries.ProjectEntry
 import edu.kitt.orm.requests.ProjectEntryRequest
-import edu.kitt.projectRepository
-import edu.kitt.userRepository
 
-class InMemoryProjectRepository : ProjectRepository {
+class InMemoryProjectRepository(val userRepository: UserRepository, val issueRepository: IssueRepository) : ProjectRepository {
     private val projectCollaborators = mutableListOf(
         CollaboratorEntry(1, 1),
         CollaboratorEntry(1, 2),
@@ -40,7 +39,7 @@ class InMemoryProjectRepository : ProjectRepository {
             projectEntry.archived,
             // FIXME: this can throw
             userRepository.getUserByID(projectEntry.ownerID)!!,
-            projectRepository.getCollaboratorsByProjectID(projectEntry.id).toMutableList(),
+            this.getCollaboratorsByProjectID(projectEntry.id).toMutableList(),
             issueRepository.getIssuesByProjectID(projectEntry.id).toMutableList()
         )
     }
@@ -53,7 +52,7 @@ class InMemoryProjectRepository : ProjectRepository {
     }
 
     override fun getAllProjects(): List<Project> {
-        return projects.map { projectRepository.getProjectByID(it.id)!! }
+        return projects.map { this.getProjectByID(it.id)!! }
     }
 
     override fun createProject(project: ProjectEntryRequest): Project? {

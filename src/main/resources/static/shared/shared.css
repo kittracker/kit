@@ -71,6 +71,8 @@
     background: #FFFFFF;
 
     overflow: hidden;
+
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 .kit_toast_err {
@@ -82,4 +84,6 @@
     background: #FFFFFF;
 
     overflow: hidden;
+
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }

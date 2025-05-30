@@ -3,6 +3,7 @@ import users from "./views/users.js"
 import userDetails from "./views/userDetails.js";
 import projects from "./views/projects.js";
 import projectDetails from "./views/projectDetails.js";
+import ProjectDetails from "./views/classProjectDetails.js";
 import IssueDetails from "./views/classIssueDetails.js";
 import Projects from "./views/classProjects.js";
 import Home from "./views/classHome.js"
@@ -17,7 +18,8 @@ const routes = {
     "/": { title: "Home", component: (_) => new Home() },
     // "/projects": { title: "Projects", render: projects },
     "/projects": { title: "Project Details", component: (_) => new Projects() },
-    "/projects/:id": { title: "Project Details", render: projectDetails },
+    // "/projects/:id": { title: "Project Details", render: projectDetails },
+    "/projects/:id": { title: "Project Details", component: (params) => new ProjectDetails(params.id) },
     "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id) },
     "/users": { title: "Users", render: users },
     "/users/:id": { title: "User Details", render: userDetails },  // Dynamic ID
@@ -53,7 +55,7 @@ async function router() {
         document.title = matched.route.title;
         // Show loading state
         app.innerHTML = `
-            <div class="text-center">
+            <div class="text-center pt-5 min-vh-100">
                 <div class="spinner-border" role="status"></div>
             </div>
         `;

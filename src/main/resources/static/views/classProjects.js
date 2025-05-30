@@ -149,7 +149,7 @@ export default class Projects {
                 <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100" id=${projectSection}>
                 </section>
                 <section class="col-xl-4 col-12 px-3">
-                    <div class="d-flex flex-column gap-5 filter-section p-5">
+                    <div class="d-flex flex-column gap-5 p-5 filter-section">
                         <div>
                             <p>Filter by Project Name</p>
                             <form class="input-group">

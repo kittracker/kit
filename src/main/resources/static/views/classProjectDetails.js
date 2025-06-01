@@ -6,11 +6,12 @@ export default class ProjectDetails {
         this.project = null;
         this.container = document.createElement("div");
 
+        const navbar = document.getElementById("navbar");
 
         const options = {
             root: null,
-            rootMargin: '0px',
-            threshold: 1
+            rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
+            threshold: [0, 1]
         };
 
         const observe = (entries, observer) => {
@@ -20,11 +21,21 @@ export default class ProjectDetails {
                 return;
             }
 
+            const navbar = document.getElementById("navbar");
+            if (!navbar) {
+                console.error("Error: Could not retrieve navbar component.");
+                return;
+            }
+
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    sticky.classList.add("d-none");
-                } else {
+                if (!entry.isIntersecting) {
+                    sticky.style.top = navbar.offsetHeight.toString();
+
                     sticky.classList.remove("d-none");
+                    sticky.classList.add("d-flex");
+                } else {
+                    sticky.classList.remove("d-flex");
+                    sticky.classList.add("d-none");
                 }
             });
         }
@@ -40,14 +51,12 @@ export default class ProjectDetails {
         this.render()
     }
 
-
     render() {
         this.container.innerHTML =  `
-            <!-- d-flex & d-none are bootstrap classes and positioned at the end to avoid breaking behaviour with js -->
-            <section class="m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary d-flex d-none" id="sticky-info">
+            <section class="container-fluid m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
                 <h5 class="text-wrap text-break">${this.project.name}</h5>
             </section>
-
+            
             <div class="m-0 g-0 pt-3 pb-1 px-3 min-vh-100">
                 <div class="row m-0 p-0 g-0">
                     <div class="row m-0 p-5 g-0">
@@ -59,8 +68,8 @@ export default class ProjectDetails {
                     </div>
                 </div>
                 
-                <div class="row mt-5 p-0 g-0">
-                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100">
+                <div class="row flex-xl-row flex-column-reverse gap-xl-0 gap-4 mt-5 p-0 g-0">
+                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100" id="content-section">
                     </section>
                     <section class="col-xl-4 col-12">
                         <div class="d-flex flex-column gap-5 p-5 project-details-filters">

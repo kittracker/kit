@@ -68,33 +68,29 @@ export default class ProjectDetails {
 
     renderIssues(element, status) {
         element.innerHTML = `
-            ${this.project.issues.length > 0 ? `
-                ${this.project.issues.map(issue => `
-                    ${issue.status === status ? `
-                        <div class="card mb-3 p-2 project-card" href="/issues/${issue.id}" data-link>
-                            <div class="card-body">
-                                <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                                    <div class="d-flex gap-3">
-                                        ${this.renderIssueStatus(status)}
-                                        <h5 class="card-title">${issue.title}</h5>
-                                    </div>
-                                    <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.createdBy.username}</h6>
+            ${this.project.issues.map(issue => `
+                ${issue.status === status ? `
+                    <div class="card mb-3 p-2 project-card" href="/issues/${issue.id}" data-link>
+                        <div class="card-body">
+                            <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                                <div class="d-flex gap-3">
+                                    ${this.renderIssueStatus(status)}
+                                    <h5 class="card-title">${issue.title}</h5>
                                 </div>
-                                <br />
-                                <p class="card-text">${issue.description}</p>
+                                <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.createdBy.username}</h6>
                             </div>
+                            <br />
+                            <p class="card-text">${issue.description}</p>
                         </div>
-                    `
-                : ``}
-                `).join("")} `
-            :
-            `<h5 class="text-center p-5">No projects yet</h5>`
-        }   
+                    </div>
+                `
+            : ``}
+            `).join("")}
         `;
 
         if (element.innerHTML.trim() === "") {
             element.innerHTML = `
-                <h5 class="text-center p-5">No issues yet</h5>
+                <h5 class="text-center p-5 text-secondary">No issues yet</h5>
             `;
         }
     }
@@ -136,30 +132,34 @@ export default class ProjectDetails {
             return;
         }
 
-        // collaborators.innerHTML = `
-        //     ${this.project.collaborators.length > 0 ? `
-        //         ${this.project.issues.map(issue => `
-        //             ${issue.status === status ? `
-        //                 <div class="card mb-3 p-2 project-card" href="/issues/${issue.id}" data-link>
-        //                     <div class="card-body">
-        //                         <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-        //                             <div class="d-flex gap-3">
-        //                                 ${this.renderIssueStatus(status)}
-        //                                 <h5 class="card-title">${issue.title}</h5>
-        //                             </div>
-        //                             <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.createdBy.username}</h6>
-        //                         </div>
-        //                         <br />
-        //                         <p class="card-text">${issue.description}</p>
-        //                     </div>
-        //                 </div>
-        //             `
-        //         : ``}
-        //         `).join("")} `
-        //     :
-        //     `<h5 class="text-center p-5">No projects yet</h5>`
-        // }
-        // `;
+        collaborators.innerHTML = `
+            <div class="card mb-3 p-2 project-card" href="/users/${this.project.owner.id}" data-link>
+                <div class="card-body">
+                    <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-star-fill"></i>
+                            <h5 class="card-title">${this.project.owner.username}</h5>
+                        </div>
+                    </div>
+                    <br />
+                    <p class="card-text">${this.project.owner.emailAddress}</p>
+                </div>
+            </div>
+            ${this.project.collaborators.map(user => `
+                <div class="card mb-3 p-2 project-card" href="/users/${user.id}" data-link>
+                    <div class="card-body">
+                        <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                            <div class="d-flex gap-3">
+                                <i class="bi bi-person-circle"></i>
+                                <h5 class="card-title">${user.username}</h5>
+                            </div>
+                        </div>
+                        <br />
+                        <p class="card-text">${user.emailAddress}</p>
+                    </div>
+                </div>
+            `).join("")}
+        `;
     }
 
     render() {
@@ -175,7 +175,13 @@ export default class ProjectDetails {
                     </div>
                     
                     <div class="row m-0 p-3 g-0">
-                        <h5 class="fs-5 text-center text-wrap text-break">${this.project.description}</h5>
+                        <h5 class="fs-5 text-center text-wrap text-break">
+                            ${this.project.description.length > 0 ?
+                                `${this.project.description}`
+                                :
+                                `<p class="text-secondary">No description provided</p>`
+                            }
+                        </h5>
                     </div>
                 </div>
                 

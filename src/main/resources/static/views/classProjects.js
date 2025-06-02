@@ -49,7 +49,7 @@ export default class Projects {
                     </div>
                 `).join("")} `
                 :
-                `<h5 class="text-center p-5">No projects yet</h5>`
+                `<h5 class="text-center p-5 text-secondary">No projects yet</h5>`
             }
         `;
     }

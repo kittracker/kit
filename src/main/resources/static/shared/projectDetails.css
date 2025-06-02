@@ -24,6 +24,21 @@
     color: rgb(255, 49, 49);
 }
 
+.list-item {
+    color: black;
+
+    transition: ease-in-out 150ms;
+}
+
+.list-group-item-action.list-item:hover {
+    background: rgb(255, 49, 49);
+    color: #FFFFFF;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
 @media(min-width: 768px) {
     .project-sticky {
         top: 80px;

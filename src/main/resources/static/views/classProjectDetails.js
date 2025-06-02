@@ -4,7 +4,11 @@ export default class ProjectDetails {
     constructor(id) {
         this.id = id;
         this.project = null;
+        this.users = null;
+        this.newCollaborators = [];
         this.container = document.createElement("div");
+
+        this.isFiltered = false;
 
         const navbar = document.getElementById("navbar");
 
@@ -14,7 +18,7 @@ export default class ProjectDetails {
             threshold: [0, 1]
         };
 
-        const observe = (entries, observer) => {
+        const observe = (entries, _) => {
             const sticky = document.getElementById("sticky-info");
             if (!sticky) {
                 console.error("Error: Could not retrieve sticky-info component.");
@@ -47,9 +51,176 @@ export default class ProjectDetails {
         const response = await fetch(`/api/projects/${this.id}`);
         if (response.ok) {
             this.project = await response.json();
-            console.log(this.project.collaborators);
         }
+        this.isFiltered = false;
         this.render()
+    }
+
+    async fetchUsers() {
+        const response = await fetch(`/api/users`);
+        if (response.ok) {
+            this.users = await response.json();
+        }
+    }
+
+    search() {
+        const element = document.getElementById("searchBar");
+
+        let regex = new RegExp(element.value, "i");
+        this.project.issues = this.project.issues.filter(issue => regex.test(issue.title) || regex.test(issue.createdBy.username) || regex.test(issue.description));
+        this.project.collaborators = this.project.collaborators.filter(user => regex.test(user.username) || regex.test(user.emailAddress));
+
+        const active = document.getElementById("activeResearch");
+        active.textContent = `Active: ${element.value}`;
+        this.isFiltered = true;
+
+        element.value = "";
+
+        this.renderOpenIssues();
+        this.renderInProgressIssues();
+        this.renderClosedIssues();
+        this.renderCollaborators();
+    }
+
+    callback(e) {
+        e.preventDefault();
+
+        if (e.submitter.id === "searchFilter") this.search();
+        else if (e.submitter.id === "reset") this.fetchProject();
+        else console.error("Error: Unknown callback requested.");
+    }
+
+    async postIssue(e) {
+        e.preventDefault();
+
+        const issueTitleModal = document.getElementById("issueTitle");
+
+        const issueTitle = issueTitleModal.value;
+        const issueDescription = document.getElementById("issueDescription").value;
+
+        if (issueTitle.length === 0) {
+            issueTitleModal.focus();
+            return;
+        }
+
+        await fetch("/api/issues", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "title": issueTitle,
+                "description": issueDescription,
+                "createdBy": 1, // TODO: change this into logged-in user id
+                "projectID": this.project.id,
+            })
+        }).then(async (res) => {
+            const modalElement = document.getElementById("modal");
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+
+            if (res.ok) {
+                Notifier.success(issueTitle, "Issue created successfully");
+            } else {
+                Notifier.danger(issueTitle, await res.text());
+            }
+
+            await this.fetchProject();
+        });
+    }
+
+    async postCollaborators(e) {
+        e.preventDefault();
+
+        const select = document.getElementById("selectUsers");
+
+        if (this.newCollaborators.length === 0) {
+            select.focus();
+            return;
+        }
+
+        for (const user of this.newCollaborators) {
+            if (user.id === this.project.owner.id) continue;
+
+            try {
+                const res = await fetch("/api/collaborators", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        "userID": user.id,
+                        "projectID": this.project.id,
+                    })
+                });
+
+                if (res.ok) {
+                    Notifier.success(user.username, "Collaborator added successfully");
+                } else {
+                    const errorText = await res.text();
+                    Notifier.danger(user.username, errorText);
+                }
+            } catch (error) {
+                Notifier.danger(user.username, `Request failed: ${error.message}`);
+            }
+        }
+
+        await this.fetchProject();
+
+        const modalElement = document.getElementById("modalSecondary");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+    }
+
+    clearNewCollaborators(_) {
+        const list = document.getElementById("usersList");
+        list.innerHTML = "";
+
+        const select = document.getElementById("selectUsers");
+        select.value = -1;
+
+        this.newCollaborators.length = 0;
+    }
+
+    selectCollaborator(e) {
+        e.preventDefault();
+
+        const select = document.getElementById("selectUsers");
+        const index = select.value;
+
+        if (parseInt(index) === -1) {
+            Notifier.danger("User Selection", "Please select a valid option");
+            return;
+        }
+
+        const user = this.users[index - 1];
+
+        if (this.newCollaborators.includes(user)) {
+            Notifier.warning(user.username, "User already selected");
+            return;
+        }
+
+        this.newCollaborators.push(user)
+
+        const list = document.getElementById("usersList");
+        const item = document.createElement("li");
+        item.classList.add("list-group-item", "list-group-item-action", "list-item");
+        item.textContent = user.username;
+        item.dataset.userID = user.id;
+
+        item.addEventListener("click", (e) => {
+            const item = e.currentTarget;
+            const id = item.dataset.userID;
+
+            this.newCollaborators = this.newCollaborators.filter(user => user.id.toString() !== id);
+            item.remove();
+
+            Notifier.info(item.textContent, "User removed successfully");
+        });
+
+        list.append(item);
+
+        // TODO: maybe for the UX is better to remove from this.users the already appended user
     }
 
     renderIssueStatus(status) {
@@ -70,17 +241,17 @@ export default class ProjectDetails {
         element.innerHTML = `
             ${this.project.issues.map(issue => `
                 ${issue.status === status ? `
-                    <div class="card mb-3 p-2 project-card" href="/issues/${issue.id}" data-link>
+                    <div class="card mb-3 p-2 kit-card" href="/issues/${issue.id}" data-link>
                         <div class="card-body">
                             <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                                <div class="d-flex gap-3">
+                                <div class="d-flex gap-3" style="min-width: 0;">
                                     ${this.renderIssueStatus(status)}
-                                    <h5 class="card-title">${issue.title}</h5>
+                                    <h5 class="card-title d-block text-truncate">${issue.title}</h5>
                                 </div>
                                 <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.createdBy.username}</h6>
                             </div>
                             <br />
-                            <p class="card-text">${issue.description}</p>
+                            <p class="card-text d-block text-truncate">${issue.description}</p>
                         </div>
                     </div>
                 `
@@ -133,20 +304,24 @@ export default class ProjectDetails {
         }
 
         collaborators.innerHTML = `
-            <div class="card mb-3 p-2 project-card" href="/users/${this.project.owner.id}" data-link>
-                <div class="card-body">
-                    <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                        <div class="d-flex gap-3">
-                            <i class="bi bi-star-fill"></i>
-                            <h5 class="card-title">${this.project.owner.username}</h5>
+            ${!this.isFiltered ? `
+                <div class="card mb-3 p-2 kit-card" href="/users/${this.project.owner.id}" data-link>
+                    <div class="card-body">
+                        <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                            <div class="d-flex gap-3">
+                                <i class="bi bi-star-fill"></i>
+                                <h5 class="card-title">${this.project.owner.username}</h5>
+                            </div>
                         </div>
+                        <br/>
+                        <p class="card-text">${this.project.owner.emailAddress}</p>
                     </div>
-                    <br />
-                    <p class="card-text">${this.project.owner.emailAddress}</p>
                 </div>
-            </div>
+                `
+                : ``
+            }
             ${this.project.collaborators.map(user => `
-                <div class="card mb-3 p-2 project-card" href="/users/${user.id}" data-link>
+                <div class="card mb-3 p-2 kit-card" href="/users/${user.id}" data-link>
                     <div class="card-body">
                         <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
                             <div class="d-flex gap-3">
@@ -163,7 +338,7 @@ export default class ProjectDetails {
     }
 
     render() {
-        this.container.innerHTML =  `
+        this.container.innerHTML = `
             <section class="container-fluid m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
                 <h5 class="text-wrap text-break">${this.project.name}</h5>
             </section>
@@ -199,29 +374,29 @@ export default class ProjectDetails {
                             <div>
                                 <ul class="nav nav-pills nav-justified" id="pills-tab" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link button active" id="pills-open-tab" data-bs-toggle="pill" data-bs-target="#pills-open" type="button" role="tab" aria-controls="pills-open" aria-selected="true">OPEN</button>
+                                        <button class="btn nav-link button active" id="pills-open-tab" data-bs-toggle="pill" data-bs-target="#pills-open" type="button" role="tab" aria-controls="pills-open" aria-selected="true">OPEN</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link button" id="pills-in-progress-tab" data-bs-toggle="pill" data-bs-target="#pills-in-progress" type="button" role="tab" aria-controls="pills-open" aria-selected="true">IN PROGRESS</button>
+                                        <button class="btn nav-link button" id="pills-in-progress-tab" data-bs-toggle="pill" data-bs-target="#pills-in-progress" type="button" role="tab" aria-controls="pills-open" aria-selected="true">IN PROGRESS</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link button" id="pills-closed-tab" data-bs-toggle="pill" data-bs-target="#pills-closed" type="button" role="tab" aria-controls="pills-closed" aria-selected="false">CLOSED</button>
+                                        <button class="btn nav-link button" id="pills-closed-tab" data-bs-toggle="pill" data-bs-target="#pills-closed" type="button" role="tab" aria-controls="pills-closed" aria-selected="false">CLOSED</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link button" id="pills-collaborators-tab" data-bs-toggle="pill" data-bs-target="#pills-collaborators" type="button" role="tab" aria-controls="pills-collaborators" aria-selected="false">COLLABORATORS</button>
+                                        <button class="btn nav-link button" id="pills-collaborators-tab" data-bs-toggle="pill" data-bs-target="#pills-collaborators" type="button" role="tab" aria-controls="pills-collaborators" aria-selected="false">COLLABORATORS</button>
                                     </li>
                                 </ul>
                             </div>
                             <div>
                                 <p>Search</p>
                                 <form class="input-group">
-                                    <input type="text" class="form-control search-bar" placeholder="Search" aria-label="Search" aria-describedby="Search">
-                                    <button class="btn button" type="submit">Search</button>
+                                    <input type="text" class="form-control search-bar" id="searchBar" placeholder="Search" aria-label="Search" aria-describedby="Search">
+                                    <button class="btn button" type="submit" id="searchFilter">Search</button>
                                 </form> 
                                 <p class="py-3" id="activeResearch"></p>
                             </div>
                             <form>
-                                <button class="container-fluid btn button" type="submit">RESET</button>
+                                <button class="container-fluid btn button" type="submit" id="reset">RESET</button>
                             </form>
                         </div>
                     </section>
@@ -236,6 +411,15 @@ export default class ProjectDetails {
         this.renderClosedIssues();
         this.renderCollaborators();
 
+        const newDropdown = document.getElementById("newDropdown");
+        newDropdown.classList.remove("d-none");
+
+        const newDropdownContent = document.getElementById("newDropdownContent");
+        newDropdownContent.innerHTML = `
+            <li><button class="dropdown-item py-2 px-4" id="newIssue" data-bs-toggle="modal" data-bs-target="#modal">NEW ISSUE</button></li>
+            <li><button class="dropdown-item py-2 px-4" id="newCollaborator" data-bs-toggle="modal" data-bs-target="#modalSecondary">NEW COLLABORATOR</button></li>
+        `;
+
         const projectTitle = document.getElementById("project-title");
         if (!projectTitle) {
             console.error("Error: Could not retrieve project-title component.");
@@ -244,9 +428,64 @@ export default class ProjectDetails {
 
         this.observer.unobserve(projectTitle);
         this.observer.observe(projectTitle);
+
+        const modalTitle = document.getElementById("modalTitle");
+        modalTitle.textContent = "New Issue";
+
+        const modalBody = document.getElementById("modalBody");
+        modalBody.innerHTML = `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Issue Title</p>
+                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue Name" aria-label="Issue Name" aria-describedby="issueTitle" required>
+                </div>
+                <div>
+                    <p>Description</p>
+                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Issue Description" rows="4" ></textarea>
+                </div>
+            </div>
+        `;
+
+        const modalFooter = document.getElementById("modalFooter");
+        modalFooter.onsubmit = (e) => this.postIssue(e);
+
+        const modalSecondaryTitle = document.getElementById("modalSecondaryTitle");
+        modalSecondaryTitle.textContent = "New Collaborator";
+
+        const modalSecondaryBody = document.getElementById("modalSecondaryBody");
+        modalSecondaryBody.innerHTML = `
+            <div class="d-flex flex-column gap-5 p-3">
+                <ul class="list-group text-center" id="usersList">
+                </ul>
+                <form class="input-group" id="collaboratorsForm">
+                    <span class="input-group-text fg-dark" id="visible-addon">@</span>
+                    <select class="form-select search-bar" id="selectUsers" aria-label="Example select with button addon">
+                        <option value="-1" selected>Choose...</option>
+                        ${this.users.map((user, index) => `
+                            <option value="${index + 1}">${user.username}</option>    
+                        `)}
+                    </select>
+                    <button class="btn button" type="submit">Add</button>
+                </form>
+            </div>
+        `;
+
+        const collaboratorsForm = document.getElementById("collaboratorsForm");
+        collaboratorsForm.onsubmit = (e) => this.selectCollaborator(e);
+
+        const modalSecondary = document.getElementById("modalSecondary");
+        modalSecondary.addEventListener("hidden.bs.modal", (e) => this.clearNewCollaborators(e));
+
+        const modalSecondaryFooter = document.getElementById("modalSecondaryFooter");
+        modalSecondaryFooter.onsubmit = (e) => this.postCollaborators(e);
+
+        this.container.onsubmit = (e) => this.callback(e);
     }
 
     unmount() {
+        const newDropdown = document.getElementById("newDropdown");
+        newDropdown.classList.add("d-none");
+
         const projectTitle = document.getElementById("project-title");
         if (!projectTitle) {
             console.error("Error: Could not retrieve project-title component.");
@@ -257,9 +496,10 @@ export default class ProjectDetails {
         this.observer.disconnect();
     }
 
-    mount(root) {
+    async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
-        this.fetchProject(); // Fetch issue data and render
+        await this.fetchUsers();
+        await this.fetchProject(); // Fetch issue data and render
     }
 }

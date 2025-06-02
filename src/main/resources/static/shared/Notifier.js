@@ -17,7 +17,7 @@ export default class Notifier {
             <div class="toast p-2" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     ${icon}
-                    <strong class="me-auto p-1 fg-dark">${title}</strong>
+                    <strong class="d-block text-truncate me-auto p-1 fg-dark">${title}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -27,9 +27,9 @@ export default class Notifier {
         `;
 
         if (icon === this.Icon.Danger) {
-            temp.firstElementChild.classList.add("kit_toast_err");
+            temp.firstElementChild.classList.add("kit-toast-err");
         } else {
-            temp.firstElementChild.classList.add("kit_toast");
+            temp.firstElementChild.classList.add("kit-toast");
         }
 
         const toast = temp.firstElementChild;

@@ -34,14 +34,14 @@ export default class Projects {
         projects.innerHTML = `
             ${this.projects.length > 0 ? `
                 ${this.projects.map(project => `
-                    <div class="card mb-3 p-2 project-card" href="/projects/${project.id}" data-link>
+                    <div class="card mb-3 p-2 kit-card" href="/projects/${project.id}" data-link>
                         <div class="card-body">
                             <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                                <h5 class="card-title">${project.name}</h5>
+                                <h5 class="card-title d-block text-truncate">${project.name}</h5>
                                 <h6 class="card-subtitle mb-2 text-body-tertiary">@${project.owner.username}</h6>
                             </div>
                             <br />
-                            <p class="card-text">${project.description}</p>
+                            <p class="card-text d-block text-truncate">${project.description}</p>
                             <div class="progress" role="progressbar" aria-label="Project Completion" aria-valuenow="${this.getProjectCompletePercentage(project)}" aria-valuemin="0" aria-valuemax="100">
                                 <div class="progress-bar bg-reverse" style="width: ${this.percentage}%">${this.percentage}%</div>
                             </div>
@@ -206,6 +206,11 @@ export default class Projects {
         newProjectCollapse.classList.remove("d-none");
 
         this.container.onsubmit = (e) => this.callback(e);
+    }
+
+    unmount() {
+        const newButton = document.getElementById("newButton");
+        newButton.classList.add("d-none");
     }
 
     mount(root) {

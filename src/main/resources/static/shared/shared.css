@@ -14,36 +14,70 @@
     background: rgb(255, 49, 49);
 }
 
-.button {
+.btn.button {
+    background: transparent;
     color: #202020;
 
     border-color: #202020;
     border-width: 3px;
+
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
-.button:hover {
-    background: #202020;
+.btn.button:hover {
+    background-color: #202020;
     color: rgb(255, 49, 49);
 }
 
-.button:focus {
+.btn.button:focus {
+    background: transparent;
+    color: #202020;
+
+    border-color: #202020;
+
     outline: none !important;
     box-shadow: none !important;
 }
 
-.button-reverse {
+.btn.button:active,
+.btn.button.show {
+    background-color: #202020;
+    color: rgb(255, 49, 49);
+    border-color: #202020;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn.button-reverse {
+    background-color: transparent;
     color: #FFFFFF;
 
     border-color: #FFFFFF;
     border-width: 3px;
+
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
-.button-reverse:hover {
-    background: #FFFFFF;
+.btn.button-reverse:hover {
+    background-color: #FFFFFF;
     color: rgb(255, 49, 49);
 }
 
-.button-reverse:focus {
+.btn.button-reverse:focus {
+    background-color: transparent;
+    color: #FFFFFF;
+
+    border-color: #FFFFFF;
+
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn.button-reverse:active,
+.btn.button-reverse.show {
+    background-color: #FFFFFF;
+    color: rgb(255, 49, 49);
+    border-color: #FFFFFF;
     outline: none !important;
     box-shadow: none !important;
 }
@@ -60,6 +94,19 @@
     font-weight: bold;
 
     cursor: pointer;
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+    background: transparent;
+    color: rgb(255, 49, 49);
+
+    font-weight: bold;
+}
+
+.dropdown-item:hover {
+    font-weight: bold;
+    color: rgb(255, 49, 49);
 }
 
 .borders-primary {
@@ -80,7 +127,15 @@
     border-style: solid;
 }
 
-.kit_toast {
+.search-bar:focus {
+    outline: none !important;
+    box-shadow: none !important;
+
+    border-color: rgb(255, 49, 49);
+    border-width: 3px;
+}
+
+.kit-toast {
     border-color: #202020;
     border-width: 3px;
 
@@ -93,7 +148,7 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
-.kit_toast_err {
+.kit-toast-err {
     border-color: rgb(255, 49, 49);
     border-width: 3px;
 
@@ -104,4 +159,19 @@
     overflow: hidden;
 
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.kit-card {
+    border-color: #202020;
+    border-width: 3px;
+    border-radius: 20px;
+    border-style: solid;
+
+    transition: all 150ms;
+}
+
+.kit-card:hover {
+    border-color: rgb(255, 49, 49);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
 }

@@ -15,45 +15,23 @@ import io.ktor.server.sessions.*
 import java.sql.Connection
 import java.sql.DriverManager
 import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.v1.jdbc.Database
 
-fun Application.configureDatabases() {
-    val dbConnection: Connection = connectToPostgres(embedded = true)
-    val cityService = CityService(dbConnection)
-    
-    routing {
-    
-        // Create city
-        post("/cities") {
-            val city = call.receive<City>()
-            val id = cityService.create(city)
-            call.respond(HttpStatusCode.Created, id)
-        }
-    
-        // Read city
-        get("/cities/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            try {
-                val city = cityService.read(id)
-                call.respond(HttpStatusCode.OK, city)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.NotFound)
-            }
-        }
-    
-        // Update city
-        put("/cities/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            val user = call.receive<City>()
-            cityService.update(id, user)
-            call.respond(HttpStatusCode.OK)
-        }
-    
-        // Delete city
-        delete("/cities/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            cityService.delete(id)
-            call.respond(HttpStatusCode.OK)
-        }
+
+fun Application.configureDatabases(embedded: Boolean) {
+    if (embedded) {
+        log.info("Using embedded H2 database for testing; replace this flag to use postgres")
+        Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver", user = "root", password = "")
+    } else {
+        val url = environment.config.property("postgres.url").getString()
+        log.info("Connecting to postgres database at $url")
+        val user = environment.config.property("postgres.user").getString()
+        val password = environment.config.property("postgres.password").getString()
+        Database.connect(
+            url,
+            user = user,
+            password = password
+        )
     }
 }
 /**

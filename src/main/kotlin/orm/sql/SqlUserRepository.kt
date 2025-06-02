@@ -12,7 +12,7 @@ class SqlUserRepository(private val connection: Connection) : UserRepository {
         private const val SELECT_ALL_USERS = "SELECT id, email_address, username FROM users"
     }
 
-    override fun getUserByID(uid: Int): User? {
+    override suspend fun getUserByID(uid: Int): User? {
         val statement = connection.prepareStatement(SELECT_USER_BY_ID, Statement.RETURN_GENERATED_KEYS)
         statement.setInt(1, uid)
         val resultSet = statement.executeQuery()
@@ -26,7 +26,7 @@ class SqlUserRepository(private val connection: Connection) : UserRepository {
         }
     }
 
-    override fun getAllUsers(): List<User> {
+    override suspend fun getAllUsers(): List<User> {
         val statement = connection.prepareStatement(SELECT_ALL_USERS, Statement.RETURN_GENERATED_KEYS)
         val resultSet = statement.executeQuery()
         val users = mutableListOf<User>()

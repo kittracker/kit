@@ -7,13 +7,13 @@ import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 
 interface IssueRepository {
-    fun createIssue(issue: IssueEntryRequest): Issue?
-    fun getIssuesByProjectID(id: Int): List<Issue>
-    fun getIssueByID(id: Int): Issue?
-    fun getIssueLinks(id: Int): List<IssueLink>
-    fun getAllIssues() : List<Issue>
-    fun editIssue(issue: IssueEntryRequest): Issue?
-    fun deleteIssue(id: Int): Boolean
-    fun linkIssues(link: IssueLinkEntryRequest): IssueLink?
-    fun deleteLink(link: IssueLinkEntryRequest): Boolean
+    suspend fun createIssue(issue: IssueEntryRequest): Issue?
+    suspend fun getIssuesByProjectID(id: Int): List<Issue>
+    suspend fun getIssueByID(id: Int): Issue?
+    suspend fun getIssueLinks(id: Int): List<IssueLink>
+    suspend fun getAllIssues() : List<Issue>
+    suspend fun editIssue(issue: IssueEntryRequest): Issue?
+    suspend fun deleteIssue(id: Int): Boolean
+    suspend fun linkIssues(link: IssueLinkEntryRequest): IssueLink?
+    suspend fun deleteLink(link: IssueLinkEntryRequest): Boolean
 }

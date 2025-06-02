@@ -13,11 +13,11 @@ class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRep
         CommentEntry(3, 3, "this is a comment", 1),
     )
 
-    override fun removeCommentByID(id: Int): Boolean {
+    override suspend fun removeCommentByID(id: Int): Boolean {
         return comments.removeIf { it.id == id }
     }
 
-    override fun getCommentsByIssueID(id: Int): List<Comment> {
+    override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
         return comments.filter { it.issueID == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
@@ -25,7 +25,7 @@ class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRep
         }
     }
 
-    override fun getCommentsByUserID(id: Int): List<Comment> {
+    override suspend fun getCommentsByUserID(id: Int): List<Comment> {
         return comments.filter { it.author == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
@@ -33,7 +33,7 @@ class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRep
         }
     }
 
-    override fun createComment(comment: CommentEntryRequest): Comment? {
+    override suspend fun createComment(comment: CommentEntryRequest): Comment? {
         val new = CommentEntry(
             id = comments.last().id + 1,
             author = comment.author?: return null,
@@ -47,7 +47,7 @@ class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRep
         return null
     }
 
-    override fun editComment(comment: CommentEntryRequest): Comment? {
+    override suspend fun editComment(comment: CommentEntryRequest): Comment? {
         val stored = comments.find { it.id == comment.id && it.issueID == comment.issueID } ?: return null
         val edited = stored.copy(
             text = comment.text ?: stored.text

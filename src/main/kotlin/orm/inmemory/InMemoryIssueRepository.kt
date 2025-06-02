@@ -24,7 +24,7 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         IssueEntry(3, "title", "description", IssueStatus.OPEN, 3, 1),
     )
 
-    override fun createIssue(issue: IssueEntryRequest): Issue? {
+    override suspend fun createIssue(issue: IssueEntryRequest): Issue? {
         val new = IssueEntry(
             id = issues.last().id + 1,
             title = issue.title ?: return null,
@@ -37,14 +37,14 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         return getIssueByID(new.id)
     }
 
-    override fun getIssuesByProjectID(id: Int): List<Issue> {
+    override suspend fun getIssuesByProjectID(id: Int): List<Issue> {
         return issues.filter { it.projectID == id }.map {
             // FIXME: this can throw
             this.getIssueByID(it.id!!)!!
         }
     }
 
-    override fun getIssueByID(id: Int): Issue? {
+    override suspend fun getIssueByID(id: Int): Issue? {
         val issueEntry = issues.firstOrNull { it.id == id }
         if (issueEntry == null) return null
         return Issue(
@@ -59,18 +59,18 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         )
     }
 
-    override fun getIssueLinks(id: Int): List<IssueLink> {
+    override suspend fun getIssueLinks(id: Int): List<IssueLink> {
         return issueLinks.filter { it.linker == id }.map {
             val title = issues.first { it2 -> it2.id == it.linked }.title
             IssueLink(it.linked, title)
         }
     }
 
-    override fun getAllIssues() : List<Issue> {
+    override suspend fun getAllIssues() : List<Issue> {
         return issues.map { this.getIssueByID(it.id)!! }
     }
 
-    override fun editIssue(issue: IssueEntryRequest): Issue? {
+    override suspend fun editIssue(issue: IssueEntryRequest): Issue? {
         val stored = issues.find { it.id == issue.id } ?: return null
         val edited = stored.copy(
             title = issue.title ?: stored.title,
@@ -84,7 +84,7 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         return getIssueByID(edited.id)
     }
 
-    override fun deleteIssue(id: Int): Boolean {
+    override suspend fun deleteIssue(id: Int): Boolean {
         issueLinks.removeIf { it.linker == id }
         commentRepository.getCommentsByIssueID(id).forEach { // TODO: add method to CommentRepository
             commentRepository.removeCommentByID(it.id)
@@ -92,7 +92,7 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         return issues.removeIf { it.id == id }
     }
 
-    override fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
+    override suspend fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
         if (issues.none { it.id == link.linked }) return null
         val existentLink = issueLinks.find { it.linker == link.linker && it.linked == link.linked }
         if (existentLink != null) {
@@ -113,7 +113,7 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
         return IssueLink(new.linked, getIssueByID(new.linked)!!.title)
     }
 
-    override fun deleteLink(link: IssueLinkEntryRequest): Boolean {
+    override suspend fun deleteLink(link: IssueLinkEntryRequest): Boolean {
         return issueLinks.removeIf { it.linker == link.linker && it.linked == link.linked }
     }
 }

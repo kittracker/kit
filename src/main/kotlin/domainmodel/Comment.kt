@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Comment(
-    val id: Int,
+    val id: UInt,
     val author: User,
     val text: String
 )

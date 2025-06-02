@@ -21,7 +21,7 @@ import org.jetbrains.exposed.v1.jdbc.Database
 fun Application.configureDatabases(embedded: Boolean) {
     if (embedded) {
         log.info("Using embedded H2 database for testing; replace this flag to use postgres")
-        Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver", user = "root", password = "")
+        Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver", user = "root", password = "")
     } else {
         val url = environment.config.property("postgres.url").getString()
         log.info("Connecting to postgres database at $url")

@@ -12,6 +12,11 @@ import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import org.jetbrains.exposed.v1.core.StdOutSqlLogger
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.addLogger
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.File
 
 class Repositories(
@@ -26,10 +31,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.initInMemoryRepositories(): Repositories {
-
-    val connection = connectToPostgres(embedded = false)
-
-    val userRepository = SqlUserRepository(connection)
+    val userRepository = InMemoryUserRepository()
     val commentRepository = InMemoryCommentRepository(userRepository)
     val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
     val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
@@ -49,8 +51,31 @@ fun Application.module() {
         json()
     }
 
-    val dbConnection = connectToPostgres(embedded = true)
+    configureDatabases(embedded = true)
+
+    transaction {
+        addLogger(StdOutSqlLogger)
+        SchemaUtils.create(Users, Projects, Issues, IssueLinks, Comments, Collaborators)
+
+        Users.insert { user ->
+            user[userName] = "spectrev333"
+            user[emailAddress] = "spectrev333@kittracker.org"
+        }
+
+        Users.insert { user ->
+            user[userName] = "cardisk"
+            user[emailAddress] = "cardisk@kittracker.org"
+        }
+
+        Users.insert { user ->
+            user[userName] = "mircocaneschi"
+            user[emailAddress] = "mircocaneschi@kittracker.org"
+        }
+    }
+
     val repos = initInMemoryRepositories()
+
+    repos.userRepository = ExposedUserRepository()
 
     routing {
         route("/api") {

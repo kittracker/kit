@@ -1,14 +1,9 @@
 package edu.kitt.orm
 
 import edu.kitt.domainmodel.IssueStatus
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.Table
-import org.jetbrains.exposed.v1.core.dao.id.CompositeID
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.UIntIdTable
-import org.jetbrains.exposed.v1.dao.CompositeEntity
-import org.jetbrains.exposed.v1.dao.CompositeEntityClass
-import org.jetbrains.exposed.v1.dao.Entity
 import org.jetbrains.exposed.v1.dao.UIntEntity
 import org.jetbrains.exposed.v1.dao.UIntEntityClass
 
@@ -63,15 +58,15 @@ class IssueDAO(id: EntityID<UInt>) : UIntEntity(id) {
 object Comments : UIntIdTable() {
     val author = reference("author", Users)
     val text = text("text")
-    val issueID = reference("issue_id", Issues)
+    val issue = reference("issue_id", Issues)
 }
 
 class CommentDAO(id: EntityID<UInt>) : UIntEntity(id) {
     companion object : UIntEntityClass<CommentDAO>(Comments)
 
-    val author by Comments.author
-    val text by Comments.text
-    val issueID by Comments.issueID
+    var author by UserDAO referencedOn Comments.author
+    var text by Comments.text
+    var issue by IssueDAO referencedOn Comments.issue
 }
 
 object IssueLinks : Table() {

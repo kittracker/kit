@@ -215,7 +215,7 @@ export default class ProjectDetails {
             this.newCollaborators = this.newCollaborators.filter(user => user.id.toString() !== id);
             item.remove();
 
-            Notifier.info(item.textContent, "User removed successfully");
+            Notifier.info(item.textContent, "User deselected");
         });
 
         list.append(item);

@@ -47,11 +47,15 @@ export default class ProjectDetails {
         this.observer = new IntersectionObserver(observe, options);
     }
 
-    async fetchProject() {
+    async update() {
         const response = await fetch(`/api/projects/${this.id}`);
         if (response.ok) {
             this.project = await response.json();
         }
+    }
+
+    async fetchProject() {
+        await this.update();
         this.isFiltered = false;
         this.render()
     }
@@ -125,7 +129,8 @@ export default class ProjectDetails {
                 Notifier.danger(issueTitle, await res.text());
             }
 
-            await this.fetchProject();
+            await this.update();
+            this.renderOpenIssues();
         });
     }
 
@@ -165,7 +170,8 @@ export default class ProjectDetails {
             }
         }
 
-        await this.fetchProject();
+        await this.update();
+        this.renderCollaborators();
 
         const modalElement = document.getElementById("modalSecondary");
         const modal = bootstrap.Modal.getInstance(modalElement);

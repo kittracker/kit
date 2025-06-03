@@ -76,6 +76,9 @@ fun Application.module() {
     val repos = initInMemoryRepositories()
 
     repos.userRepository = ExposedUserRepository()
+    repos.projectRepository = ExposedProjectRepository()
+    repos.userRepository = ExposedUserRepository()
+    repos.commentRepository = ExposedCommentRepository()
 
     routing {
         route("/api") {

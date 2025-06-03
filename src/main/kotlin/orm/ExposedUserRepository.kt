@@ -12,7 +12,7 @@ class ExposedUserRepository : UserRepository {
         transaction {
             UserDAO.findById(uid.toUInt())?.let {
                 User(
-                    id = it.id.value.toInt(),
+                    id = it.id.value,
                     emailAddress = it.emailAddress,
                     username = it.userName
                 )
@@ -24,7 +24,7 @@ class ExposedUserRepository : UserRepository {
         transaction {
             UserDAO.all().map {
                 User(
-                    id = it.id.value.toInt(),
+                    id = it.id.value,
                     emailAddress = it.emailAddress,
                     username = it.userName
                 )

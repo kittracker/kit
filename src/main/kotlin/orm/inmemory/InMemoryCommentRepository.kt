@@ -8,28 +8,28 @@ import edu.kitt.orm.requests.CommentEntryRequest
 
 class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRepository {
     private val comments = mutableListOf(
-        CommentEntry(1, 1, "this is a comment", 1),
-        CommentEntry(2, 2, "this is a comment", 1),
-        CommentEntry(3, 3, "this is a comment", 1),
+        CommentEntry(1u, 1u, "this is a comment", 1),
+        CommentEntry(2u, 2u, "this is a comment", 1),
+        CommentEntry(3u, 3u, "this is a comment", 1),
     )
 
-    override suspend fun removeCommentByID(id: Int): Boolean {
+    override suspend fun removeCommentByID(id: UInt): Boolean {
         return comments.removeIf { it.id == id }
     }
 
-    override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
+    override suspend fun getCommentsByIssueID(id: UInt): List<Comment> {
         return comments.filter { it.issueID == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
-            Comment(it.id, user!!, it.text)
+            Comment(it.id.toUInt(), user!!, it.text)
         }
     }
 
-    override suspend fun getCommentsByUserID(id: Int): List<Comment> {
+    override suspend fun getCommentsByUserID(id: UInt): List<Comment> {
         return comments.filter { it.author == id }.map {
             val user = userRepository.getUserByID(it.author);
             // FIXME: this will throw if user is invalid
-            Comment(it.id, user!!, it.text)
+            Comment(it.id.toUInt(), user!!, it.text)
         }
     }
 

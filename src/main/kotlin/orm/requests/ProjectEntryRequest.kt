@@ -8,5 +8,6 @@ data class ProjectEntryRequest(
     val id: UInt? = null,
     val name: String? = null,
     val description: String? = null,
-    val archived: Boolean? = null
+    val archived: Boolean? = null,
+    val ownerID: UInt? = null,
 )

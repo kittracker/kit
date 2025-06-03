@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CollaboratorEntry(
-    val userID: Int,
-    val projectID: Int,
+    val userID: UInt,
+    val projectID: UInt,
 )

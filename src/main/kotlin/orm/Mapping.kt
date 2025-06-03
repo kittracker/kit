@@ -29,11 +29,12 @@ object Projects : UIntIdTable() {
 class ProjectDAO(id: EntityID<UInt>) : UIntEntity(id) {
     companion object : UIntEntityClass<ProjectDAO>(Projects)
 
-    val name by Projects.name
-    val description by Projects.description
-    val archived by Projects.archived
-    val owner by UserDAO referencedOn Projects.ownerID
+    var name by Projects.name
+    var description by Projects.description
+    var archived by Projects.archived
+    var owner by UserDAO referencedOn Projects.ownerID
     val collaborators by UserDAO via Collaborators
+    val issues by IssueDAO referrersOn Issues.projectID
 }
 
 object Issues : UIntIdTable() {
@@ -53,6 +54,7 @@ class IssueDAO(id: EntityID<UInt>) : UIntEntity(id) {
     val createdBy by UserDAO referencedOn Issues.createdBy
     val project by ProjectDAO referencedOn Issues.projectID
     val links by IssueDAO via IssueLinks
+    val comments by CommentDAO referrersOn Comments.issue
 }
 
 object Comments : UIntIdTable() {

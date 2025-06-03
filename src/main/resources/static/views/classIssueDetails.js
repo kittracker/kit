@@ -5,6 +5,42 @@ export default class IssueDetails {
         this.issueId = issueId;
         this.issue = null;
         this.container = document.createElement("div");
+
+        const navbar = document.getElementById("navbar");
+
+        const options = {
+            root: null,
+            rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
+            threshold: [0, 1]
+        };
+
+        const observe = (entries, _) => {
+            const sticky = document.getElementById("sticky-info");
+            if (!sticky) {
+                console.error("Error: Could not retrieve sticky-info component.");
+                return;
+            }
+
+            const navbar = document.getElementById("navbar");
+            if (!navbar) {
+                console.error("Error: Could not retrieve navbar component.");
+                return;
+            }
+
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    sticky.style.top = navbar.offsetHeight.toString();
+
+                    sticky.classList.remove("d-none");
+                    sticky.classList.add("d-flex");
+                } else {
+                    sticky.classList.remove("d-flex");
+                    sticky.classList.add("d-none");
+                }
+            });
+        }
+
+        this.observer = new IntersectionObserver(observe, options);
     }
 
     async fetchIssue() {
@@ -21,7 +57,7 @@ export default class IssueDetails {
             "CLOSED": "danger",
             "IN_PROGRESS": "warning"
         };
-        return `<span class="badge rounded-pill p-2 bg-${statusMap[status] || "secondary"}">${status}</span>`;
+        return `<div class="badge rounded-pill p-2 bg-${statusMap[status] || "secondary"}">${status}</div>`;
     };
 
     renderComments() {
@@ -131,16 +167,70 @@ export default class IssueDetails {
         // `;
 
         this.container.innerHTML =  `
-            <section class="container-fluid m-0 px-3 g-0 d-flex align-items-center justify-content-evenly project-sticky border-bottom-primary" id="sticky-info">
+            <section class="container-fluid d-none m-0 px-3 g-0 align-items-center justify-content-evenly project-sticky border-bottom-primary" id="sticky-info">
+                <h5 class="d-block my-0 text-truncate">${this.issue.title}</h5>
                 <div class="d-flex gap-3 align-items-center justify-content-center">
+                    <h5 class="my-0 text-body-tertiary">#${this.issue.id}</h5>
                     ${this.getStatusBadge(this.issue.status)}
-                    <h5 class="d-block my-0 text-truncate">${this.issue.title}</h5>
                 </div>
-                <h5 class="my-0 text-body-tertiary">#${this.issue.id}</h5>
+            </section>
+            
+            <section class="m-0 g-0 pt-3 pb-1 min-vh-100">
+                <div class="d-flex flex-column gap-4 m-0 g-0 py-5 px-3 border-bottom-primary" id="issue-details">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h1>${this.issue.title}</h1>
+                        <div class="d-flex align-items-center justify-content-end gap-3">
+                            <h3 class="p-0 m-0 g-0 text-body-tertiary">#${this.issue.id}</h3>
+                            <h3 class="p-0 m-0 g-0 d-md-block d-none text-body-tertiary">@${this.issue.createdBy.username}</h3>
+                        </div>
+                    </div>
+                    <h6 class="d-md-none d-block text-body-tertiary">@${this.issue.createdBy.username}</h6>
+                    <h3>${this.getStatusBadge(this.issue.status)}</h3>
+                </div>
+                
+                <div class="row flex-xl-row flex-column gap-xl-0 gap-4 mt-5 p-0 g-0">
+                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100 bg-primary" id="comment-section">
+                    </section>
+                    <section class="col-xl-4 col-12 px-3">
+                        <h3 class="m-0 pb-5 g-0 text-center">Related Issues</h3>
+                        ${this.issue.links.map(link => `
+                            <div class="card mb-3 p-2 kit-card" href="/issues/${link.id}" data-link>
+                                <div class="card-body">
+                                    <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                                        <div class="d-flex gap-3">
+                                            <i class="bi bi-link-45deg"></i>
+                                            <h5 class="card-title d-block text-truncate">${link.title}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `)}
+                    </section>
+                </div>
             </section>
         `;
 
         this.container.onsubmit = (e) => this.addComment(e);
+
+        const issueDetails = document.getElementById("issue-details");
+        if (!issueDetails) {
+            console.error("Error: Could not retrieve issue-details component.");
+            return;
+        }
+
+        this.observer.unobserve(issueDetails);
+        this.observer.observe(issueDetails);
+    }
+
+    unmount() {
+        const issueDetails = document.getElementById("issue-details");
+        if (!issueDetails) {
+            console.error("Error: Could not retrieve issue-details component.");
+            return;
+        }
+
+        this.observer.unobserve(issueDetails);
+        this.observer.disconnect();
     }
 
     async mount(root) {

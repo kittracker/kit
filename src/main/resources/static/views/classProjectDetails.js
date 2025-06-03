@@ -316,11 +316,11 @@ export default class ProjectDetails {
                         <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
                             <div class="d-flex gap-3">
                                 <i class="bi bi-star-fill"></i>
-                                <h5 class="card-title">${this.project.owner.username}</h5>
+                                <h5 class="card-title d-block text-truncate">${this.project.owner.username}</h5>
                             </div>
                         </div>
                         <br/>
-                        <p class="card-text">${this.project.owner.emailAddress}</p>
+                        <p class="card-text d-block text-truncate">${this.project.owner.emailAddress}</p>
                     </div>
                 </div>
                 `
@@ -345,11 +345,11 @@ export default class ProjectDetails {
 
     render() {
         this.container.innerHTML = `
-            <section class="container-fluid m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
+            <section class="container-fluid d-none m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
                 <h5 class="d-block px-3 text-truncate">${this.project.name}</h5>
             </section>
             
-            <div class="m-0 g-0 pt-3 pb-1 p-0 min-vh-100">
+            <section class="m-0 g-0 pt-3 pb-1 min-vh-100">
                 <div class="row m-0 p-0 g-0">
                     <div class="row m-0 p-5 g-0">
                         <h1 class="text-center text-wrap text-break"><strong id="project-title">${this.project.name}</strong></h1>
@@ -407,7 +407,7 @@ export default class ProjectDetails {
                         </div>
                     </section>
                 </div>
-            </div>
+            </section>
             
             <br>
         `;

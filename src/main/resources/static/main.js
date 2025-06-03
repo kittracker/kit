@@ -53,22 +53,30 @@ async function router() {
 
     if (matched) {
         document.title = matched.route.title;
+
+        // If unmount needs to access components, the content is not changed yet here
+        if (currentlyLoadedComponent && "unmount" in currentlyLoadedComponent) {
+            currentlyLoadedComponent.unmount();
+            currentlyLoadedComponent = null;
+        }
+
         // Show loading state
         app.innerHTML = `
             <div class="text-center pt-5 min-vh-100">
                 <div class="spinner-border" role="status"></div>
             </div>
         `;
-        if (currentlyLoadedComponent && "unmount" in currentlyLoadedComponent) {
-            currentlyLoadedComponent.unmount();
-            currentlyLoadedComponent = null;
-        }
+
         if ("component" in matched.route) {
             currentlyLoadedComponent = matched.route.component(matched.params) // calls constructor
-            currentlyLoadedComponent.mount(app);
+            await currentlyLoadedComponent.mount(app);
         } else {
             app.innerHTML = await matched.route.render(matched.params); // Pass params to render
         }
+
+        requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+        });
     } else {
         app.innerHTML = `
             <div class="text-center">

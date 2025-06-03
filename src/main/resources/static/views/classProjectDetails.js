@@ -346,7 +346,7 @@ export default class ProjectDetails {
     render() {
         this.container.innerHTML = `
             <section class="container-fluid m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
-                <h5 class="text-wrap text-break">${this.project.name}</h5>
+                <h5 class="d-block px-3 text-truncate">${this.project.name}</h5>
             </section>
             
             <div class="m-0 g-0 pt-3 pb-1 p-0 min-vh-100">

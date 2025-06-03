@@ -103,7 +103,7 @@ export default class Home {
         `;
     }
 
-    mount(root) {
+    async mount(root) {
         root.innerHTML = "";
         root.appendChild(this.container);
         this.render();

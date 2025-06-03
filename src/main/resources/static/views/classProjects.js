@@ -37,7 +37,7 @@ export default class Projects {
                     <div class="card mb-3 p-2 kit-card" href="/projects/${project.id}" data-link>
                         <div class="card-body">
                             <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                                <h5 class="card-title d-block text-truncate">${project.name}</h5>
+                                <h5 class="card-title pe-md-3 d-block text-truncate">${project.name}</h5>
                                 <h6 class="card-subtitle mb-2 text-body-tertiary">@${project.owner.username}</h6>
                             </div>
                             <br />
@@ -213,9 +213,9 @@ export default class Projects {
         newButton.classList.add("d-none");
     }
 
-    mount(root) {
+    async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
-        this.fetchProjects(); // Fetch issue data and render
+        await this.fetchProjects(); // Fetch issue data and render
     }
 }

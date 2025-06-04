@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class IssueLink(
-    val id: UInt,
+    val id: Int,
     val title: String,
 )

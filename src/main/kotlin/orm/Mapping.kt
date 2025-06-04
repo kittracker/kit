@@ -3,31 +3,31 @@ package edu.kitt.orm
 import edu.kitt.domainmodel.IssueStatus
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
-import org.jetbrains.exposed.v1.core.dao.id.UIntIdTable
-import org.jetbrains.exposed.v1.dao.UIntEntity
-import org.jetbrains.exposed.v1.dao.UIntEntityClass
+import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.dao.IntEntity
+import org.jetbrains.exposed.v1.dao.IntEntityClass
 
-object Users : UIntIdTable() {
+object Users : IntIdTable() {
     val userName = varchar("username", 50).index()
     val emailAddress = varchar("email_address", 255)
 }
 
-class UserDAO(id: EntityID<UInt>) : UIntEntity(id) {
-    companion object : UIntEntityClass<UserDAO>(Users)
+class UserDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<UserDAO>(Users)
 
     val userName by Users.userName
     val emailAddress by Users.emailAddress
 }
 
-object Projects : UIntIdTable() {
+object Projects : IntIdTable() {
     val name = varchar("name", 255)
     val description = text("description")
     val archived = bool("archived")
     val ownerID = reference("owner_id", Users)
 }
 
-class ProjectDAO(id: EntityID<UInt>) : UIntEntity(id) {
-    companion object : UIntEntityClass<ProjectDAO>(Projects)
+class ProjectDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<ProjectDAO>(Projects)
 
     var name by Projects.name
     var description by Projects.description
@@ -37,7 +37,7 @@ class ProjectDAO(id: EntityID<UInt>) : UIntEntity(id) {
     val issues by IssueDAO referrersOn Issues.projectID
 }
 
-object Issues : UIntIdTable() {
+object Issues : IntIdTable() {
     val title = varchar("title", 255)
     val description = text("description")
     val status = enumeration<IssueStatus>("status") // Maybe define enum here?
@@ -45,8 +45,8 @@ object Issues : UIntIdTable() {
     val projectID = reference("project_id", Projects)
 }
 
-class IssueDAO(id: EntityID<UInt>) : UIntEntity(id) {
-    companion object : UIntEntityClass<IssueDAO>(Issues)
+class IssueDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<IssueDAO>(Issues)
 
     val title by Issues.title
     val description by Issues.description
@@ -57,14 +57,14 @@ class IssueDAO(id: EntityID<UInt>) : UIntEntity(id) {
     val comments by CommentDAO referrersOn Comments.issue
 }
 
-object Comments : UIntIdTable() {
+object Comments : IntIdTable() {
     val author = reference("author", Users)
     val text = text("text")
     val issue = reference("issue_id", Issues)
 }
 
-class CommentDAO(id: EntityID<UInt>) : UIntEntity(id) {
-    companion object : UIntEntityClass<CommentDAO>(Comments)
+class CommentDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<CommentDAO>(Comments)
 
     var author by UserDAO referencedOn Comments.author
     var text by Comments.text

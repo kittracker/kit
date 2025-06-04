@@ -8,10 +8,10 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedCommentRepository : CommentRepository {
-    override suspend fun removeCommentByID(id: UInt): Boolean {
+    override suspend fun removeCommentByID(id: Int): Boolean {
         return withContext(Dispatchers.IO) {
             transaction {
-                CommentDAO.findById(id.toUInt())?.delete() != null
+                CommentDAO.findById(id)?.delete() != null
             }
         }
     }
@@ -28,21 +28,21 @@ class ExposedCommentRepository : CommentRepository {
         )
     }
 
-    override suspend fun getCommentsByIssueID(id: UInt): List<Comment> {
+    override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
         return withContext(Dispatchers.IO) {
             transaction {
-                CommentDAO.find { Comments.issue eq id.toUInt() }.map {
+                CommentDAO.find { Comments.issue eq id }.map {
                     mapCommentDAOToDomain(it)
                 }
             }
         }
     }
 
-    override suspend fun getCommentsByUserID(id: UInt): List<Comment> {
+    override suspend fun getCommentsByUserID(id: Int): List<Comment> {
         return withContext(Dispatchers.IO) {
             transaction {
                 // Assuming Comments.author is a reference to UserDAO's ID (which is UInt)
-                CommentDAO.find { Comments.author eq id.toUInt() }.map {
+                CommentDAO.find { Comments.author eq id }.map {
                     mapCommentDAOToDomain(it)
                 }
             }

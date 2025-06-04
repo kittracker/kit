@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class ExposedUserRepository : UserRepository {
     override suspend fun getUserByID(uid: Int): User? = withContext(Dispatchers.IO) {
         transaction {
-            UserDAO.findById(uid.toUInt())?.let {
+            UserDAO.findById(uid)?.let {
                 User(
                     id = it.id.value,
                     emailAddress = it.emailAddress,

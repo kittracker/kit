@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Issue(
-    val id: UInt,
+    val id: Int,
     val title: String,
     val description: String,
     val status: IssueStatus,

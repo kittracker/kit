@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class IssueLinkEntry(
-    val linker: UInt,
-    val linked: UInt,
+    val linker: Int,
+    val linked: Int,
 )

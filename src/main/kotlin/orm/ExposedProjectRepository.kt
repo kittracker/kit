@@ -66,13 +66,13 @@ class ExposedProjectRepository : ProjectRepository {
 
     override suspend fun getProjectByID(id: Int): Project? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            ProjectDAO.findById(id.toUInt())?.let(::mapProjectDAOToDomain)
+            ProjectDAO.findById(id)?.let(::mapProjectDAOToDomain)
         }
     }
 
     override suspend fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val project = ProjectDAO.findById(projectId.toUInt())
+            val project = ProjectDAO.findById(projectId)
             project?.collaborators?.map { collaborator ->
                 User(
                     id = collaborator.id.value,
@@ -118,7 +118,7 @@ class ExposedProjectRepository : ProjectRepository {
     override suspend fun deleteProject(id: Int): Boolean {
         return newSuspendedTransaction(Dispatchers.IO) {
             val rowsDeleted = Projects.deleteWhere {
-                Projects.id eq id.toUInt()
+                Projects.id eq id
             }
             rowsDeleted == 1
         }

@@ -189,7 +189,16 @@ export default class IssueDetails {
                 </div>
                 
                 <div class="row flex-xl-row flex-column gap-xl-0 gap-4 mt-5 p-0 g-0">
-                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100 bg-primary" id="comment-section">
+                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100" id="comment-section">
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-person-circle h1"></i>
+                            <div class="card flex-grow-1">
+                                <h6 class="card-header">@${this.issue.createdBy.username}</h6>
+                                <div class="card-body">
+                                    <github-md>${this.issue.description}</github-md>
+                                </div>
+                            </div>
+                        </div>
                     </section>
                     <section class="col-xl-4 col-12 px-3">
                         <h3 class="m-0 pb-5 g-0 text-center">Related Issues</h3>
@@ -220,6 +229,8 @@ export default class IssueDetails {
 
         this.observer.unobserve(issueDetails);
         this.observer.observe(issueDetails);
+
+        renderMarkdown();
     }
 
     unmount() {

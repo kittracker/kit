@@ -447,7 +447,7 @@ export default class ProjectDetails {
                 </div>
                 <div>
                     <p>Description</p>
-                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Issue Description" rows="4" ></textarea>
+                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
                 </div>
             </div>
         `;

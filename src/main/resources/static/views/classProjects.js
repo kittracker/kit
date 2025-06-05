@@ -211,6 +211,9 @@ export default class Projects {
     unmount() {
         const newButton = document.getElementById("newButton");
         newButton.classList.add("d-none");
+
+        const newProjectCollapse = document.getElementById("newProjectCollapse");
+        newProjectCollapse.classList.add("d-none");
     }
 
     async mount(root) {

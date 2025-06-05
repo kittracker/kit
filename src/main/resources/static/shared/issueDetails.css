@@ -3,3 +3,11 @@
     border-color: #202020;
     border-width: 3px;
 }
+
+.user-popover {
+    border-radius: 20px;
+    border-color: #202020;
+    border-width: 3px;
+
+    overflow: hidden;
+}

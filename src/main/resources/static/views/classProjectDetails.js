@@ -369,10 +369,10 @@ export default class ProjectDetails {
                 <div class="row flex-xl-row flex-column-reverse gap-xl-0 gap-4 mt-5 p-0 g-0">
                     <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100" id="content-section">
                         <div class="tab-content" id="pills-tabContent">
-                            <div class="tab-pane fade show active" id="pills-open" role="tabpanel" aria-labelledby="pills-open-tab" tabindex="0"></div>
-                            <div class="tab-pane fade" id="pills-in-progress" role="tabpanel" aria-labelledby="pills-in-progress-tab" tabindex="0"></div>
-                            <div class="tab-pane fade" id="pills-closed" role="tabpanel" aria-labelledby="pills-closed-tab" tabindex="0"></div>
-                            <div class="tab-pane fade" id="pills-collaborators" role="tabpanel" aria-labelledby="pills-collaborators-tab" tabindex="0"></div>
+                            <div class="tab-pane show active" id="pills-open" role="tabpanel" aria-labelledby="pills-open-tab" tabindex="0"></div>
+                            <div class="tab-pane" id="pills-in-progress" role="tabpanel" aria-labelledby="pills-in-progress-tab" tabindex="0"></div>
+                            <div class="tab-pane" id="pills-closed" role="tabpanel" aria-labelledby="pills-closed-tab" tabindex="0"></div>
+                            <div class="tab-pane" id="pills-collaborators" role="tabpanel" aria-labelledby="pills-collaborators-tab" tabindex="0"></div>
                         </div>
                     </section>
                     <section class="col-xl-4 col-12 px-3">

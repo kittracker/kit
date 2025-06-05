@@ -43,11 +43,15 @@ export default class IssueDetails {
         this.observer = new IntersectionObserver(observe, options);
     }
 
-    async fetchIssue() {
+    async update() {
         const response = await fetch(`/api/issues/${this.issueId}`);
         if (response.ok) {
             this.issue = await response.json();
         }
+    }
+
+    async fetchIssue() {
+        await this.update();
         this.render()
     }
 
@@ -62,23 +66,59 @@ export default class IssueDetails {
 
     renderComments() {
         const commentsSection = document.getElementById("comments-section");
+
         commentsSection.innerHTML = this.issue.comments.map(comment => `
-            <div class="card mb-3">
-                <div class="card-header align-middle section-bg-2">
-                    <h5><strong class="author-hover" href="/users/${comment.author.id}" data-link>@${comment.author.username}</strong></h5>
+            <div class="d-flex gap-3">
+                <div class="d-flex flex-column m-0 p-0 g-0">
+                    <i class="bi bi-person-circle h1"
+                        data-bs-toggle="popover"
+                        data-bs-placement="right"
+                        data-bs-trigger="hover focus"
+                        data-bs-custom-class="font-monospace user-popover"
+                        data-bs-title="@${comment.author.username}"
+                        data-bs-content="${comment.author.emailAddress}"
+                    ></i>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">${comment.text}</p>
+                <div class="card flex-grow-1 comment">
+                    <div class="card-header d-flex align-items-center justify-content-start">
+                        <h6 class="m-0 p-0 g-0"
+                            data-bs-toggle="popover"
+                            data-bs-placement="right"
+                            data-bs-trigger="hover focus"
+                            data-bs-custom-class="font-monospace user-popover"
+                            data-bs-title="@${comment.author.username}"
+                            data-bs-content="${comment.author.emailAddress}"
+                        >@${comment.author.username}</h6>
+                    </div>
+                    <div class="card-body">
+                        <github-md>${comment.text}</github-md>
+                    </div>
                 </div>
             </div>
         `).join("");
+
+        let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        let popoverList = popoverTriggerList.map(popoverTriggerEl => {
+            return new bootstrap.Popover(popoverTriggerEl)
+        })
+
+        renderMarkdown();
     }
 
     async addComment(ev) {
         ev.preventDefault();
-        const commentInput = document.getElementById("comment");
-        const comment = commentInput.value.trim();
-        if (!comment) return;
+
+        const textarea = document.getElementById("commentArea");
+        const comment = textarea.value;
+
+        const writeButton = document.getElementById("write-tab");
+        const writeButtonTab = bootstrap.Tab.getOrCreateInstance(writeButton);
+
+        if (comment.length === 0) {
+            writeButtonTab.show();
+            textarea.focus();
+            return;
+        }
 
         await fetch("/api/comments", {
             method: 'POST',
@@ -92,80 +132,18 @@ export default class IssueDetails {
             })
         }).then(async (res) => {
             if (res.ok) {
-                this.issue.comments.push(await res.json())
+                await this.update();
                 this.renderComments();
             }
-            commentInput.value = "";
+
+            textarea.value = "";
+            writeButtonTab.show();
         }).catch((reason) => {
             Notifier.danger("Error", reason);
         });
     }
 
     render() {
-        // this.container.innerHTML =  `
-        //     <div class="row m-0 p-0 g-0 min-vh-100">
-        //
-        //         <div class="row border-bottom m-3 gy-3" style="padding: 3%">
-        //             <div class="d-flex justify-content-between">
-        //                 <h1>${this.issue.title}</h1>
-        //                 <div class="d-flex align-items-center justify-content-end">
-        //                     <h1 class="text-body-tertiary">#${this.issue.id}</h1>
-        //                     <h3 class="px-4 author-hover" href="/users/${this.issue.createdBy.id}" data-link>@${this.issue.createdBy.username}</h3>
-        //                     <h3>${this.getStatusBadge(this.issue.status)}</h3>
-        //                 </div>
-        //             </div>
-        //             <p>${this.issue.description}</p>
-        //         </div>
-        //
-        //         <br />
-        //
-        //         <div class="row m-3">
-        //             <div class="col-8">
-        //                 <div id="comments-section">
-        //                     ${this.issue.comments.length > 0 ? `
-        //                             ${this.issue.comments.map(comment => `
-        //                                 <div class="card mb-3">
-        //                                     <div class="card-header align-middle section-bg-2">
-        //                                         <h5><strong class="author-hover" href="/users/${comment.author.id}" data-link>@${comment.author.username}</strong></h5>
-        //                                     </div>
-        //                                     <div class="card-body">
-        //                                         <p class="card-text">${comment.text}</p>
-        //                                     </div>
-        //                                 </div>
-        //                             `).join("")}
-        //                     ` : `<div class="text-center"> <b>No Comments Yet</b> </div>`}
-        //                 </div>
-        //                 <div class="col mt-3">
-        //                     <div class="card mb-3">
-        //                         <div class="card-body">
-        //                             <form>
-        //                                 <div class="mb-3">
-        //                                     <label for="comment" class="form-label">Your Comment</label>
-        //                                     <textarea placeholder="Comment as spectrev333" class="form-control" id="comment" name="comment" rows="4" required></textarea>
-        //                                 </div>
-        //                                 <button type="submit" class="btn btn-primary">Submit</button>
-        //                             </form>
-        //                         </div>
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //
-        //             <div class="col-4">
-        //                 <a class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none rounded-top section-bg">
-        //                     <span class="fs-5 fw-semibold">Related Issues</span>
-        //                 </a>
-        //                 <div class="list-group list-group-flush border-bottom scrollarea">
-        //                     ${this.issue.links.map(link => `
-        //                         <a href="/issues/${link.id}" class="list-group-item py-3 lh-sm list-item-action" data-link>
-        //                             <div class="mb-1"><strong>#${link.id} ${link.title}</strong></div>
-        //                         </a>
-        //                     `).join("")}
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     </div>
-        // `;
-
         this.container.innerHTML =  `
             <section class="container-fluid d-none m-0 px-3 g-0 align-items-center justify-content-evenly project-sticky border-bottom-primary" id="sticky-info">
                 <h5 class="d-block my-0 text-truncate">${this.issue.title}</h5>
@@ -187,10 +165,26 @@ export default class IssueDetails {
                 <div class="row flex-xl-row flex-column gap-xl-0 gap-4 mt-5 p-0 g-0">
                     <section class="col-xl-8 col-12 d-flex flex-column gap-5 px-3 min-vh-100" id="comment-section">
                         <div class="d-flex gap-3">
-                            <i class="bi bi-person-circle h1"></i>
+                            <div class="d-flex flex-column m-0 p-0 g-0">
+                                <i class="bi bi-person-circle h1"
+                                    data-bs-toggle="popover"
+                                    data-bs-placement="right"
+                                    data-bs-trigger="hover focus"
+                                    data-bs-custom-class="font-monospace user-popover"
+                                    data-bs-title="@${this.issue.createdBy.username}"
+                                    data-bs-content="${this.issue.createdBy.emailAddress}"
+                                ></i>
+                            </div>
                             <div class="card flex-grow-1 comment">
                                 <div class="card-header d-flex align-items-center justify-content-between">
-                                    <h6 class="m-0 p-0 g-0">@${this.issue.createdBy.username}</h6>
+                                    <h6 class="m-0 p-0 g-0"
+                                        data-bs-toggle="popover"
+                                        data-bs-placement="right"
+                                        data-bs-trigger="hover focus"
+                                        data-bs-custom-class="font-monospace user-popover"
+                                        data-bs-title="@${this.issue.createdBy.username}"
+                                        data-bs-content="${this.issue.createdBy.emailAddress}"
+                                    >@${this.issue.createdBy.username}</h6>
                                     <h6 class="m-0 p-0 g-0">AUTHOR</h6>
                                 </div>
                                 <div class="card-body">
@@ -198,28 +192,33 @@ export default class IssueDetails {
                                 </div>
                             </div>
                         </div>
-                        ${this.issue.comments.map(comment => `
-                            <div class="d-flex gap-3">
-                                <i class="bi bi-person-circle h1"></i>
-                                <div class="card flex-grow-1 comment">
-                                    <h6 class="card-header">@${comment.author.username}</h6>
-                                    <div class="card-body">
-                                        <github-md>${comment.text}</github-md>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join("")}
+                        <div class="d-flex flex-column gap-5 m-0 p-0 g-0" id="comments-section">
+                        </div>
                         <div class="d-flex gap-3">
                             <i class="bi bi-person-circle h1"></i>
                             <div class="card flex-grow-1 comment">
-                                <div class="card-header d-flex align-items-center justify-content-between">
-                                    <h6 class="m-0 p-0 g-0">@${this.issue.createdBy.username}</h6>
-                                    <h6 class="m-0 p-0 g-0">AUTHOR</h6>
+                                <div class="card-header">
+                                    <ul class="nav nav-pills" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="btn nav-link button active" id="write-tab" data-bs-toggle="tab" data-bs-target="#write-tab-pane" type="button" role="tab" aria-controls="write-tab-pane" aria-selected="true">Write</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="btn nav-link button" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-tab-pane" type="button" role="tab" aria-controls="preview-tab-pane" aria-selected="false">Preview</button>
+                                        </li>
+                                    </ul>
                                 </div>
                                 <div class="card-body">
-                                    <github-md>${this.issue.description}</github-md>
+                                    <div class="tab-content">
+                                        <div class="tab-pane show active" id="write-tab-pane" role="tabpanel" aria-labelledby="write-tab" tabindex="0">
+                                            <textarea class="form-control search-bar" id="commentArea" aria-label="textarea" placeholder="Use Markdown to format your comment" rows="5"></textarea>
+                                        </div>
+                                        <div class="tab-pane" id="preview-tab-pane" role="tabpanel" aria-labelledby="preview-tab" tabindex="0">...</div>
+                                    </div>
+                                    <form class="d-flex align-items-center justify-content-end m-0 g-0 pt-3">
+                                        <button class="btn button" type="submit">Comment</button>
+                                    </form>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </section>
                     <section class="col-xl-4 col-12 px-3">
@@ -239,7 +238,27 @@ export default class IssueDetails {
                     </section>
                 </div>
             </section>
+            
+            <br>
         `;
+
+        // TODO: add popover for comment form when authentication is properly done
+
+        this.renderComments();
+
+        const previewButton = document.getElementById("preview-tab");
+        previewButton.addEventListener("shown.bs.tab", event => {
+            const textarea = document.getElementById("commentArea");
+            const comment = textarea.value.trim();
+
+            const previewPane = document.getElementById("preview-tab-pane");
+
+            previewPane.innerHTML = `
+                <github-md>${comment}</github-md>
+            `;
+
+            renderMarkdown();
+        })
 
         this.container.onsubmit = (e) => this.addComment(e);
 
@@ -251,8 +270,6 @@ export default class IssueDetails {
 
         this.observer.unobserve(issueDetails);
         this.observer.observe(issueDetails);
-
-        renderMarkdown();
     }
 
     unmount() {

@@ -176,24 +176,46 @@ export default class IssueDetails {
             </section>
             
             <section class="m-0 g-0 pt-3 pb-1 min-vh-100">
-                <div class="d-flex flex-column gap-4 m-0 g-0 py-5 px-3 border-bottom-primary" id="issue-details">
+                <div class="d-flex flex-column gap-4 m-0 g-0 py-5 px-3" id="issue-details">
                     <div class="d-flex align-items-center justify-content-between">
                         <h1>${this.issue.title}</h1>
-                        <div class="d-flex align-items-center justify-content-end gap-3">
-                            <h3 class="p-0 m-0 g-0 text-body-tertiary">#${this.issue.id}</h3>
-                            <h3 class="p-0 m-0 g-0 d-md-block d-none text-body-tertiary">@${this.issue.createdBy.username}</h3>
-                        </div>
+                        <h3 class="p-0 m-0 g-0 text-body-tertiary">#${this.issue.id}</h3>
                     </div>
-                    <h6 class="d-md-none d-block text-body-tertiary">@${this.issue.createdBy.username}</h6>
                     <h3>${this.getStatusBadge(this.issue.status)}</h3>
                 </div>
                 
                 <div class="row flex-xl-row flex-column gap-xl-0 gap-4 mt-5 p-0 g-0">
-                    <section class="col-xl-8 col-12 d-flex flex-column gap-3 px-3 min-vh-100" id="comment-section">
+                    <section class="col-xl-8 col-12 d-flex flex-column gap-5 px-3 min-vh-100" id="comment-section">
                         <div class="d-flex gap-3">
                             <i class="bi bi-person-circle h1"></i>
-                            <div class="card flex-grow-1">
-                                <h6 class="card-header">@${this.issue.createdBy.username}</h6>
+                            <div class="card flex-grow-1 comment">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <h6 class="m-0 p-0 g-0">@${this.issue.createdBy.username}</h6>
+                                    <h6 class="m-0 p-0 g-0">AUTHOR</h6>
+                                </div>
+                                <div class="card-body">
+                                    <github-md>${this.issue.description}</github-md>
+                                </div>
+                            </div>
+                        </div>
+                        ${this.issue.comments.map(comment => `
+                            <div class="d-flex gap-3">
+                                <i class="bi bi-person-circle h1"></i>
+                                <div class="card flex-grow-1 comment">
+                                    <h6 class="card-header">@${comment.author.username}</h6>
+                                    <div class="card-body">
+                                        <github-md>${comment.text}</github-md>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join("")}
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-person-circle h1"></i>
+                            <div class="card flex-grow-1 comment">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <h6 class="m-0 p-0 g-0">@${this.issue.createdBy.username}</h6>
+                                    <h6 class="m-0 p-0 g-0">AUTHOR</h6>
+                                </div>
                                 <div class="card-body">
                                     <github-md>${this.issue.description}</github-md>
                                 </div>

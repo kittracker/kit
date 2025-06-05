@@ -2,6 +2,18 @@ package edu.kitt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import edu.kitt.orm.CommentRepository
+import edu.kitt.orm.ExposedCommentRepository
+import edu.kitt.orm.ExposedIssueRepository
+import edu.kitt.orm.ExposedProjectRepository
+import edu.kitt.orm.ExposedUserRepository
+import edu.kitt.orm.IssueRepository
+import edu.kitt.orm.ProjectRepository
+import edu.kitt.orm.UserRepository
+import edu.kitt.orm.inmemory.InMemoryCommentRepository
+import edu.kitt.orm.inmemory.InMemoryIssueRepository
+import edu.kitt.orm.inmemory.InMemoryProjectRepository
+import edu.kitt.orm.inmemory.InMemoryUserRepository
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -77,4 +89,39 @@ fun Application.initDbSchema(connection: Connection) {
     connection.createStatement().use { statement ->
         statement.execute(schema)
     }
+}
+
+class Repositories(
+    var userRepository: UserRepository,
+    var commentRepository: CommentRepository,
+    var issueRepository: IssueRepository,
+    var projectRepository: ProjectRepository
+)
+
+fun Application.initInMemoryRepositories(): Repositories {
+    val userRepository = InMemoryUserRepository()
+    val commentRepository = InMemoryCommentRepository(userRepository)
+    val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
+    val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
+
+    return Repositories(
+        userRepository = userRepository,
+        commentRepository = commentRepository,
+        issueRepository = issueRepository,
+        projectRepository = projectRepository
+    )
+}
+
+fun Application.initExposedRepositories(): Repositories {
+    val userRepository = ExposedUserRepository()
+    val commentRepository = ExposedCommentRepository()
+    val issueRepository = ExposedIssueRepository()
+    val projectRepository = ExposedProjectRepository()
+
+    return Repositories(
+        userRepository = userRepository,
+        commentRepository = commentRepository,
+        issueRepository = issueRepository,
+        projectRepository = projectRepository
+    )
 }

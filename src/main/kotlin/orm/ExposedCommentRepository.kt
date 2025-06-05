@@ -16,23 +16,11 @@ class ExposedCommentRepository : CommentRepository {
         }
     }
 
-    private fun mapCommentDAOToDomain(commentDAO: CommentDAO): Comment {
-        return Comment(
-            id = commentDAO.id.value,
-            author = User(
-                id = commentDAO.author.id.value,
-                emailAddress = commentDAO.author.emailAddress,
-                username = commentDAO.author.userName
-            ),
-            text = commentDAO.text
-        )
-    }
-
     override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
         return withContext(Dispatchers.IO) {
             transaction {
                 CommentDAO.find { Comments.issue eq id }.map {
-                    mapCommentDAOToDomain(it)
+                    mapCommentDAOtoComment(it)
                 }
             }
         }
@@ -43,7 +31,7 @@ class ExposedCommentRepository : CommentRepository {
             transaction {
                 // Assuming Comments.author is a reference to UserDAO's ID (which is UInt)
                 CommentDAO.find { Comments.author eq id }.map {
-                    mapCommentDAOToDomain(it)
+                    mapCommentDAOtoComment(it)
                 }
             }
         }
@@ -64,7 +52,7 @@ class ExposedCommentRepository : CommentRepository {
                     text = entry.text!! // TODO: add proper check before
                     this.issue = issue
                 }
-                mapCommentDAOToDomain(newCommentDAO)
+                mapCommentDAOtoComment(newCommentDAO)
             }
         }
     }
@@ -88,7 +76,7 @@ class ExposedCommentRepository : CommentRepository {
                 commentDAO.author = newAuthorDAO
                 commentDAO.issue = issueDAO
 
-                mapCommentDAOToDomain(commentDAO)
+                mapCommentDAOtoComment(commentDAO)
             }
         }
     }

@@ -15,78 +15,23 @@ import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTrans
 
 class ExposedProjectRepository : ProjectRepository {
 
-    private fun mapProjectDAOToDomain(project: ProjectDAO): Project = Project(
-        id = project.id.value,
-        name = project.name,
-        description = project.description,
-        archived = project.archived,
-        owner = User(
-            id = project.owner.id.value,
-            emailAddress = project.owner.emailAddress,
-            username = project.owner.userName
-        ),
-        collaborators = project.collaborators.map { collaborator ->
-            User(
-                id = collaborator.id.value,
-                emailAddress = collaborator.emailAddress,
-                username = collaborator.userName
-            )
-        } as MutableList<User>,
-        issues = project.issues.map { issue ->
-            Issue(
-                id = issue.id.value,
-                title = issue.title,
-                description = issue.description,
-                status = issue.status,
-                createdBy = User(
-                    id = issue.createdBy.id.value,
-                    emailAddress = issue.createdBy.emailAddress,
-                    username = issue.createdBy.userName
-                ),
-                comments = issue.comments.map { comment ->
-                    Comment(
-                        id = comment.id.value,
-                        author = User(
-                            id = comment.author.id.value,
-                            emailAddress = comment.author.emailAddress,
-                            username = comment.author.userName
-                        ),
-                        text = comment.text
-                    )
-                } as MutableList<Comment>,
-                links = issue.links.map { link ->
-                    IssueLink(
-                        id = link.id.value,
-                        title = link.title
-                    )
-                } as MutableList<IssueLink>,
-            )
-        } as MutableList<Issue>
-    )
-
     override suspend fun getProjectByID(id: Int): Project? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            ProjectDAO.findById(id)?.let(::mapProjectDAOToDomain)
+            ProjectDAO.findById(id)?.let(::mapProjectDAOtoProject)
         }
     }
 
     override suspend fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return newSuspendedTransaction(Dispatchers.IO) {
             val project = ProjectDAO.findById(projectId)
-            project?.collaborators?.map { collaborator ->
-                User(
-                    id = collaborator.id.value,
-                    emailAddress = collaborator.emailAddress,
-                    username = collaborator.userName
-                )
-            } ?: listOf()
+            project?.collaborators?.map(::mapUserDAOtoUser) ?: listOf()
         }
     }
 
     override suspend fun getAllProjects(): List<Project> {
         return newSuspendedTransaction(Dispatchers.IO) {
             val projects = ProjectDAO.all()
-            projects.map(::mapProjectDAOToDomain)
+            projects.map(::mapProjectDAOtoProject)
         }
     }
 
@@ -97,7 +42,7 @@ class ExposedProjectRepository : ProjectRepository {
             description = project.description!!
             archived = project.archived!!
             owner = UserDAO.findById(project.ownerID!!)!!
-            }.let(::mapProjectDAOToDomain)
+            }.let(::mapProjectDAOtoProject)
         }
     }
 
@@ -111,7 +56,7 @@ class ExposedProjectRepository : ProjectRepository {
                 owner = UserDAO.findById(project.ownerID!!)!!
             }
 
-            mapProjectDAOToDomain(projectDAO)
+            mapProjectDAOtoProject(projectDAO)
         }
     }
 
@@ -132,11 +77,7 @@ class ExposedProjectRepository : ProjectRepository {
                 it[projectID] = collaborator.projectID
                 it[userID] = user.id.value
             }
-            User(
-                id = user.id.value,
-                emailAddress = user.emailAddress,
-                username = user.userName
-            )
+            mapUserDAOtoUser(user)
         }
     }
 

@@ -10,25 +10,13 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class ExposedUserRepository : UserRepository {
     override suspend fun getUserByID(uid: Int): User? = withContext(Dispatchers.IO) {
         transaction {
-            UserDAO.findById(uid)?.let {
-                User(
-                    id = it.id.value,
-                    emailAddress = it.emailAddress,
-                    username = it.userName
-                )
-            }
+            UserDAO.findById(uid)?.let(::mapUserDAOtoUser)
         }
     }
 
     override suspend fun getAllUsers(): List<User> = withContext(Dispatchers.IO) {
         transaction {
-            UserDAO.all().map {
-                User(
-                    id = it.id.value,
-                    emailAddress = it.emailAddress,
-                    username = it.userName
-                )
-            }
+            UserDAO.all().map(::mapUserDAOtoUser)
         }
     }
 }

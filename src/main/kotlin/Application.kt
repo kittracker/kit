@@ -19,29 +19,8 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.File
 
-class Repositories(
-    var userRepository: UserRepository,
-    var commentRepository: CommentRepository,
-    var issueRepository: IssueRepository,
-    var projectRepository: ProjectRepository
-)
-
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
-}
-
-fun Application.initInMemoryRepositories(): Repositories {
-    val userRepository = InMemoryUserRepository()
-    val commentRepository = InMemoryCommentRepository(userRepository)
-    val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
-    val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
-
-    return Repositories(
-        userRepository = userRepository,
-        commentRepository = commentRepository,
-        issueRepository = issueRepository,
-        projectRepository = projectRepository
-    )
 }
 
 fun Application.module() {
@@ -73,12 +52,7 @@ fun Application.module() {
         }
     }
 
-    val repos = initInMemoryRepositories()
-
-    repos.userRepository = ExposedUserRepository()
-    repos.projectRepository = ExposedProjectRepository()
-    repos.userRepository = ExposedUserRepository()
-    repos.commentRepository = ExposedCommentRepository()
+    val repos = initExposedRepositories()
 
     routing {
         route("/api") {

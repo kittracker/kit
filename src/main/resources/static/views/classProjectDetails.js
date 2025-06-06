@@ -206,7 +206,7 @@ export default class ProjectDetails {
             return;
         }
 
-        this.newCollaborators.push(user)
+        this.newCollaborators.push(user);
 
         const list = document.getElementById("usersList");
         const item = document.createElement("li");
@@ -443,7 +443,7 @@ export default class ProjectDetails {
             <div class="d-flex flex-column gap-5 p-3">
                 <div>
                     <p>Issue Title</p>
-                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue Name" aria-label="Issue Name" aria-describedby="issueTitle" required>
+                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue title" aria-label="Issue Name" aria-describedby="issueTitle" required>
                 </div>
                 <div>
                     <p>Description</p>

@@ -5,6 +5,7 @@ export default class IssueDetails {
         this.issueId = issueId;
         this.issue = null;
         this.container = document.createElement("div");
+        this.newLinks = [];
 
         this.editModalFunc = () => this.fillModal();
 
@@ -68,6 +69,244 @@ export default class IssueDetails {
 
         return `<div class="badge rounded-pill p-2 bg-${statusMap[status] || "secondary"}">${status}</div>`;
     };
+
+    async addComment(ev) {
+        ev.preventDefault();
+
+        const textarea = document.getElementById("commentArea");
+        const comment = textarea.value;
+
+        const writeButton = document.getElementById("write-tab");
+        const writeButtonTab = bootstrap.Tab.getOrCreateInstance(writeButton);
+
+        if (comment.length === 0) {
+            writeButtonTab.show();
+            textarea.focus();
+            return;
+        }
+
+        await fetch("/api/comments", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "author": 2,
+                "text": comment,
+                "issueID": this.issue.id
+            })
+        }).then(async (res) => {
+            if (res.ok) {
+                await this.update();
+                this.renderComments();
+            }
+
+            textarea.value = "";
+            writeButtonTab.show();
+        }).catch((reason) => {
+            Notifier.danger("Error", reason);
+        });
+
+        // TODO: switch the author ID when proper authentication is done
+    }
+
+    fillModal() {
+        const title = document.getElementById("editIssueTitle");
+        title.value = this.issue.title;
+
+        const status = document.getElementById("statusSelector");
+        switch (this.issue.status) {
+            case "OPEN":
+                status.value = "0";
+                break;
+            case "IN_PROGRESS":
+                status.value = "1";
+                break;
+            case "CLOSED":
+                status.value = "2";
+                break;
+        }
+
+        const description = document.getElementById("editIssueDescription");
+        description.value = this.issue.description;
+    }
+
+    async editIssue(e) {
+        e.preventDefault();
+
+        const titleItem = document.getElementById("editIssueTitle");
+        const title = titleItem.value;
+
+        const statusItem = document.getElementById("statusSelector");
+        let status;
+
+        switch (statusItem.value) {
+            case "0":
+                status = "OPEN";
+                break;
+            case "1":
+                status = "IN_PROGRESS";
+                break;
+            case "2":
+                status = "CLOSED";
+                break;
+        }
+
+        const descriptionItem = document.getElementById("editIssueDescription");
+        const description = descriptionItem.value;
+
+        const modalElement = document.getElementById("editModal");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+
+        if (title === this.issue.title &&
+            status === this.issue.status &&
+            description === this.issue.description) {
+
+            if (modal) modal.hide();
+            return;
+        }
+
+        await fetch("/api/issues", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "id": this.issue.id,
+                "title": title,
+                "status": status,
+                "description": description
+            })
+        }).then(async (res) => {
+            if (res.ok) {
+                await this.update();
+                await this.render();
+
+                Notifier.success(title, "Issue edited successfully");
+            }
+        }).catch((reason) => {
+            Notifier.danger("Error", reason);
+        });
+
+        if (modal) modal.hide();
+    }
+
+    async selectLink(e) {
+        e.preventDefault();
+
+        const input = document.getElementById("linkInput");
+        const id = input.value;
+
+        if (id.length === 0) {
+            return;
+        }
+
+        const res = await fetch(`/api/issues/${id}`);
+        if (!res.ok) {
+            Notifier.danger("Link", `Cannot find issue with ID: ${id}`);
+            return;
+        }
+
+        if (this.newLinks.includes(id)) {
+            Notifier.warning("Link", "Issue already selected");
+            return;
+        }
+
+        this.newLinks.push(id);
+
+        const list = document.getElementById("linkList");
+        const item = document.createElement("li");
+        item.classList.add("list-group-item", "list-group-item-action", "list-item");
+        item.textContent = id;
+        item.dataset.id = id;
+
+        item.addEventListener("click", (e) => {
+            const item = e.currentTarget;
+            const id = item.dataset.id;
+
+            this.newLinks = this.newLinks.filter(issueID => issueID !== id);
+            item.remove();
+
+            Notifier.info(item.textContent, "Issue deselected");
+        });
+
+        list.append(item);
+    }
+
+    clearLinks(_) {
+        const list = document.getElementById("linkList");
+        list.innerHTML = "";
+
+        this.newLinks.length = 0;
+    }
+
+    async createLink(e) {
+        e.preventDefault();
+
+        const input = document.getElementById("linkInput");
+
+        if (this.newLinks.length === 0) {
+            input.focus();
+            return;
+        }
+
+        for (const id of this.newLinks) {
+            if (id === this.issue.id) continue;
+
+            try {
+                const res = await fetch("/api/links", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        "linker": this.issue.id,
+                        "linked": id,
+                    })
+                });
+
+                if (res.ok) {
+                    Notifier.success(`Link #${id}`, "Link created successfully");
+                } else {
+                    const errorText = await res.text();
+                    Notifier.danger(`Link #${id}`, errorText);
+                }
+            } catch (error) {
+                Notifier.danger(`Link #${id}`, `Request failed: ${error.message}`);
+            }
+        }
+
+        await this.update();
+        this.renderLinks();
+
+        const modalElement = document.getElementById("modal");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+    }
+
+    renderLinks() {
+        const links = document.getElementById("issue-links");
+        links.innerHTML = `
+            <h3 class="m-0 pb-5 g-0 text-center">Related Issues</h3>
+            ${this.issue.links.length > 0 ? `
+                ${this.issue.links.map(link => `
+                    <div class="card mb-3 p-2 kit-card" href="/issues/${link.id}" data-link>
+                        <div class="card-body">
+                            <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
+                                <div class="d-flex gap-3">
+                                    <i class="bi bi-link-45deg"></i>
+                                    <h5 class="card-title d-block text-truncate">${link.title}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `)}
+                `
+                :
+                `<h5 class="text-secondary text-center">No links yet</h5>`
+            }
+        `;
+    }
 
     renderComments() {
         const commentsSection = document.getElementById("comments-section");
@@ -148,128 +387,6 @@ export default class IssueDetails {
         renderMarkdown();
     }
 
-    async addComment(ev) {
-        ev.preventDefault();
-
-        const textarea = document.getElementById("commentArea");
-        const comment = textarea.value;
-
-        const writeButton = document.getElementById("write-tab");
-        const writeButtonTab = bootstrap.Tab.getOrCreateInstance(writeButton);
-
-        if (comment.length === 0) {
-            writeButtonTab.show();
-            textarea.focus();
-            return;
-        }
-
-        await fetch("/api/comments", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "author": 2,
-                "text": comment,
-                "issueID": this.issue.id
-            })
-        }).then(async (res) => {
-            if (res.ok) {
-                await this.update();
-                this.renderComments();
-            }
-
-            textarea.value = "";
-            writeButtonTab.show();
-        }).catch((reason) => {
-            Notifier.danger("Error", reason);
-        });
-
-        // TODO: switch the author ID when proper authentication is done
-    }
-
-    fillModal() {
-        const title = document.getElementById("issueTitle");
-        title.value = this.issue.title;
-
-        const status = document.getElementById("statusSelector");
-        switch (this.issue.status) {
-            case "OPEN":
-                status.value = "0";
-                break;
-            case "IN_PROGRESS":
-                status.value = "1";
-                break;
-            case "CLOSED":
-                status.value = "2";
-                break;
-        }
-
-        const description = document.getElementById("issueDescription");
-        description.value = this.issue.description;
-    }
-
-    async editIssue(e) {
-        e.preventDefault();
-
-        const titleItem = document.getElementById("issueTitle");
-        const title = titleItem.value;
-
-        const statusItem = document.getElementById("statusSelector");
-        let status;
-
-        switch (statusItem.value) {
-            case "0":
-                status = "OPEN";
-                break;
-            case "1":
-                status = "IN_PROGRESS";
-                break;
-            case "2":
-                status = "CLOSED";
-                break;
-        }
-
-        const descriptionItem = document.getElementById("issueDescription");
-        const description = descriptionItem.value;
-
-        if (title === this.issue.title &&
-            status === this.issue.status &&
-            description === this.issue.description) {
-
-            const modalElement = document.getElementById("modal");
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) modal.hide();
-            return;
-        }
-
-        await fetch("/api/issues", {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "id": this.issue.id,
-                "title": title,
-                "status": status,
-                "description": description
-            })
-        }).then(async (res) => {
-            if (res.ok) {
-                await this.update();
-                await this.render();
-
-                Notifier.success(title, "Issue edited successfully");
-            }
-        }).catch((reason) => {
-            Notifier.danger("Error", reason);
-        });
-
-        const modalElement = document.getElementById("modal");
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) modal.hide();
-    }
-
     render() {
         this.container.innerHTML = `
             <section class="container-fluid d-none m-0 px-3 g-0 align-items-center justify-content-evenly project-sticky border-bottom-primary" id="sticky-info">
@@ -327,25 +444,7 @@ export default class IssueDetails {
                         <div class="d-flex flex-column gap-5 m-0 p-0 g-0" id="comments-section">
                         </div>
                     </section>
-                    <section class="col-xl-4 col-12 px-3 mt-xl-0 mt-5">
-                        <h3 class="m-0 pb-5 g-0 text-center">Related Issues</h3>
-                        ${this.issue.links.length > 0 ? `
-                            ${this.issue.links.map(link => `
-                                <div class="card mb-3 p-2 kit-card" href="/issues/${link.id}" data-link>
-                                    <div class="card-body">
-                                        <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
-                                            <div class="d-flex gap-3">
-                                                <i class="bi bi-link-45deg"></i>
-                                                <h5 class="card-title d-block text-truncate">${link.title}</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `)}
-                            `
-                            :
-                            `<h5 class="text-secondary text-center">No links yet</h5>`
-                        }
+                    <section class="col-xl-4 col-12 px-3 mt-xl-0 mt-5" id="issue-links">
                     </section>
                 </div>
             </section>
@@ -356,6 +455,7 @@ export default class IssueDetails {
         // TODO: add popover for comment form when authentication is properly done
 
         this.renderComments();
+        this.renderLinks();
 
         const previewButton = document.getElementById("preview-tab");
         previewButton.addEventListener("shown.bs.tab", event => {
@@ -371,18 +471,46 @@ export default class IssueDetails {
             renderMarkdown();
         })
 
-        const editButton = document.getElementById("editButton");
-        editButton.classList.remove("d-none");
+        const newButton = document.getElementById("newButton");
+        newButton.classList.remove("d-none");
 
         const modalTitle = document.getElementById("modalTitle");
-        modalTitle.textContent = "Edit Issue";
+        modalTitle.textContent = "Link Issue";
 
         const modalBody = document.getElementById("modalBody");
         modalBody.innerHTML = `
             <div class="d-flex flex-column gap-5 p-3">
+                <ul class="list-group text-center" id="linkList">
+                </ul>
+                <form class="input-group" id="linkForm">
+                    <span class="input-group-text fg-dark" id="visible-addon">#</span>
+                    <input type="text" class="form-control search-bar" id="linkInput" placeholder="Link id" aria-label="Link id" aria-describedby="Link id">
+                    <button class="btn button" type="submit">Add</button>
+                </form>
+            </div>
+        `;
+
+        const linkForm = document.getElementById("linkForm");
+        linkForm.onsubmit = (e) => this.selectLink(e);
+
+        const modal = document.getElementById('modal');
+        modal.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
+
+        const modalFooter = document.getElementById("modalFooter");
+        modalFooter.onsubmit = (e) => this.createLink(e);
+
+        const editButton = document.getElementById("editButton");
+        editButton.classList.remove("d-none");
+
+        const editModalTitle = document.getElementById("editModalTitle");
+        editModalTitle.textContent = "Edit Issue";
+
+        const editModalBody = document.getElementById("editModalBody");
+        editModalBody.innerHTML = `
+            <div class="d-flex flex-column gap-5 p-3">
                 <div>
                     <p>Issue Title</p>
-                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue Name" aria-label="Issue Name" aria-describedby="issueTitle" required>
+                    <input type="text" class="form-control search-bar" id="editIssueTitle" placeholder="Issue title" aria-label="Issue title" aria-describedby="editIssueTitle" required>
                 </div>
                 <select class="form-select search-bar" id="statusSelector">
                     <option value="0">OPEN</option>
@@ -391,16 +519,16 @@ export default class IssueDetails {
                 </select>
                 <div>
                     <p>Description</p>
-                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
+                    <textarea class="form-control search-bar" id="editIssueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
                 </div>
             </div>
         `;
 
-        const modal = document.getElementById('modal');
-        modal.addEventListener('show.bs.modal', this.editModalFunc);
+        const editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', this.editModalFunc);
 
-        const modalFooter = document.getElementById("modalFooter");
-        modalFooter.onsubmit = async (e) => this.editIssue(e);
+        const editModalFooter = document.getElementById("editModalFooter");
+        editModalFooter.onsubmit = async (e) => this.editIssue(e);
 
         this.container.onsubmit = (e) => this.addComment(e);
 
@@ -415,10 +543,13 @@ export default class IssueDetails {
     }
 
     unmount() {
+        const newButton = document.getElementById("newButton");
+        newButton.classList.add("d-none");
+
         const editButton = document.getElementById("editButton");
         editButton.classList.add("d-none");
 
-        const modal = document.getElementById('modal');
+        const modal = document.getElementById('editModal');
         modal.removeEventListener('show.bs.modal', this.editModalFunc);
 
         const issueDetails = document.getElementById("issue-details");

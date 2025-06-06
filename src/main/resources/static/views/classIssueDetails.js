@@ -315,7 +315,12 @@ export default class IssueDetails {
                                     <h6 class="m-0 p-0 g-0">AUTHOR</h6>
                                 </div>
                                 <div class="card-body">
-                                    <github-md>${this.issue.description}</github-md>
+                                    ${this.issue.description.length > 0 ? `
+                                        <github-md>${this.issue.description}</github-md>
+                                        `
+                                        :
+                                        `<p class="m-0 p-0 g-0 text-secondary text-center">No description provided</p>`
+                                    }
                                 </div>
                             </div>
                         </div>

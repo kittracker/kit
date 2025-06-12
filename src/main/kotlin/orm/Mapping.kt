@@ -61,9 +61,9 @@ object Collaborators : Table() {
 class UserDAO(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UserDAO>(Users)
 
-    val userName by Users.userName
-    val emailAddress by Users.emailAddress
-    val passwordHash by Users.passwordHash
+    var userName by Users.userName
+    var emailAddress by Users.emailAddress
+    var passwordHash by Users.passwordHash
 }
 
 class ProjectDAO(id: EntityID<Int>) : IntEntity(id) {

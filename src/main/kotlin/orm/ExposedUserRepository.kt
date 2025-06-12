@@ -2,6 +2,8 @@ package edu.kitt.orm
 
 import edu.kitt.checkPassword
 import edu.kitt.domainmodel.User
+import edu.kitt.hashPassword
+import edu.kitt.orm.requests.SignupRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -25,7 +27,7 @@ class ExposedUserRepository : UserRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             val userDAO = UserDAO.find {
                 Users.userName eq username
-            }.first()
+            }.first() // TODO handle exception
             if (checkPassword(password, userDAO.passwordHash)) {
                 return@newSuspendedTransaction User(
                     userDAO.id.value,
@@ -37,4 +39,14 @@ class ExposedUserRepository : UserRepository {
             }
         }
     }
+
+    override suspend fun createUser(request: SignupRequest): User? = newSuspendedTransaction(Dispatchers.IO) {
+        val userDAO = UserDAO.new {
+            emailAddress = request.email
+            userName = request.username
+            passwordHash = hashPassword(request.password)
+        }
+        mapUserDAOtoUser(userDAO)
+    }
+
 }

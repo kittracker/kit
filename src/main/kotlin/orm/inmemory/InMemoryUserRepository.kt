@@ -1,7 +1,6 @@
-package edu.kitt.orm.inmemory
+package edu.kitt.orm
 
 import edu.kitt.domainmodel.User
-import edu.kitt.orm.UserRepository
 import edu.kitt.orm.entries.UserEntry
 
 class InMemoryUserRepository : UserRepository {
@@ -26,12 +25,8 @@ class InMemoryUserRepository : UserRepository {
     }
 
     override suspend fun getUser(username: String, password: String): User? {
-        return users.firstOrNull { it.username == username }?.let {
-            User(
-                it.id!!,
-                it.emailAddress,
-                it.username,
-            )
-        }
+        val user = users.firstOrNull { it.username == username && it.username == password }
+        if (user == null) return null
+        return User(user.id!!, user.emailAddress, user.username)
     }
 }

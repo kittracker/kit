@@ -8,9 +8,10 @@ ktor:
       - classes
   development: true
 jwt:
-  domain: "https://jwt-provider-domain/"
-  audience: "jwt-audience"
-  realm: "ktor sample app"
+  secret: "secret"
+  issuer: "http://0.0.0.0:8080/"
+  audience: "http://0.0.0.0:8080/hello"
+  realm: "Access to 'hello'"
 postgres:
   url: "jdbc:postgresql://localhost/kittracker"
   user: postgres

@@ -14,8 +14,9 @@ import org.jetbrains.exposed.v1.dao.IntEntity
 import org.jetbrains.exposed.v1.dao.IntEntityClass
 
 object Users : IntIdTable() {
-    val userName = varchar("username", 50).index()
+    val userName = varchar("username", 50).uniqueIndex()
     val emailAddress = varchar("email_address", 255)
+    val passwordHash = varchar("password_hash", 255)
 }
 
 object Projects : IntIdTable() {
@@ -62,6 +63,7 @@ class UserDAO(id: EntityID<Int>) : IntEntity(id) {
 
     val userName by Users.userName
     val emailAddress by Users.emailAddress
+    val passwordHash by Users.passwordHash
 }
 
 class ProjectDAO(id: EntityID<Int>) : IntEntity(id) {

@@ -1,5 +1,6 @@
 package edu.kitt.orm
 
+import edu.kitt.checkPassword
 import edu.kitt.domainmodel.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,6 +18,23 @@ class ExposedUserRepository : UserRepository {
     override suspend fun getAllUsers(): List<User> = withContext(Dispatchers.IO) {
         transaction {
             UserDAO.all().map(::mapUserDAOtoUser)
+        }
+    }
+
+    override suspend fun getUser(username: String, password: String): User? {
+        return newSuspendedTransaction(Dispatchers.IO) {
+            val userDAO = UserDAO.find {
+                Users.userName eq username
+            }.first()
+            if (checkPassword(password, userDAO.passwordHash)) {
+                return@newSuspendedTransaction User(
+                    userDAO.id.value,
+                    userDAO.emailAddress,
+                    userDAO.userName
+                )
+            } else {
+                return@newSuspendedTransaction null
+            }
         }
     }
 }

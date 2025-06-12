@@ -24,4 +24,14 @@ class InMemoryUserRepository : UserRepository {
     override suspend fun getAllUsers(): List<User> {
         return users.map { User(it.id!!, it.emailAddress, it.username) }
     }
+
+    override suspend fun getUser(username: String, password: String): User? {
+        return users.firstOrNull { it.username == username }?.let {
+            User(
+                it.id!!,
+                it.emailAddress,
+                it.username,
+            )
+        }
+    }
 }

@@ -15,6 +15,8 @@ import io.ktor.server.sessions.*
 import java.sql.Connection
 import java.sql.DriverManager
 import kotlinx.serialization.Serializable
+import org.springframework.security.crypto.bcrypt.BCrypt
+
 
 fun Application.configureSecurity() {
     // Please read the jwt property from the config file if you are using EngineMain
@@ -52,3 +54,11 @@ fun Application.configureSecurity() {
 }
 @Serializable
 data class MySession(val count: Int = 0)
+
+fun hashPassword(password: String): String {
+    return BCrypt.hashpw(password, BCrypt.gensalt())
+}
+
+fun checkPassword(password: String, hash: String): Boolean {
+    return BCrypt.checkpw(password, hash)
+}

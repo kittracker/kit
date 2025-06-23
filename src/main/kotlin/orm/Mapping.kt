@@ -85,7 +85,7 @@ class IssueDAO(id: EntityID<Int>) : IntEntity(id) {
     var status by Issues.status
     var createdBy by UserDAO referencedOn Issues.createdBy
     var project by ProjectDAO referencedOn Issues.projectID
-    val links by IssueDAO via IssueLinks // This will load Issues
+    val links by IssueDAO.via(IssueLinks.linker, IssueLinks.linked) // This will load Issues
     val comments by CommentDAO referrersOn Comments.issue
 }
 

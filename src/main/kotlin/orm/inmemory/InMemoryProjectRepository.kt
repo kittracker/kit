@@ -1,16 +1,16 @@
-package edu.kitt.orm
+package edu.kitt.orm.inmemory
 
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
-import edu.kitt.issueRepository
+import edu.kitt.orm.IssueRepository
+import edu.kitt.orm.ProjectRepository
+import edu.kitt.orm.UserRepository
 import edu.kitt.orm.entries.CollaboratorEntry
 import edu.kitt.orm.entries.ProjectEntry
 import edu.kitt.orm.requests.ProjectEntryRequest
-import edu.kitt.projectRepository
-import edu.kitt.userRepository
 
-class InMemoryProjectRepository : ProjectRepository {
+class InMemoryProjectRepository(val userRepository: UserRepository, val issueRepository: IssueRepository) : ProjectRepository {
     private val projectCollaborators = mutableListOf(
         CollaboratorEntry(1, 1),
         CollaboratorEntry(1, 2),
@@ -29,7 +29,7 @@ class InMemoryProjectRepository : ProjectRepository {
         ProjectEntry(3, "project_name", "project_description", false, 3),
     )
 
-    override fun getProjectByID(id: Int): Project? {
+    override suspend fun getProjectByID(id: Int): Project? {
         val projectEntry = projects.firstOrNull { it.id == id }
         if (projectEntry == null) return null
         return Project(
@@ -39,23 +39,23 @@ class InMemoryProjectRepository : ProjectRepository {
             projectEntry.archived,
             // FIXME: this can throw
             userRepository.getUserByID(projectEntry.ownerID)!!,
-            projectRepository.getCollaboratorsByProjectID(projectEntry.id).toMutableList(),
+            this.getCollaboratorsByProjectID(projectEntry.id).toMutableList(),
             issueRepository.getIssuesByProjectID(projectEntry.id).toMutableList()
         )
     }
 
-    override fun getCollaboratorsByProjectID(projectId: Int): List<User> {
+    override suspend fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return projectCollaborators.filter { it.projectID == projectId }.map {
             // FIXME: this can throw
             userRepository.getUserByID(it.userID)!!
         }
     }
 
-    override fun getAllProjects(): List<Project> {
-        return projects.map { projectRepository.getProjectByID(it.id)!! }
+    override suspend fun getAllProjects(): List<Project> {
+        return projects.map { this.getProjectByID(it.id)!! }
     }
 
-    override fun createProject(project: ProjectEntryRequest): Project? {
+    override suspend fun createProject(project: ProjectEntryRequest): Project? {
         val new = ProjectEntry(
             id = projects.last().id + 1,
             name = project.name ?: return null,
@@ -67,7 +67,7 @@ class InMemoryProjectRepository : ProjectRepository {
         return getProjectByID(new.id)
     }
 
-    override fun editProject(project: ProjectEntryRequest): Project? {
+    override suspend fun editProject(project: ProjectEntryRequest): Project? {
         val stored = projects.find { it.id == project.id } ?: return null
         val edited = stored.copy(
             name = project.name ?: stored.name,
@@ -81,7 +81,7 @@ class InMemoryProjectRepository : ProjectRepository {
         return getProjectByID(edited.id)
     }
 
-    override fun deleteProject(id: Int): Boolean {
+    override suspend fun deleteProject(id: Int): Boolean {
         issueRepository.getIssuesByProjectID(id).forEach {
             issueRepository.deleteIssue(it.id)      // TODO: add method to issueRepository
         }
@@ -89,7 +89,7 @@ class InMemoryProjectRepository : ProjectRepository {
         return projects.removeIf { it.id == id }
     }
 
-    override fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User? {
+    override suspend fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User? {
         if (projects.none { it.id == collaborator.projectID }) return null
 
         val existentCollaborator = projectCollaborators.find {
@@ -109,7 +109,7 @@ class InMemoryProjectRepository : ProjectRepository {
         return userRepository.getUserByID(collaborator.userID)!!
     }
 
-    override fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean {
+    override suspend fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean {
         return projectCollaborators.removeIf { it.userID == collaborator.userID && it.projectID == collaborator.projectID }
     }
 }

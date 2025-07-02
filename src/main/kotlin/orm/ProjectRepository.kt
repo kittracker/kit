@@ -6,12 +6,12 @@ import edu.kitt.domainmodel.User
 import edu.kitt.orm.requests.ProjectEntryRequest
 
 interface ProjectRepository {
-    fun getProjectByID(id: Int): Project?
-    fun getCollaboratorsByProjectID(projectId: Int): List<User>
-    fun getAllProjects(): List<Project>
-    fun createProject(project: ProjectEntryRequest): Project?
-    fun editProject(project: ProjectEntryRequest): Project?
-    fun deleteProject(id: Int): Boolean
-    fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User?
-    fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean
+    suspend fun getProjectByID(id: Int): Project?
+    suspend fun getCollaboratorsByProjectID(projectId: Int): List<User>
+    suspend fun getAllProjects(): List<Project>
+    suspend fun createProject(project: ProjectEntryRequest): Project?
+    suspend fun editProject(project: ProjectEntryRequest): Project?
+    suspend fun deleteProject(id: Int): Boolean
+    suspend fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User?
+    suspend fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean
 }

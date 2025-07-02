@@ -6,14 +6,15 @@ import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import edu.kitt.orm.requests.ProjectEntryRequest
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.projectRoutes() {
+fun Route.projectRoutes(repos: Repositories) {
     route("/projects") {
         get {
-            call.respond(projectRepository.getAllProjects())
+            call.respond(repos.projectRepository.getAllProjects())
         }
 
         get("/{id}") {
@@ -23,7 +24,7 @@ fun Route.projectRoutes() {
                 return@get
             }
 
-            val project = projectRepository.getProjectByID(projectID)
+            val project = repos.projectRepository.getProjectByID(projectID)
             if (project == null) {
                 call.respond(HttpStatusCode.NotFound, "Project not found")
                 return@get
@@ -34,7 +35,7 @@ fun Route.projectRoutes() {
 
         post {
             val project = call.receive<ProjectEntryRequest>()
-            val created = projectRepository.createProject(project)
+            val created = repos.projectRepository.createProject(project)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to create project")
                 return@post
@@ -46,7 +47,7 @@ fun Route.projectRoutes() {
         put {
             val entry = call.receive<ProjectEntryRequest>()
 
-            val edited = projectRepository.editProject(entry)
+            val edited = repos.projectRepository.editProject(entry)
             if (edited == null) {
                 call.respond(HttpStatusCode.NotFound, "Project not found")
                 return@put
@@ -62,7 +63,7 @@ fun Route.projectRoutes() {
                 return@delete
             }
 
-            if (!projectRepository.deleteProject(id)) {
+            if (!repos.projectRepository.deleteProject(id)) {
                 call.respond(HttpStatusCode.NotFound, "Unable to remove project")
                 return@delete
             }
@@ -72,11 +73,11 @@ fun Route.projectRoutes() {
     }
 }
 
-fun Route.collaboratorRoutes() {
+fun Route.collaboratorRoutes(repos: Repositories) {
     route("/collaborators") {
         post {
             val collaborator = call.receive<CollaboratorEntryRequest>()
-            val created = projectRepository.addCollaboratorToProject(collaborator)
+            val created = repos.projectRepository.addCollaboratorToProject(collaborator)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to add collaborator to project")
                 return@post
@@ -87,7 +88,7 @@ fun Route.collaboratorRoutes() {
 
         delete {
             val collaborator = call.receive<CollaboratorEntryRequest>()
-            if (!projectRepository.removeCollaboratorToProject(collaborator)) {
+            if (!repos.projectRepository.removeCollaboratorToProject(collaborator)) {
                 call.respond(HttpStatusCode.NotFound, "Project not found")
                 return@delete
             }
@@ -97,15 +98,15 @@ fun Route.collaboratorRoutes() {
     }
 }
 
-fun Route.issueRoutes() {
+fun Route.issueRoutes(repos: Repositories) {
     route("/issues") {
         get {
-            call.respond(issueRepository.getAllIssues())
+            call.respond(repos.issueRepository.getAllIssues())
         }
 
         post {
             val issue = call.receive<IssueEntryRequest>()
-            val created = issueRepository.createIssue(issue)
+            val created = repos.issueRepository.createIssue(issue)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to create issue")
                 return@post
@@ -121,7 +122,7 @@ fun Route.issueRoutes() {
                 return@get
             }
 
-            val issue = issueRepository.getIssueByID(issueID)
+            val issue = repos.issueRepository.getIssueByID(issueID)
             if (issue == null) {
                 call.respond(HttpStatusCode.NotFound, "Issue not found")
                 return@get
@@ -133,7 +134,7 @@ fun Route.issueRoutes() {
         put {
             val entry = call.receive<IssueEntryRequest>()
 
-            val edited = issueRepository.editIssue(entry)
+            val edited = repos.issueRepository.editIssue(entry)
             if (edited == null) {
                 call.respond(HttpStatusCode.NotFound, "Issue not found")
                 return@put
@@ -149,7 +150,7 @@ fun Route.issueRoutes() {
                 return@delete
             }
 
-            if (!issueRepository.deleteIssue(id)) {
+            if (!repos.issueRepository.deleteIssue(id)) {
                 call.respond(HttpStatusCode.NotFound, "Unable to remove comment")
                 return@delete
             }
@@ -159,12 +160,12 @@ fun Route.issueRoutes() {
     }
 }
 
-fun Route.linkRoutes() {
+fun Route.linkRoutes(repos: Repositories) {
     route("/links") {
         post {
             val link = call.receive<IssueLinkEntryRequest>()
 
-            val created = issueRepository.linkIssues(link)
+            val created = repos.issueRepository.linkIssues(link)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to create link")
                 return@post
@@ -175,7 +176,7 @@ fun Route.linkRoutes() {
 
         delete {
             val link = call.receive<IssueLinkEntryRequest>()
-            if (!issueRepository.deleteLink(link)) {
+            if (!repos.issueRepository.deleteLink(link)) {
                 call.respond(HttpStatusCode.NotFound, "Unable to remove link")
                 return@delete
             }
@@ -185,12 +186,12 @@ fun Route.linkRoutes() {
     }
 }
 
-fun Route.commentRoutes() {
+fun Route.commentRoutes(repos: Repositories) {
     route("/comments") {
         post {
             val comment = call.receive<CommentEntryRequest>()
 
-            val created = commentRepository.createComment(comment)
+            val created = repos.commentRepository.createComment(comment)
             if (created == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to create comment")
                 return@post
@@ -202,7 +203,7 @@ fun Route.commentRoutes() {
         put {
             val comment = call.receive<CommentEntryRequest>()
 
-            val edited = commentRepository.editComment(comment)
+            val edited = repos.commentRepository.editComment(comment)
             if (edited == null) {
                 call.respond(HttpStatusCode.NotFound, "Comment requested not found")
                 return@put
@@ -218,7 +219,7 @@ fun Route.commentRoutes() {
                 return@delete
             }
 
-            if (!commentRepository.removeCommentByID(commentID)) {
+            if (!repos.commentRepository.removeCommentByID(commentID)) {
                 call.respond(HttpStatusCode.NotFound, "Unable to remove comment")
                 return@delete
             }
@@ -228,10 +229,10 @@ fun Route.commentRoutes() {
     }
 }
 
-fun Route.userRoutes() {
+fun Route.userRoutes(repos: Repositories) {
     route("/users") {
         get {
-            call.respond(userRepository.getAllUsers())
+            call.respond(repos.userRepository.getAllUsers())
         }
 
         post {
@@ -245,7 +246,7 @@ fun Route.userRoutes() {
                 return@get
             }
 
-            val user = userRepository.getUserByID(uid)
+            val user = repos.userRepository.getUserByID(uid)
             if (user == null) {
                 call.respond(HttpStatusCode.NotFound, "User not found")
                 return@get

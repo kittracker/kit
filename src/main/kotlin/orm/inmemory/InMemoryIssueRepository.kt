@@ -1,17 +1,17 @@
-package edu.kitt.orm
+package edu.kitt.orm.inmemory
 
-import edu.kitt.commentRepository
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.issueRepository
+import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.entries.IssueLinkEntry
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
-import edu.kitt.userRepository
+import edu.kitt.orm.CommentRepository
+import edu.kitt.orm.UserRepository
 
-class InMemoryIssueRepository : IssueRepository {
+class InMemoryIssueRepository(val commentRepository: CommentRepository, val userRepository: UserRepository) : IssueRepository {
     private val issueLinks = mutableListOf(
         IssueLinkEntry(1, 2),
         IssueLinkEntry(2, 1),
@@ -24,7 +24,7 @@ class InMemoryIssueRepository : IssueRepository {
         IssueEntry(3, "title", "description", IssueStatus.OPEN, 3, 1),
     )
 
-    override fun createIssue(issue: IssueEntryRequest): Issue? {
+    override suspend fun createIssue(issue: IssueEntryRequest): Issue? {
         val new = IssueEntry(
             id = issues.last().id + 1,
             title = issue.title ?: return null,
@@ -37,14 +37,14 @@ class InMemoryIssueRepository : IssueRepository {
         return getIssueByID(new.id)
     }
 
-    override fun getIssuesByProjectID(id: Int): List<Issue> {
+    override suspend fun getIssuesByProjectID(id: Int): List<Issue> {
         return issues.filter { it.projectID == id }.map {
             // FIXME: this can throw
-            issueRepository.getIssueByID(it.id!!)!!
+            this.getIssueByID(it.id!!)!!
         }
     }
 
-    override fun getIssueByID(id: Int): Issue? {
+    override suspend fun getIssueByID(id: Int): Issue? {
         val issueEntry = issues.firstOrNull { it.id == id }
         if (issueEntry == null) return null
         return Issue(
@@ -55,22 +55,22 @@ class InMemoryIssueRepository : IssueRepository {
             // FIXME: this can throw
             userRepository.getUserByID(issueEntry.createdBy)!!,
             commentRepository.getCommentsByIssueID(issueEntry.id!!).toMutableList(),
-            issueRepository.getIssueLinks(issueEntry.id!!).toMutableList()
+            this.getIssueLinks(issueEntry.id!!).toMutableList()
         )
     }
 
-    override fun getIssueLinks(id: Int): List<IssueLink> {
+    override suspend fun getIssueLinks(id: Int): List<IssueLink> {
         return issueLinks.filter { it.linker == id }.map {
             val title = issues.first { it2 -> it2.id == it.linked }.title
             IssueLink(it.linked, title)
         }
     }
 
-    override fun getAllIssues() : List<Issue> {
-        return issues.map { issueRepository.getIssueByID(it.id)!! }
+    override suspend fun getAllIssues() : List<Issue> {
+        return issues.map { this.getIssueByID(it.id)!! }
     }
 
-    override fun editIssue(issue: IssueEntryRequest): Issue? {
+    override suspend fun editIssue(issue: IssueEntryRequest): Issue? {
         val stored = issues.find { it.id == issue.id } ?: return null
         val edited = stored.copy(
             title = issue.title ?: stored.title,
@@ -84,7 +84,7 @@ class InMemoryIssueRepository : IssueRepository {
         return getIssueByID(edited.id)
     }
 
-    override fun deleteIssue(id: Int): Boolean {
+    override suspend fun deleteIssue(id: Int): Boolean {
         issueLinks.removeIf { it.linker == id }
         commentRepository.getCommentsByIssueID(id).forEach { // TODO: add method to CommentRepository
             commentRepository.removeCommentByID(it.id)
@@ -92,7 +92,7 @@ class InMemoryIssueRepository : IssueRepository {
         return issues.removeIf { it.id == id }
     }
 
-    override fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
+    override suspend fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
         if (issues.none { it.id == link.linked }) return null
         val existentLink = issueLinks.find { it.linker == link.linker && it.linked == link.linked }
         if (existentLink != null) {
@@ -113,7 +113,7 @@ class InMemoryIssueRepository : IssueRepository {
         return IssueLink(new.linked, getIssueByID(new.linked)!!.title)
     }
 
-    override fun deleteLink(link: IssueLinkEntryRequest): Boolean {
+    override suspend fun deleteLink(link: IssueLinkEntryRequest): Boolean {
         return issueLinks.removeIf { it.linker == link.linker && it.linked == link.linked }
     }
 }

@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class UserEntry(
     val id: Int,
     val emailAddress: String,
-    val username: String
+    val username: String,
+
 )

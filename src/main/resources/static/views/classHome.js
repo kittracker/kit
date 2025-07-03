@@ -9,11 +9,11 @@ export default class Home {
             <div class="d-flex flex-column gap-5 p-3">
                 <div>
                     <p>Username</p>
-                    <input type="text" class="form-control search-bar" id="username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
+                    <input type="text" class="form-control search-bar" id="login-username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
                 </div>
                 <div>
                     <p>Password</p>
-                    <input type="password" class="form-control search-bar" id="password-input" placeholder="Password">
+                    <input type="password" class="form-control search-bar" id="login-password-input" placeholder="Password">
                 </div>
             </div>
         `);
@@ -22,15 +22,15 @@ export default class Home {
             <div class="d-flex flex-column gap-5 p-3">
                 <div>
                     <p>Email</p>
-                    <input type="text" class="form-control search-bar" id="email-input" placeholder="Email" aria-label="Email" aria-describedby="email">
+                    <input type="text" class="form-control search-bar" id="register-email-input" placeholder="Email" aria-label="Email" aria-describedby="email">
                 </div>
                 <div>
                     <p>Username</p>
-                    <input type="text" class="form-control search-bar" id="username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
+                    <input type="text" class="form-control search-bar" id="register-username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
                 </div>
                 <div>
                     <p>Password</p>
-                    <input type="password" class="form-control search-bar" id="password-input" placeholder="Password">
+                    <input type="password" class="form-control search-bar" id="register-password-input" placeholder="Password">
                 </div>
             </div>
         `);
@@ -41,10 +41,10 @@ export default class Home {
     async login(e) {
         e.preventDefault();
 
-        const username_input = document.getElementById("username-input");
+        const username_input = document.getElementById("login-username-input");
         const username = username_input.value;
 
-        const password_input = document.getElementById("password-input");
+        const password_input = document.getElementById("login-password-input");
         const password = password_input.value;
 
         await fetch("/login", {
@@ -69,13 +69,13 @@ export default class Home {
     async register(e) {
         e.preventDefault();
 
-        const email_input = document.getElementById("email-input");
+        const email_input = document.getElementById("register-email-input");
         const email = email_input.value;
 
-        const username_input = document.getElementById("username-input");
+        const username_input = document.getElementById("register-username-input");
         const username = username_input.value;
 
-        const password_input = document.getElementById("password-input");
+        const password_input = document.getElementById("register-password-input");
         const password = password_input.value;
 
         await fetch("/register", {
@@ -217,7 +217,9 @@ export default class Home {
     }
 
     unmount() {
-        console.log("smontato");
+        ModalBuilder.dispose(this.loginModal);
+        ModalBuilder.dispose(this.registerModal);
+
         destroy();
         window.removeEventListener("resize", this._resizeHandler);
     }

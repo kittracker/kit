@@ -1,4 +1,5 @@
 import Notifier from "../shared/Notifier.js";
+import ModalBuilder from "../shared/ModalBuilder.js";
 
 const projectName = "projectName";
 const projectNameFilter = "projectNameFilter";
@@ -17,19 +18,43 @@ export default class Projects {
     constructor() {
         this.projects = null;
         this.percentage = 0; // Used to avoid project percentage recalculation twice
+
+        this.hideArchived = false;
+
+        this.modal = ModalBuilder.newModalWithTitleAndBody("newProjectModal", "New Project", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Project Name</p>
+                    <input type="text" class="form-control search-bar" id=${projectNameModal} placeholder="Project Name" aria-label="Project Name" aria-describedby="projectNameModal" required>
+                </div>
+                <div>
+                    <p>Description</p>
+                    <textarea class="form-control search-bar" id=${projectDescriptionModal} placeholder="Project Description" rows="4" ></textarea>
+                </div>
+            </div>
+        `);
+
         this.container = document.createElement("div");
     }
 
-    async fetchProjects() {
+    async update() {
         const response = await fetch(`/api/projects`);
         if (response.ok) {
             this.projects = await response.json();
         }
+    }
+
+    async fetchProjects() {
+        await this.update();
         this.render()
     }
 
     renderProjects() {
         const projects = document.getElementById(projectSection);
+
+        if (this.hideArchived) {
+            this.projects = this.projects.filter(project => !project.archived);
+        }
 
         projects.innerHTML = `
             ${this.projects.length > 0 ? `
@@ -40,6 +65,15 @@ export default class Projects {
                                 <h5 class="card-title pe-md-3 d-block text-truncate">${project.name}</h5>
                                 <h6 class="card-subtitle mb-2 text-body-tertiary">@${project.owner.username}</h6>
                             </div>
+                            ${project.archived ? `
+                                <div class="row m-0 p-0 g-0">
+                                    <div class="d-block mt-2">
+                                        <div class="badge rounded-pill px-4 bg-warning">
+                                            <p class="m-0 p-0 g-0">ARCHIVED</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ``}
                             <br />
                             <p class="card-text d-block text-truncate">${project.description}</p>
                             <div class="progress" role="progressbar" aria-label="Project Completion" aria-valuenow="${this.getProjectCompletePercentage(project)}" aria-valuemin="0" aria-valuemax="100">
@@ -102,7 +136,10 @@ export default class Projects {
 
         if (e.submitter.id === projectNameFilter) this.filterProjectsByName();
         else if (e.submitter.id === authorNameFilter) this.filterProjectsByAuthor();
-        else if (e.submitter.id === reset) this.fetchProjects();
+        else if (e.submitter.id === reset) {
+            this.hideArchived = false;
+            this.fetchProjects();
+        }
         else console.error("Error: Unknown callback requested.");
     }
 
@@ -127,6 +164,8 @@ export default class Projects {
             body: JSON.stringify({
                 "name": projectName,
                 "description": projectDescription,
+                "archived": false,
+                "ownerID": 1
             })
         }).then(async (res) => {
             const modalElement = document.getElementById("modal");
@@ -167,6 +206,14 @@ export default class Projects {
                             </form> 
                             <p class="py-3" id=${activeAuthorNameFilter}></p>
                         </div>
+                        
+                        <div class="form-check m-0 p-0 g-0 d-flex align-items-center gap-3">
+                            <input class="form-check-input m-0 fs-4 kit-checkbox" type="checkbox" value="" id="hideArchived">
+                            <label class="form-check-label">
+                                HIDE ARCHIVED PROJECTS
+                            </label>
+                        </div>
+                        
                         <form>
                             <button class="container-fluid btn button" type="submit" id=${reset}>RESET</button>
                         </form>
@@ -179,31 +226,23 @@ export default class Projects {
 
         this.renderProjects();
 
-        const modalTitle = document.getElementById("modalTitle");
-        modalTitle.textContent = "New Project";
+        let hideArchived = document.getElementById("hideArchived");
+        hideArchived.addEventListener("change", async (_) => {
+            this.hideArchived = !this.hideArchived;
+            await this.update();
+            this.renderProjects();
+        });
 
-        const modalBody = document.getElementById("modalBody");
-        modalBody.innerHTML = `
-            <div class="d-flex flex-column gap-5 p-3">
-                <div>
-                    <p>Project Name</p>
-                    <input type="text" class="form-control search-bar" id=${projectNameModal} placeholder="Project Name" aria-label="Project Name" aria-describedby="projectNameModal" required>
-                </div>
-                <div>
-                    <p>Description</p>
-                    <textarea class="form-control search-bar" id=${projectDescriptionModal} placeholder="Project Description" rows="4" ></textarea>
-                </div>
-            </div>
-        `;
-
-        const modalFooter = document.getElementById("modalFooter");
+        const modalFooter = document.getElementById("newProjectModal-footer");
         modalFooter.onsubmit = (e) => this.postProject(e);
 
         const newButton = document.getElementById("newButton");
         newButton.classList.remove("d-none");
+        newButton.onclick = (_) => this.modal.show();
 
-        const newProjectCollapse = document.getElementById("newProjectCollapse");
-        newProjectCollapse.classList.remove("d-none");
+        const newButtonCollapse = document.getElementById("newButtonCollapse");
+        newButtonCollapse.classList.remove("d-none");
+        newButtonCollapse.textContent = "NEW PROJECT";
 
         this.container.onsubmit = (e) => this.callback(e);
     }
@@ -212,8 +251,10 @@ export default class Projects {
         const newButton = document.getElementById("newButton");
         newButton.classList.add("d-none");
 
-        const newProjectCollapse = document.getElementById("newProjectCollapse");
-        newProjectCollapse.classList.add("d-none");
+        const newButtonCollapse = document.getElementById("newButtonCollapse");
+        newButtonCollapse.classList.add("d-none");
+
+        ModalBuilder.dispose(this.modal);
     }
 
     async mount(root) {

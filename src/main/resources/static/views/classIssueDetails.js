@@ -1,4 +1,5 @@
 import Notifier from "../shared/Notifier.js";
+import ModalBuilder from "../shared/ModalBuilder.js";
 
 export default class IssueDetails {
     constructor(issueId) {
@@ -44,6 +45,36 @@ export default class IssueDetails {
         }
 
         this.observer = new IntersectionObserver(observe, options);
+
+        this.linkModal = ModalBuilder.newModalWithTitleAndBody("newLinkModal", "Link Issue", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <ul class="list-group text-center" id="linkList">
+                </ul>
+                <form class="input-group" id="linkForm">
+                    <span class="input-group-text fg-dark" id="visible-addon">#</span>
+                    <input type="text" class="form-control search-bar" id="linkInput" placeholder="Link id" aria-label="Link id" aria-describedby="Link id">
+                    <button class="btn button" type="submit">Add</button>
+                </form>
+            </div>
+        `);
+
+        this.editModal = ModalBuilder.newModalWithTitleAndBody("editModal", "Edit Issue", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Issue Title</p>
+                    <input type="text" class="form-control search-bar" id="editIssueTitle" placeholder="Issue title" aria-label="Issue title" aria-describedby="editIssueTitle" required>
+                </div>
+                <select class="form-select search-bar" id="statusSelector">
+                    <option value="0">OPEN</option>
+                    <option value="1">IN PROGRESS</option>
+                    <option value="2">CLOSED</option>
+                </select>
+                <div>
+                    <p>Description</p>
+                    <textarea class="form-control search-bar" id="editIssueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
+                </div>
+            </div>
+        `);
     }
 
     async update() {
@@ -67,7 +98,7 @@ export default class IssueDetails {
 
         if (status === "IN_PROGRESS") status = "IN PROGRESS";
 
-        return `<div class="badge rounded-pill p-2 bg-${statusMap[status] || "secondary"}">${status}</div>`;
+        return `<div class="badge rounded-pill p-2 bg-${statusMap[status] || "secondary"}"><h6 class="m-0 p-0 g-0">${status}</h6></div>`;
     };
 
     async addComment(ev) {
@@ -473,61 +504,23 @@ export default class IssueDetails {
 
         const newButton = document.getElementById("newButton");
         newButton.classList.remove("d-none");
-
-        const modalTitle = document.getElementById("modalTitle");
-        modalTitle.textContent = "Link Issue";
-
-        const modalBody = document.getElementById("modalBody");
-        modalBody.innerHTML = `
-            <div class="d-flex flex-column gap-5 p-3">
-                <ul class="list-group text-center" id="linkList">
-                </ul>
-                <form class="input-group" id="linkForm">
-                    <span class="input-group-text fg-dark" id="visible-addon">#</span>
-                    <input type="text" class="form-control search-bar" id="linkInput" placeholder="Link id" aria-label="Link id" aria-describedby="Link id">
-                    <button class="btn button" type="submit">Add</button>
-                </form>
-            </div>
-        `;
+        newButton.onclick = (_) => this.linkModal.show();
 
         const linkForm = document.getElementById("linkForm");
         linkForm.onsubmit = (e) => this.selectLink(e);
 
-        const modal = document.getElementById('modal');
-        modal.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
+        this.linkModal._element.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
 
-        const modalFooter = document.getElementById("modalFooter");
-        modalFooter.onsubmit = (e) => this.createLink(e);
+        const linkFooter = document.getElementById("newLinkModal-footer");
+        linkFooter.onsubmit = (e) => this.createLink(e);
 
         const editButton = document.getElementById("editButton");
         editButton.classList.remove("d-none");
+        editButton.onclick = (_) => this.editModal.show();
 
-        const editModalTitle = document.getElementById("editModalTitle");
-        editModalTitle.textContent = "Edit Issue";
+        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
 
-        const editModalBody = document.getElementById("editModalBody");
-        editModalBody.innerHTML = `
-            <div class="d-flex flex-column gap-5 p-3">
-                <div>
-                    <p>Issue Title</p>
-                    <input type="text" class="form-control search-bar" id="editIssueTitle" placeholder="Issue title" aria-label="Issue title" aria-describedby="editIssueTitle" required>
-                </div>
-                <select class="form-select search-bar" id="statusSelector">
-                    <option value="0">OPEN</option>
-                    <option value="1">IN PROGRESS</option>
-                    <option value="2">CLOSED</option>
-                </select>
-                <div>
-                    <p>Description</p>
-                    <textarea class="form-control search-bar" id="editIssueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
-                </div>
-            </div>
-        `;
-
-        const editModal = document.getElementById('editModal');
-        editModal.addEventListener('show.bs.modal', this.editModalFunc);
-
-        const editModalFooter = document.getElementById("editModalFooter");
+        const editModalFooter = document.getElementById("editModal-footer");
         editModalFooter.onsubmit = async (e) => this.editIssue(e);
 
         this.container.onsubmit = (e) => this.addComment(e);
@@ -560,6 +553,9 @@ export default class IssueDetails {
 
         this.observer.unobserve(issueDetails);
         this.observer.disconnect();
+
+        ModalBuilder.dispose(this.linkModal);
+        ModalBuilder.dispose(this.editModal);
     }
 
     async mount(root) {

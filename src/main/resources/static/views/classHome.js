@@ -1,9 +1,101 @@
 // src/main/resources/static/views/classHome.js
 import { init, resizeCanvas, destroy } from "./../shared/canvas.js";
+import ModalBuilder from "../shared/ModalBuilder.js";
+import Notifier from "../shared/Notifier.js";
 
 export default class Home {
     constructor() {
+        this.loginModal = ModalBuilder.newModalWithTitleAndBody("loginModal", "Sign In", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Username</p>
+                    <input type="text" class="form-control search-bar" id="username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
+                </div>
+                <div>
+                    <p>Password</p>
+                    <input type="password" class="form-control search-bar" id="password-input" placeholder="Password">
+                </div>
+            </div>
+        `);
+
+        this.registerModal = ModalBuilder.newModalWithTitleAndBody("registerModal", "Sign Up", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Email</p>
+                    <input type="text" class="form-control search-bar" id="email-input" placeholder="Email" aria-label="Email" aria-describedby="email">
+                </div>
+                <div>
+                    <p>Username</p>
+                    <input type="text" class="form-control search-bar" id="username-input" placeholder="Username" aria-label="Username" aria-describedby="username">
+                </div>
+                <div>
+                    <p>Password</p>
+                    <input type="password" class="form-control search-bar" id="password-input" placeholder="Password">
+                </div>
+            </div>
+        `);
+
         this.container = document.createElement("div");
+    }
+
+    async login(e) {
+        e.preventDefault();
+
+        const username_input = document.getElementById("username-input");
+        const username = username_input.value;
+
+        const password_input = document.getElementById("password-input");
+        const password = password_input.value;
+
+        await fetch("/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "username": username,
+                "password": password
+            })
+        }).then(async (res) => {
+            if (res.ok) {
+                const json = await res.json();
+                console.log(json);
+            } else {
+                Notifier.danger("Sign In", "Invalid username or password");
+            }
+        });
+    }
+
+    async register(e) {
+        e.preventDefault();
+
+        const email_input = document.getElementById("email-input");
+        const email = email_input.value;
+
+        const username_input = document.getElementById("username-input");
+        const username = username_input.value;
+
+        const password_input = document.getElementById("password-input");
+        const password = password_input.value;
+
+        await fetch("/register", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "email": email,
+                "username": username,
+                "password": password
+            })
+        }).then(async (res) => {
+            if (res.ok) {
+                const json = await res.json();
+                console.log(json);
+            } else {
+                Notifier.danger("Sign Up", "Registration failed, please try again");
+            }
+        });
     }
 
     render() {
@@ -101,6 +193,18 @@ export default class Home {
             <br> <br>
     
         `;
+
+        const signIn = document.getElementById("signIn");
+        signIn.onclick = () => { this.loginModal.show(); };
+
+        const loginFooter = document.getElementById("loginModal-footer");
+        loginFooter.onsubmit = async (e) => this.login(e);
+
+        const signUp = document.getElementById("signUp");
+        signUp.onclick = () => { this.registerModal.show(); };
+
+        const registerFooter = document.getElementById("registerModal-footer");
+        registerFooter.onsubmit = async (e) => this.register(e);
     }
 
     async mount(root) {
@@ -113,6 +217,7 @@ export default class Home {
     }
 
     unmount() {
+        console.log("smontato");
         destroy();
         window.removeEventListener("resize", this._resizeHandler);
     }

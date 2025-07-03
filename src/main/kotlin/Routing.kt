@@ -254,5 +254,21 @@ fun Route.userRoutes(repos: Repositories) {
 
             call.respond(user)
         }
+
+        get("/username/{username}") {
+            val username = call.parameters["username"]
+            if (username == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid username")
+                return@get
+            }
+
+            val user = repos.userRepository.getUserByUsername(username)
+            if (user == null) {
+                call.respond(HttpStatusCode.NotFound, "User not found")
+                return@get
+            }
+
+            call.respond(user)
+        }
     }
 }

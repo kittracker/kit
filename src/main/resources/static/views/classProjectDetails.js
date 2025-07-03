@@ -1,4 +1,5 @@
 import Notifier from "../shared/Notifier.js";
+import ModalBuilder from "../shared/ModalBuilder.js";
 
 export default class ProjectDetails {
     constructor(id) {
@@ -45,6 +46,50 @@ export default class ProjectDetails {
         }
 
         this.observer = new IntersectionObserver(observe, options);
+
+        this.editModalFunc = () => this.fillModal();
+
+        this.issueModal = ModalBuilder.newModalWithTitleAndBody("newIssueModal", "New Issue", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Issue Title</p>
+                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue title" aria-label="Issue Name" aria-describedby="issueTitle" required>
+                </div>
+                <div>
+                    <p>Description</p>
+                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
+                </div>
+            </div>
+        `);
+
+        this.collaboratorsModal = ModalBuilder.newModalWithTitleAndBody("newCollaboratorsModal", "New Collaborators", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <ul class="list-group text-center" id="usersList">
+                </ul>
+                <form class="input-group" id="collaboratorsForm">
+                    <span class="input-group-text fg-dark" id="visible-addon">@</span>
+                    <input type="text" class="form-control search-bar" id="collaborator-input" placeholder="Username" aria-label="Username">
+                    <button class="btn button" type="submit">Add</button>
+                </form>
+            </div>
+        `);
+
+        this.editModal = ModalBuilder.newModalWithTitleAndBody("editProjectModal", "Edit Project", `
+            <div class="d-flex flex-column gap-5 p-3">
+                <div>
+                    <p>Project Name</p>
+                    <input type="text" class="form-control search-bar" id="editProjectName" placeholder="Project name" aria-label="Project name" required>
+                </div>
+                <select class="form-select search-bar" id="statusSelector">
+                    <option value="0">IN PROGRESS</option>
+                    <option value="1">ARCHIVED</option>
+                </select>
+                <div>
+                    <p>Description</p>
+                    <textarea class="form-control search-bar" id="editProjectDescription" placeholder="Project description" rows="5" ></textarea>
+                </div>
+            </div>
+        `);
     }
 
     async update() {
@@ -94,6 +139,73 @@ export default class ProjectDetails {
         else console.error("Error: Unknown callback requested.");
     }
 
+    fillModal() {
+        const title = document.getElementById("editProjectName");
+        title.value = this.project.name;
+
+        const status = document.getElementById("statusSelector");
+        if (this.project.archived) status.value = 1;
+        else status.value = 0;
+
+        const description = document.getElementById("editProjectDescription");
+        description.value = this.project.description;
+    }
+
+    async editProject(e) {
+        e.preventDefault();
+
+        const titleItem = document.getElementById("editProjectName");
+        const title = titleItem.value;
+
+        const statusItem = document.getElementById("statusSelector");
+        let archived;
+
+        switch (statusItem.value) {
+            case "0":
+                archived = false;
+                break;
+            case "1":
+                archived = true;
+                break;
+        }
+
+        const descriptionItem = document.getElementById("editProjectDescription");
+        const description = descriptionItem.value;
+
+        if (title === this.project.name &&
+            archived === this.project.archived &&
+            description === this.project.description) {
+
+            this.editModal.hide();
+            return;
+        }
+
+        await fetch("/api/projects", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "id": this.project.id,
+                "name": title,
+                "description": description,
+                "archived": archived,
+                "ownerID": this.project.owner.id
+            })
+        }).then(async (res) => {
+            if (res.ok) {
+                await this.update();
+                await this.render();
+
+                Notifier.success(title, "Project edited successfully");
+            }
+        }).catch((reason) => {
+            Notifier.danger("Error", reason);
+        });
+
+        this.editModal.hide();
+    }
+
     async postIssue(e) {
         e.preventDefault();
 
@@ -137,10 +249,10 @@ export default class ProjectDetails {
     async postCollaborators(e) {
         e.preventDefault();
 
-        const select = document.getElementById("selectUsers");
+        const input = document.getElementById("collaborator-input");
 
         if (this.newCollaborators.length === 0) {
-            select.focus();
+            input.focus();
             return;
         }
 
@@ -173,33 +285,33 @@ export default class ProjectDetails {
         await this.update();
         this.renderCollaborators();
 
-        const modalElement = document.getElementById("modalSecondary");
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) modal.hide();
+        this.collaboratorsModal.hide();
     }
 
     clearNewCollaborators(_) {
         const list = document.getElementById("usersList");
         list.innerHTML = "";
 
-        const select = document.getElementById("selectUsers");
-        select.value = -1;
+        const input = document.getElementById("collaborator-input");
+        input.value = "";
 
         this.newCollaborators.length = 0;
     }
 
-    selectCollaborator(e) {
+    async selectCollaborator(e) {
         e.preventDefault();
 
-        const select = document.getElementById("selectUsers");
-        const index = select.value;
+        const input = document.getElementById("collaborator-input");
+        let username = input.value;
+        input.value = "";
 
-        if (parseInt(index) === -1) {
-            Notifier.danger("User Selection", "Please select a valid option");
+        const response = await fetch(`/api/users/username/${username}`);
+        if (!response.ok) {
+            Notifier.danger(username, "User not found");
             return;
         }
 
-        const user = this.users[index - 1];
+        let user = await response.json();
 
         if (this.newCollaborators.includes(user)) {
             Notifier.warning(user.username, "User already selected");
@@ -225,8 +337,6 @@ export default class ProjectDetails {
         });
 
         list.append(item);
-
-        // TODO: maybe for the UX is better to remove from this.users the already appended user
     }
 
     renderIssueStatus(status) {
@@ -345,14 +455,32 @@ export default class ProjectDetails {
 
     render() {
         this.container.innerHTML = `
-            <section class="container-fluid d-none m-0 p-0 g-0 align-items-center justify-content-center project-sticky border-bottom-primary" id="sticky-info">
+            <section class="container-fluid d-none m-0 p-0 g-0 align-items-center justify-content-${this.project.archived ? "evenly" : "center"} project-sticky border-bottom-primary" id="sticky-info">
                 <h5 class="d-block px-3 text-truncate">${this.project.name}</h5>
+                ${this.project.archived ? `
+                    <div class="row m-0 p-2 g-0">
+                        <div class="d-block text-center">
+                            <div class="badge rounded-pill px-2 bg-warning">
+                                <h6 class="m-0 p-0 g-0">ARCHIVED</h6>
+                            </div>
+                        </div>
+                    </div>
+                ` : ``}
             </section>
             
             <section class="m-0 g-0 pt-3 pb-1 min-vh-100">
                 <div class="row m-0 p-0 g-0">
                     <div class="row m-0 p-5 g-0">
                         <h1 class="text-center text-wrap text-break"><strong id="project-title">${this.project.name}</strong></h1>
+                        ${this.project.archived ? `
+                            <div class="row m-0 p-3 g-0">
+                                <div class="d-block text-center">
+                                    <div class="badge rounded-pill px-4 bg-warning">
+                                        <h5 class="m-0 p-0 g-0">ARCHIVED</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ``}
                     </div>
                     
                     <div class="row m-0 p-3 g-0">
@@ -422,9 +550,15 @@ export default class ProjectDetails {
 
         const newDropdownContent = document.getElementById("newDropdownContent");
         newDropdownContent.innerHTML = `
-            <li><button class="dropdown-item py-2 px-4" id="newIssue" data-bs-toggle="modal" data-bs-target="#modal">NEW ISSUE</button></li>
-            <li><button class="dropdown-item py-2 px-4" id="newCollaborator" data-bs-toggle="modal" data-bs-target="#modalSecondary">NEW COLLABORATOR</button></li>
+            <li><button class="dropdown-item py-2 px-4" id="newIssue">NEW ISSUE</button></li>
+            <li><button class="dropdown-item py-2 px-4" id="newCollaborator">NEW COLLABORATOR</button></li>
         `;
+
+        const newIssueButton = document.getElementById("newIssue");
+        newIssueButton.onclick = (_) => this.issueModal.show();
+
+        const newCollaboratorButton = document.getElementById("newCollaborator");
+        newCollaboratorButton.onclick = (_) => this.collaboratorsModal.show();
 
         const projectTitle = document.getElementById("project-title");
         if (!projectTitle) {
@@ -435,55 +569,25 @@ export default class ProjectDetails {
         this.observer.unobserve(projectTitle);
         this.observer.observe(projectTitle);
 
-        const modalTitle = document.getElementById("modalTitle");
-        modalTitle.textContent = "New Issue";
-
-        const modalBody = document.getElementById("modalBody");
-        modalBody.innerHTML = `
-            <div class="d-flex flex-column gap-5 p-3">
-                <div>
-                    <p>Issue Title</p>
-                    <input type="text" class="form-control search-bar" id="issueTitle" placeholder="Issue title" aria-label="Issue Name" aria-describedby="issueTitle" required>
-                </div>
-                <div>
-                    <p>Description</p>
-                    <textarea class="form-control search-bar" id="issueDescription" placeholder="Use Markdown to format your description" rows="5" ></textarea>
-                </div>
-            </div>
-        `;
-
-        const modalFooter = document.getElementById("modalFooter");
-        modalFooter.onsubmit = (e) => this.postIssue(e);
-
-        const modalSecondaryTitle = document.getElementById("modalSecondaryTitle");
-        modalSecondaryTitle.textContent = "New Collaborator";
-
-        const modalSecondaryBody = document.getElementById("modalSecondaryBody");
-        modalSecondaryBody.innerHTML = `
-            <div class="d-flex flex-column gap-5 p-3">
-                <ul class="list-group text-center" id="usersList">
-                </ul>
-                <form class="input-group" id="collaboratorsForm">
-                    <span class="input-group-text fg-dark" id="visible-addon">@</span>
-                    <select class="form-select search-bar" id="selectUsers" aria-label="Example select with button addon">
-                        <option value="-1" selected>Choose...</option>
-                        ${this.users.map((user, index) => `
-                            <option value="${index + 1}">${user.username}</option>    
-                        `)}
-                    </select>
-                    <button class="btn button" type="submit">Add</button>
-                </form>
-            </div>
-        `;
+        const issueModalFooter = document.getElementById("newIssueModal-footer");
+        issueModalFooter.onsubmit = (e) => this.postIssue(e);
 
         const collaboratorsForm = document.getElementById("collaboratorsForm");
         collaboratorsForm.onsubmit = (e) => this.selectCollaborator(e);
 
-        const modalSecondary = document.getElementById("modalSecondary");
-        modalSecondary.addEventListener("hidden.bs.modal", (e) => this.clearNewCollaborators(e));
+        this.collaboratorsModal._element.addEventListener("hidden.bs.modal", (e) => this.clearNewCollaborators(e));
 
-        const modalSecondaryFooter = document.getElementById("modalSecondaryFooter");
-        modalSecondaryFooter.onsubmit = (e) => this.postCollaborators(e);
+        const collaboratorsModalFooter = document.getElementById("newCollaboratorsModal-footer");
+        collaboratorsModalFooter.onsubmit = (e) => this.postCollaborators(e);
+
+        const editButton = document.getElementById("editButton");
+        editButton.classList.remove("d-none");
+        editButton.onclick = (_) => this.editModal.show();
+
+        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
+
+        const editModalFooter = document.getElementById("editProjectModal-footer");
+        editModalFooter.onsubmit = async (e) => this.editProject(e);
 
         this.container.onsubmit = (e) => this.callback(e);
     }
@@ -500,6 +604,10 @@ export default class ProjectDetails {
 
         this.observer.unobserve(projectTitle);
         this.observer.disconnect();
+
+        ModalBuilder.dispose(this.issueModal);
+        ModalBuilder.dispose(this.collaboratorsModal);
+        ModalBuilder.dispose(this.editModal);
     }
 
     async mount(root) {

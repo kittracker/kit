@@ -17,6 +17,22 @@ class ExposedUserRepository : UserRepository {
         }
     }
 
+    override suspend fun getUserByUsername(username: String): User? {
+        val user = transaction {
+            val userDAO = UserDAO.find { Users.userName eq username }.firstOrNull()
+            if (userDAO != null) {
+                return@transaction User(
+                    userDAO.id.value,
+                    userDAO.emailAddress,
+                    userDAO.userName,
+                )
+            } else {
+                return@transaction null
+            }
+        }
+        return user
+    }
+
     override suspend fun getAllUsers(): List<User> = withContext(Dispatchers.IO) {
         transaction {
             UserDAO.all().map(::mapUserDAOtoUser)

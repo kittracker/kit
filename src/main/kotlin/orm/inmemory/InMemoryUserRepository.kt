@@ -22,6 +22,16 @@ class InMemoryUserRepository : UserRepository {
         )
     }
 
+    override suspend fun getUserByUsername(username: String): User? {
+        val userEntry = users.firstOrNull { it.username == username }
+        if (userEntry == null) return null
+        return User(
+            userEntry.id!!,
+            userEntry.emailAddress,
+            userEntry.username,
+        )
+    }
+
     override suspend fun getAllUsers(): List<User> {
         return users.map { User(it.id!!, it.emailAddress, it.username) }
     }

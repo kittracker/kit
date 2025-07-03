@@ -37,11 +37,8 @@
                 </button>
             </div>
             <div class="d-md-flex d-none gap-3 px-5 justify-content-end align-items-center" id="navActions">
-                <button class="d-none btn px-4 button-reverse" id="newButton" data-bs-toggle="modal" data-bs-target="#modal">
+                <button class="d-none btn px-4 button-reverse" id="newButton">
                     <i class="bi bi-plus-lg"></i>
-                </button>
-                <button class="d-none btn px-4 button-reverse" id="editButton" data-bs-toggle="modal" data-bs-target="#editModal">
-                    <i class="bi bi-pencil-fill"></i>
                 </button>
                 <div class="dropdown-center d-none" id="newDropdown">
                     <button class="btn px-4 dropdown-toggle button-reverse" data-bs-toggle="dropdown" aria-expanded="false">
@@ -50,10 +47,13 @@
                     <ul class="dropdown-menu text-center mt-2 overflow-hidden borders-primary" id="newDropdownContent">
                     </ul>
                 </div>
-                <a class="btn px-4 button-reverse" href="/projects" data-link>
+                <button class="d-none btn px-4 button-reverse" id="editButton">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+                <a class="btn px-4 button-reverse" id="signIn">
                     <b>SIGN-IN</b>
                 </a>
-                <a class="btn px-4 button-reverse">
+                <a class="btn px-4 button-reverse" id="signUp">
                     <b>SIGN-UP</b>
                 </a>
             </div>
@@ -61,69 +61,13 @@
     </section>
     <section class="row m-0 p-0 g-0 text-center bg">
         <div class="mt-3 collapse" id="navActionsCollapse">
-            <p class="d-none py-3 link" id="newProjectCollapse" data-bs-toggle="modal" data-bs-target="#modal">NEW PROJECT</p>
+            <p class="d-none py-3 link" id="newButtonCollapse"></p>
             <p class="py-3 link">SIGN-IN</p>
             <p class="py-3 link">SIGN-UP</p>
         </div>
     </section>
 </header>
 
-<!-- Modal Primary -->
-<div class="modal fade" id="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content kit_modal">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 ms-3" id="modalTitle"></h1>
-            </div>
-
-            <div class="modal-body" id="modalBody">
-            </div>
-
-            <form class="modal-footer me-3" id="modalFooter">
-                <button type="button" class="btn button" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn button" id="modalDone">Done</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Secondary -->
-<div class="modal fade" id="modalSecondary" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalSecondary" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content kit_modal">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 ms-3" id="modalSecondaryTitle"></h1>
-            </div>
-
-            <div class="modal-body" id="modalSecondaryBody">
-            </div>
-
-            <form class="modal-footer me-3" id="modalSecondaryFooter">
-                <button type="button" class="btn button" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn button" id="modalSecondaryDone">Done</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content kit_modal">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 ms-3" id="editModalTitle"></h1>
-            </div>
-
-            <div class="modal-body" id="editModalBody">
-            </div>
-
-            <form class="modal-footer me-3" id="editModalFooter">
-                <button type="button" class="btn button" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn button" id="editModalDone">Done</button>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Notifications Toast -->
 <div id="notification-tray" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;"></div>

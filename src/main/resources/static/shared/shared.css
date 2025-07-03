@@ -135,6 +135,36 @@
     border-width: 3px;
 }
 
+.kit-modal {
+    border-color: #202020;
+    border-width: 3px;
+    border-radius: 20px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.kit-checkbox:focus {
+    outline: none !important;
+    box-shadow: none !important;
+
+    border-color: #202020;
+}
+
+.kit-checkbox:checked {
+    outline: none !important;
+    box-shadow: none !important;
+
+    background-color: rgb(255, 49, 49);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-color: #202020;
+}
+
+.kit-checkbox:not(:checked):hover {
+    border-color: rgb(255, 49, 49);
+}
+
 .kit-toast {
     border-color: #202020;
     border-width: 3px;

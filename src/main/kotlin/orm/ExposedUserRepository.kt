@@ -43,7 +43,8 @@ class ExposedUserRepository : UserRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             val userDAO = UserDAO.find {
                 Users.userName eq username
-            }.first() // TODO handle exception
+            }.firstOrNull()
+            if (userDAO == null) return@newSuspendedTransaction null
             if (checkPassword(password, userDAO.passwordHash)) {
                 return@newSuspendedTransaction User(
                     userDAO.id.value,

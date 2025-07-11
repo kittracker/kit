@@ -231,31 +231,31 @@ fun Route.commentRoutes(repos: Repositories) {
 
 fun Route.userRoutes(repos: Repositories) {
     route("/users") {
-        get {
-            call.respond(repos.userRepository.getAllUsers())
-        }
+//        get {
+//            call.respond(repos.userRepository.getAllUsers())
+//        }
 
         post {
 
         }
 
-        get("/{id}") {
-            val uid = call.parameters["id"]?.toIntOrNull()
-            if (uid == null) {
-                call.respond(HttpStatusCode.BadRequest, "ID must be a number")
-                return@get
-            }
+//        get("/{id}") {
+//            val uid = call.parameters["id"]?.toIntOrNull()
+//            if (uid == null) {
+//                call.respond(HttpStatusCode.BadRequest, "ID must be a number")
+//                return@get
+//            }
+//
+//            val user = repos.userRepository.getUserByID(uid)
+//            if (user == null) {
+//                call.respond(HttpStatusCode.NotFound, "User not found")
+//                return@get
+//            }
+//
+//            call.respond(user)
+//        }
 
-            val user = repos.userRepository.getUserByID(uid)
-            if (user == null) {
-                call.respond(HttpStatusCode.NotFound, "User not found")
-                return@get
-            }
-
-            call.respond(user)
-        }
-
-        get("/username/{username}") {
+        get("/{username}") {
             val username = call.parameters["username"]
             if (username == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid username")

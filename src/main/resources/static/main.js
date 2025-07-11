@@ -1,8 +1,4 @@
-import home from "./views/home.js";
-import users from "./views/users.js"
-import userDetails from "./views/userDetails.js";
-import projects from "./views/projects.js";
-import projectDetails from "./views/projectDetails.js";
+import UserDetails from "./views/classUserDetails.js";
 import ProjectDetails from "./views/classProjectDetails.js";
 import IssueDetails from "./views/classIssueDetails.js";
 import Projects from "./views/classProjects.js";
@@ -14,15 +10,11 @@ let placeholder = () => `
 `
 
 const routes = {
-    //"/": { title: "Home", render: home },
     "/": { title: "Home", component: (_) => new Home() },
-    // "/projects": { title: "Projects", render: projects },
-    "/projects": { title: "Project Details", component: (_) => new Projects() },
-    // "/projects/:id": { title: "Project Details", render: projectDetails },
+    "/projects": { title: "Projects", component: (_) => new Projects() },
     "/projects/:id": { title: "Project Details", component: (params) => new ProjectDetails(params.id) },
     "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id) },
-    "/users": { title: "Users", render: users },
-    "/users/:id": { title: "User Details", render: userDetails },  // Dynamic ID
+    "/users/:username": { title: "User Details", component: (params) => new UserDetails(params.username) },
 };
 
 const app = document.getElementById("app");

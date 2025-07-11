@@ -5,7 +5,6 @@ export default class ProjectDetails {
     constructor(id) {
         this.id = id;
         this.project = null;
-        this.users = null;
         this.newCollaborators = [];
         this.container = document.createElement("div");
 
@@ -103,13 +102,6 @@ export default class ProjectDetails {
         await this.update();
         this.isFiltered = false;
         this.render()
-    }
-
-    async fetchUsers() {
-        const response = await fetch(`/api/users`);
-        if (response.ok) {
-            this.users = await response.json();
-        }
     }
 
     search() {
@@ -305,7 +297,7 @@ export default class ProjectDetails {
         let username = input.value;
         input.value = "";
 
-        const response = await fetch(`/api/users/username/${username}`);
+        const response = await fetch(`/api/users/${username}`);
         if (!response.ok) {
             Notifier.danger(username, "User not found");
             return;
@@ -421,7 +413,7 @@ export default class ProjectDetails {
 
         collaborators.innerHTML = `
             ${!this.isFiltered ? `
-                <div class="card mb-3 p-2 kit-card" href="/users/${this.project.owner.id}" data-link>
+                <div class="card mb-3 p-2 kit-card" href="/users/${this.project.owner.username}" data-link>
                     <div class="card-body">
                         <div class="d-flex flex-md-row gap-md-0 gap-3 flex-column justify-content-between">
                             <div class="d-flex gap-3">
@@ -613,7 +605,6 @@ export default class ProjectDetails {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
-        await this.fetchUsers();
         await this.fetchProject(); // Fetch issue data and render
     }
 }

@@ -23,7 +23,6 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.addLogger
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.io.File
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -43,7 +42,7 @@ fun Application.module() {
         json()
     }
     authentication {
-        jwt {
+        jwt("auth-jwt") {
             jwtConfig.configureKtorFeature(this)
         }
     }
@@ -199,41 +198,49 @@ fun Application.module() {
             val signupRequest = call.receive<SignupRequest>()
             val user = repos.userRepository.createUser(signupRequest)
             if (user == null) {
-                call.respond(HttpStatusCode.Unauthorized, "Invalid credentials.")
+                call.respond(HttpStatusCode.Unauthorized, "Registration failed.")
                 return@post
             }
-            call.respond(user)
+
+            val token = jwtConfig.generateToken(user.id, user.username)
+
+            val cookie = Cookie(
+                name = "jwt-token",
+                value = token,
+                maxAge = 24 * 60 * 60,
+                httpOnly = true,
+                // TODO: in production change this line
+                // secure = true,
+                secure = false,
+                path = "/",
+                extensions = mapOf("SameSite" to SameSite.Strict),
+            )
+
+            call.response.cookies.append(cookie)
+
+            call.respond(HttpStatusCode.OK, user)
         }
 
-        route("/api") {
-            projectRoutes(repos)
-            collaboratorRoutes(repos)
+        authenticate("auth-jwt") {
+            route("/api") {
+                projectRoutes(repos)
+                collaboratorRoutes(repos)
 
-            issueRoutes(repos)
-            commentRoutes(repos)
-            linkRoutes(repos)
+                issueRoutes(repos)
+                commentRoutes(repos)
+                linkRoutes(repos)
 
-            userRoutes(repos)
+                userRoutes(repos)
+            }
         }
 
-        // TODO: switch these lines at the end of development
-        // staticFiles("/", File("src/main/resources/static"))
-        // staticResources("/", "static")
-
-        staticFiles(
-            "/",
-            File("src/main/resources/static")
-        )
-
-        //singlePageApplication {
-        //    filesPath = "static"
-        //    defaultPage = "index.html"
-        //    useResources = true
-        //}
-
-        // get("/") {
-        //     call.respondText("Hello World!")
-        // }
+        // TODO: uncomment this when production ready
+        singlePageApplication {
+            filesPath = "src/main/resources/static"
+            // filesPath = "static"
+            defaultPage = "index.html"
+            // useResources = true
+        }
     }
 
 }

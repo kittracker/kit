@@ -1,5 +1,4 @@
-// src/main/resources/static/views/classHome.js
-import { init, resizeCanvas, destroy } from "./../shared/canvas.js";
+import { init, resizeCanvas, destroy } from "../shared/canvas.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
 import Notifier from "../shared/Notifier.js";
 
@@ -58,8 +57,7 @@ export default class Home {
             })
         }).then(async (res) => {
             if (res.ok) {
-                const json = await res.json();
-                console.log(json);
+                location.pathname = "/projects";
             } else {
                 Notifier.danger("Sign In", "Invalid username or password");
             }
@@ -90,8 +88,7 @@ export default class Home {
             })
         }).then(async (res) => {
             if (res.ok) {
-                const json = await res.json();
-                console.log(json);
+                location.pathname = "/projects";
             } else {
                 Notifier.danger("Sign Up", "Registration failed, please try again");
             }

@@ -4,17 +4,18 @@ import IssueDetails from "./views/classIssueDetails.js";
 import Projects from "./views/classProjects.js";
 import Home from "./views/classHome.js"
 import Notifier from "./shared/Notifier.js"
+import Auth from "./shared/Auth.js"
 
 let placeholder = () => `
     <h1>This page is under construction</h1>
 `
 
 const routes = {
-    "/": { title: "Home", component: (_) => new Home() },
-    "/projects": { title: "Projects", component: (_) => new Projects() },
-    "/projects/:id": { title: "Project Details", component: (params) => new ProjectDetails(params.id) },
-    "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id) },
-    "/users/:username": { title: "User Details", component: (params) => new UserDetails(params.username) },
+    "/": { title: "Home", component: (_) => new Home(), protected: false },
+    "/projects": { title: "Projects", component: (_) => new Projects(), protected: true },
+    "/projects/:id": { title: "Project Details", component: (params) => new ProjectDetails(params.id), protected: true },
+    "/issues/:id": { title: "Issue Details", component: (params) => new IssueDetails(params.id), protected: true },
+    "/users/:username": { title: "User Details", component: (params) => new UserDetails(params.username), protected: true },
 };
 
 const app = document.getElementById("app");
@@ -40,8 +41,17 @@ function matchRoute(path) {
 let currentlyLoadedComponent = null;
 
 async function router() {
+    await Auth.checkAuthState();
+
     const path = location.pathname;
     const matched = matchRoute(path);
+
+    if (matched && matched.route.protected && !Auth.isLoggedIn()) {
+        Notifier.warning("Authentication", "You must be logged in to access this content.");
+        history.pushState({}, "", "/");
+        await router();
+        return;
+    }
 
     if (matched) {
         document.title = matched.route.title;
@@ -90,7 +100,7 @@ window.addEventListener("click", async e => {
 
 // Handle browser navigation
 window.addEventListener("popstate", router);
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
     const yearSpan = document.getElementById('copyright-year');
     if (yearSpan) {
         yearSpan.textContent = new Date().getFullYear().toString();
@@ -98,7 +108,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const tray = document.getElementById("notification-tray");
     Notifier.attach(tray);
-    router();
+    await router();
 });
 
 window.addEventListener("resize", () => {

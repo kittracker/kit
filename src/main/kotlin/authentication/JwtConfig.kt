@@ -3,6 +3,7 @@ package edu.kitt.authentication
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.auth.parseAuthorizationHeader
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
 import io.ktor.server.auth.jwt.JWTPrincipal
 
@@ -34,6 +35,11 @@ class JwtConfig (val jwtIssuer: String,
     fun configureKtorFeature(config: JWTAuthenticationProvider.Config) = with(config) {
         verifier(jwtVerifier)
         realm = jwtRealm
+
+        authHeader { call ->
+            call.request.cookies["jwt-token"]?.let { parseAuthorizationHeader("Bearer $it") }
+        }
+
         validate { credentials ->
             val userId = credentials.payload.getClaim(CLAIM_USERID).asInt()
             val username = credentials.payload.getClaim(CLAIM_USERNAME).asString()

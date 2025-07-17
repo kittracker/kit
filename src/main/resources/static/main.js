@@ -91,6 +91,11 @@ window.addEventListener("click", async e => {
 // Handle browser navigation
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", () => {
+    const yearSpan = document.getElementById('copyright-year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear().toString();
+    }
+
     const tray = document.getElementById("notification-tray");
     Notifier.attach(tray);
     router();

@@ -6,7 +6,8 @@ import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import edu.kitt.orm.requests.ProjectEntryRequest
 import io.ktor.http.*
-import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -231,29 +232,43 @@ fun Route.commentRoutes(repos: Repositories) {
 
 fun Route.userRoutes(repos: Repositories) {
     route("/users") {
-//        get {
-//            call.respond(repos.userRepository.getAllUsers())
-//        }
+        // get {
+        //     call.respond(repos.userRepository.getAllUsers())
+        // }
 
         post {
 
         }
 
-//        get("/{id}") {
-//            val uid = call.parameters["id"]?.toIntOrNull()
-//            if (uid == null) {
-//                call.respond(HttpStatusCode.BadRequest, "ID must be a number")
-//                return@get
-//            }
-//
-//            val user = repos.userRepository.getUserByID(uid)
-//            if (user == null) {
-//                call.respond(HttpStatusCode.NotFound, "User not found")
-//                return@get
-//            }
-//
-//            call.respond(user)
-//        }
+        // get("/{id}") {
+        //     val uid = call.parameters["id"]?.toIntOrNull()
+        //     if (uid == null) {
+        //         call.respond(HttpStatusCode.BadRequest, "ID must be a number")
+        //         return@get
+        //     }
+
+        //     val user = repos.userRepository.getUserByID(uid)
+        //     if (user == null) {
+        //         call.respond(HttpStatusCode.NotFound, "User not found")
+        //         return@get
+        //     }
+
+        //     call.respond(user)
+        // }
+
+        // Ping endpoint to check if the user's JWT is still valid
+        get("/me") {
+            val principal = call.principal<JWTPrincipal>()
+            val username = principal!!.payload.getClaim("username").asString()
+
+            val user = repos.userRepository.getUserByUsername(username)
+            if (user == null) {
+                call.respond(HttpStatusCode.NotFound, "User not found")
+                return@get
+            }
+
+            call.respond(user)
+        }
 
         get("/{username}") {
             val username = call.parameters["username"]

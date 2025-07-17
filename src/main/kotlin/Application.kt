@@ -11,11 +11,13 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
+import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.SameSite
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.addLogger
@@ -24,7 +26,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.File
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {
@@ -159,7 +161,38 @@ fun Application.module() {
 
             val token = jwtConfig.generateToken(user.id, user.username)
 
-            call.respond(hashMapOf("token" to token))
+            val cookie = Cookie(
+                name = "jwt-token",
+                value = token,
+                maxAge = 24 * 60 * 60,
+                httpOnly = true,
+                // TODO: in production change this line
+                // secure = true,
+                secure = false,
+                path = "/",
+                extensions = mapOf("SameSite" to SameSite.Strict),
+            )
+
+            call.response.cookies.append(cookie)
+
+            call.respond(HttpStatusCode.OK, user)
+        }
+
+        post("/logout") {
+            val cookie = Cookie(
+                name = "jwt-token",
+                value = "",
+                maxAge = 0,
+                httpOnly = true,
+                // TODO: in production change this line
+                // secure = true,
+                secure = false,
+                path = "/",
+                extensions = mapOf("SameSite" to SameSite.Strict),
+            )
+
+            call.response.cookies.append(cookie)
+            call.respond(HttpStatusCode.OK, "Logged out successfully.")
         }
 
         post("/register") {

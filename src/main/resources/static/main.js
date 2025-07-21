@@ -10,6 +10,8 @@ let placeholder = () => `
     <h1>This page is under construction</h1>
 `
 
+let current_route;
+
 const routes = {
     "/": { title: "Home", component: (_) => new Home(), protected: false },
     "/projects": { title: "Projects", component: (_) => new Projects(), protected: true },
@@ -48,12 +50,15 @@ async function router() {
 
     if (matched && matched.route.protected && !Auth.isLoggedIn()) {
         Notifier.warning("Authentication", "You must be logged in to access this content.");
+        if (current_route === "/") return;
+
         history.pushState({}, "", "/");
         await router();
         return;
     }
 
     if (matched) {
+        current_route = path;
         document.title = matched.route.title;
 
         // If unmount needs to access components, the content is not changed yet here
@@ -86,6 +91,8 @@ async function router() {
             </div>
         `;
     }
+
+    console.log(current_route);
 }
 
 // Handle SPA navigation

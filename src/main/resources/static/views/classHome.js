@@ -1,6 +1,8 @@
 import { init, resizeCanvas, destroy } from "../shared/canvas.js";
+import NavbarManager from "../shared/NavbarManager.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
 import Notifier from "../shared/Notifier.js";
+import Auth from "../shared/Auth.js";
 
 export default class Home {
     constructor() {
@@ -190,23 +192,35 @@ export default class Home {
             <br> <br>
     
         `;
+    }
 
-        const signIn = document.getElementById("signIn");
-        signIn.onclick = () => { this.loginModal.show(); };
+    configure() {
+        if (!Auth.isLoggedIn()) {
+            this.signin = NavbarManager.newButton("signUp", "SIGN UP");
+            this.signup = NavbarManager.newButton("signIn", "SIGN IN");
 
-        const loginFooter = document.getElementById("loginModal-footer");
-        loginFooter.onsubmit = async (e) => this.login(e);
+            const signIn = document.getElementById("signIn");
+            signIn.onclick = () => { this.loginModal.show(); };
+            const signInMobile = document.getElementById("signIn-mobile");
+            signInMobile.onclick = () => { this.loginModal.show(); };
 
-        const signUp = document.getElementById("signUp");
-        signUp.onclick = () => { this.registerModal.show(); };
+            const loginFooter = document.getElementById("loginModal-footer");
+            loginFooter.onsubmit = async (e) => this.login(e);
 
-        const registerFooter = document.getElementById("registerModal-footer");
-        registerFooter.onsubmit = async (e) => this.register(e);
+            const signUp = document.getElementById("signUp");
+            signUp.onclick = () => { this.registerModal.show(); };
+            const signUpMobile = document.getElementById("signUp-mobile");
+            signUpMobile.onclick = () => { this.loginModal.show(); };
+
+            const registerFooter = document.getElementById("registerModal-footer");
+            registerFooter.onsubmit = async (e) => this.register(e);
+        }
     }
 
     async mount(root) {
         root.innerHTML = "";
         root.appendChild(this.container);
+        this.configure();
         this.render();
         setTimeout(() => { init(); }, 0);
         this._resizeHandler = () => resizeCanvas();
@@ -216,6 +230,9 @@ export default class Home {
     unmount() {
         ModalBuilder.dispose(this.loginModal);
         ModalBuilder.dispose(this.registerModal);
+
+        NavbarManager.dispose(this.signin);
+        NavbarManager.dispose(this.signup);
 
         destroy();
         window.removeEventListener("resize", this._resizeHandler);

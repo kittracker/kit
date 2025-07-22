@@ -86,8 +86,11 @@ async function router() {
         });
     } else {
         app.innerHTML = `
-            <div class="text-center">
-                <h2>404 - Page Not Found</h2>
+            <div class="mt-5 text-center">
+                <h2 class="m-0 p-0 g-0">404 - Page Not Found</h2>
+                <a class="btn px-5 my-5 button" href="/" data-link>
+                    <b>HOME</b>
+                </a>
             </div>
         `;
     }

@@ -194,25 +194,6 @@ export default class Home {
         `;
     }
 
-    mountNavbar() {
-        if (!Auth.isLoggedIn()) {
-            this.signin = NavbarManager.newButton("signUp", "SIGN UP");
-            this.signup = NavbarManager.newButton("signIn", "SIGN IN");
-        } else {
-            this.profile = NavbarManager.newLink("profile", "PROFILE", `/users/${Auth.getCurrentUser().username}`);
-            this.dashboard = NavbarManager.newLink("dashboard", "DASHBOARD", `/projects`);
-        }
-
-        this.configure();
-    }
-
-    unmountNavbar() {
-        NavbarManager.dispose(this.signin);
-        NavbarManager.dispose(this.signup);
-        NavbarManager.dispose(this.profile);
-        NavbarManager.dispose(this.dashboard);
-    }
-
     configure() {
         if (!Auth.isLoggedIn()) {
             const signIn = document.getElementById("signIn");
@@ -236,7 +217,8 @@ export default class Home {
     async mount(root) {
         root.innerHTML = "";
         root.appendChild(this.container);
-        this.mountNavbar();
+        NavbarManager.loadCommonButtons();
+        this.configure();
         this.render();
         setTimeout(() => { init(); }, 0);
         this._resizeHandler = () => resizeCanvas();
@@ -247,7 +229,7 @@ export default class Home {
         ModalBuilder.dispose(this.loginModal);
         ModalBuilder.dispose(this.registerModal);
 
-        this.unmountNavbar();
+        NavbarManager.unloadCommonButtons();
 
         destroy();
         window.removeEventListener("resize", this._resizeHandler);

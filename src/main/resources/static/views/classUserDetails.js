@@ -1,5 +1,6 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
+import NavbarManager from "../shared/NavbarManager.js";
 
 export default class UserDetails {
     constructor(username) {
@@ -11,10 +12,11 @@ export default class UserDetails {
         const response = await fetch(`/api/users/${this.username}`);
         if (response.ok) {
             this.user = await response.json();
+            console.log(this.user);
         }
     }
 
-    async fetchProjects() {
+    async fetchUser() {
         await this.update();
         this.render()
     }
@@ -33,11 +35,13 @@ export default class UserDetails {
     }
 
     unmount() {
+        NavbarManager.unloadCommonButtons();
     }
 
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
-        await this.fetchProjects(); // Fetch issue data and render
+        NavbarManager.loadCommonButtons();
+        await this.fetchUser(); // Fetch issue data and render
     }
 }

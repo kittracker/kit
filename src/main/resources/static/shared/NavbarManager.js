@@ -1,3 +1,5 @@
+import Auth from "../shared/Auth.js";
+
 export default class NavbarManager {
 
     static newButtonWithoutAttach(id, label) {
@@ -92,5 +94,28 @@ export default class NavbarManager {
 
         const navActionsCollapse = document.getElementById("navActionsCollapseContent");
         navActionsCollapse.innerHTML = "";
+    }
+
+    static loadCommonButtons() {
+        if (!Auth.isLoggedIn()) {
+            this.signin = this.newButton("signUp", "SIGN UP");
+            this.signup = this.newButton("signIn", "SIGN IN");
+        } else {
+            this.logout = this.newButton("logout", "LOGOUT");
+            this.logout.onclick = async () => {
+                await Auth.logout();
+                location.href = "/";
+            }
+            this.profile = this.newLink("profile", "PROFILE", `/users/${Auth.getCurrentUser().username}`);
+            this.dashboard = this.newLink("dashboard", "DASHBOARD", `/projects`);
+        }
+    }
+
+    static unloadCommonButtons() {
+        this.dispose(this.signin);
+        this.dispose(this.signup);
+        this.dispose(this.logout);
+        this.dispose(this.profile);
+        this.dispose(this.dashboard);
     }
 }

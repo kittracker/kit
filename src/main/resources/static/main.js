@@ -50,7 +50,11 @@ async function router() {
 
     if (matched && matched.route.protected && !Auth.isLoggedIn()) {
         Notifier.warning("Authentication", "You must be logged in to access this content.");
-        if (current_route === "/") return;
+        if (current_route === "/") {
+            currentlyLoadedComponent.unmountNavbar();
+            currentlyLoadedComponent.mountNavbar();
+            return;
+        }
 
         history.pushState({}, "", "/");
         await router();

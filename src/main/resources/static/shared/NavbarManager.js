@@ -53,7 +53,7 @@ export default class NavbarManager {
         dropdown.id = id;
 
         let button = NavbarManager.newButtonWithoutAttach(`${id}-button`, label);
-        button.classList.add("dropdown-toggle");
+        button.classList.add("dropdown-toggle", "w-100");
         button.setAttribute("data-bs-toggle", "dropdown");
         button.setAttribute("aria-expanded", "false");
 

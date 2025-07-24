@@ -1,5 +1,6 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
+import NavbarManager from "../shared/NavbarManager.js";
 
 export default class ProjectDetails {
     constructor(id) {
@@ -537,21 +538,6 @@ export default class ProjectDetails {
         this.renderClosedIssues();
         this.renderCollaborators();
 
-        const newDropdown = document.getElementById("newDropdown");
-        newDropdown.classList.remove("d-none");
-
-        const newDropdownContent = document.getElementById("newDropdownContent");
-        newDropdownContent.innerHTML = `
-            <li><button class="dropdown-item py-2 px-4" id="newIssue">NEW ISSUE</button></li>
-            <li><button class="dropdown-item py-2 px-4" id="newCollaborator">NEW COLLABORATOR</button></li>
-        `;
-
-        const newIssueButton = document.getElementById("newIssue");
-        newIssueButton.onclick = (_) => this.issueModal.show();
-
-        const newCollaboratorButton = document.getElementById("newCollaborator");
-        newCollaboratorButton.onclick = (_) => this.collaboratorsModal.show();
-
         const projectTitle = document.getElementById("project-title");
         if (!projectTitle) {
             console.error("Error: Could not retrieve project-title component.");
@@ -560,6 +546,25 @@ export default class ProjectDetails {
 
         this.observer.unobserve(projectTitle);
         this.observer.observe(projectTitle);
+    }
+
+    configure() {
+        this.dropdown = NavbarManager.newDropdown("newDropdown", "NEW", `
+            <li><button class="dropdown-item py-2 px-4 newIssue">ISSUE</button></li>
+            <li><button class="dropdown-item py-2 px-4 newCollaborator">COLLABORATOR</button></li>
+        `);
+
+        this.edit = NavbarManager.newButton("editProject", "EDIT")
+        this.edit.onclick = () => this.editModal.show();
+
+        const editProjectMobile = document.getElementById("editProject-mobile");
+        editProjectMobile.onclick = () => this.editModal.show();
+
+        const newIssueButtons = document.querySelectorAll(".newIssue");
+        newIssueButtons.forEach(button => { button.onclick = () => this.issueModal.show(); });
+
+        const newCollaboratorButtons = document.querySelectorAll(".newCollaborator");
+        newCollaboratorButtons.forEach(button => { button.onclick = () => this.collaboratorsModal.show(); });
 
         const issueModalFooter = document.getElementById("newIssueModal-footer");
         issueModalFooter.onsubmit = (e) => this.postIssue(e);
@@ -571,10 +576,6 @@ export default class ProjectDetails {
 
         const collaboratorsModalFooter = document.getElementById("newCollaboratorsModal-footer");
         collaboratorsModalFooter.onsubmit = (e) => this.postCollaborators(e);
-
-        const editButton = document.getElementById("editButton");
-        editButton.classList.remove("d-none");
-        editButton.onclick = (_) => this.editModal.show();
 
         this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
 
@@ -597,6 +598,10 @@ export default class ProjectDetails {
         this.observer.unobserve(projectTitle);
         this.observer.disconnect();
 
+        NavbarManager.unloadCommonButtons();
+        NavbarManager.dispose(this.dropdown);
+        NavbarManager.dispose(this.edit);
+
         ModalBuilder.dispose(this.issueModal);
         ModalBuilder.dispose(this.collaboratorsModal);
         ModalBuilder.dispose(this.editModal);
@@ -605,6 +610,10 @@ export default class ProjectDetails {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
+
+        NavbarManager.loadCommonButtons();
+        this.configure();
+
         await this.fetchProject(); // Fetch issue data and render
     }
 }

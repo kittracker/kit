@@ -63,6 +63,8 @@ export default class NavbarManager {
         ul.classList.add("dropdown-menu", "text-center", "mt-2", "overflow-hidden", "borders-primary");
         ul.id = `${id}-content`;
 
+        ul.innerHTML = content;
+
         dropdown.appendChild(ul);
 
         const navActions = document.getElementById("navActions");

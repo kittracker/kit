@@ -1,5 +1,6 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
+import NavbarManager from "../shared/NavbarManager.js";
 
 const projectName = "projectName";
 const projectNameFilter = "projectNameFilter";
@@ -226,33 +227,31 @@ export default class Projects {
 
         this.renderProjects();
 
+        // This configuration needs to be here because of the code up here
         let hideArchived = document.getElementById("hideArchived");
         hideArchived.addEventListener("change", async (_) => {
             this.hideArchived = !this.hideArchived;
             await this.update();
             this.renderProjects();
         });
+    }
 
+    configure() {
         const modalFooter = document.getElementById("newProjectModal-footer");
         modalFooter.onsubmit = (e) => this.postProject(e);
 
-        const newButton = document.getElementById("newButton");
-        newButton.classList.remove("d-none");
-        newButton.onclick = (_) => this.modal.show();
+        this.new = NavbarManager.newButton("newProject", "NEW PROJECT");
+        this.new.onclick = () => this.modal.show();
 
-        const newButtonCollapse = document.getElementById("newButtonCollapse");
-        newButtonCollapse.classList.remove("d-none");
-        newButtonCollapse.textContent = "NEW PROJECT";
+        const newProjectMobile = document.getElementById("newProject-mobile");
+        newProjectMobile.onclick = () => this.modal.show();
 
         this.container.onsubmit = (e) => this.callback(e);
     }
 
     unmount() {
-        const newButton = document.getElementById("newButton");
-        newButton.classList.add("d-none");
-
-        const newButtonCollapse = document.getElementById("newButtonCollapse");
-        newButtonCollapse.classList.add("d-none");
+        NavbarManager.unloadCommonButtons();
+        NavbarManager.dispose(this.new);
 
         ModalBuilder.dispose(this.modal);
     }
@@ -260,6 +259,10 @@ export default class Projects {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
+
+        NavbarManager.loadCommonButtons();
+        this.configure();
+
         await this.fetchProjects(); // Fetch issue data and render
     }
 }

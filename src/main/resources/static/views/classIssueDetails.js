@@ -1,5 +1,6 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
+import NavbarManager from "../shared/NavbarManager.js";
 
 export default class IssueDetails {
     constructor(issueId) {
@@ -483,8 +484,6 @@ export default class IssueDetails {
             <br>
         `;
 
-        // TODO: add popover for comment form when authentication is properly done
-
         this.renderComments();
         this.renderLinks();
 
@@ -502,29 +501,6 @@ export default class IssueDetails {
             renderMarkdown();
         })
 
-        const newButton = document.getElementById("newButton");
-        newButton.classList.remove("d-none");
-        newButton.onclick = (_) => this.linkModal.show();
-
-        const linkForm = document.getElementById("linkForm");
-        linkForm.onsubmit = (e) => this.selectLink(e);
-
-        this.linkModal._element.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
-
-        const linkFooter = document.getElementById("newLinkModal-footer");
-        linkFooter.onsubmit = (e) => this.createLink(e);
-
-        const editButton = document.getElementById("editButton");
-        editButton.classList.remove("d-none");
-        editButton.onclick = (_) => this.editModal.show();
-
-        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
-
-        const editModalFooter = document.getElementById("editModal-footer");
-        editModalFooter.onsubmit = async (e) => this.editIssue(e);
-
-        this.container.onsubmit = (e) => this.addComment(e);
-
         const issueDetails = document.getElementById("issue-details");
         if (!issueDetails) {
             console.error("Error: Could not retrieve issue-details component.");
@@ -535,16 +511,36 @@ export default class IssueDetails {
         this.observer.observe(issueDetails);
     }
 
+    configure() {
+        this.new = NavbarManager.newButton("newLink", "NEW LINK");
+        this.new.onclick = () => this.linkModal.show();
+
+        const newLinkMobile = document.getElementById("newLink-mobile");
+        newLinkMobile.onclick = () => this.linkModal.show();
+
+        this.edit = NavbarManager.newButton("editLink", "EDIT")
+        this.edit.onclick = () => this.editModal.show();
+
+        const editLinkMobile = document.getElementById("editLink-mobile");
+        editLinkMobile.onclick = () => this.editModal.show();
+
+        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
+
+        const editModalFooter = document.getElementById("editModal-footer");
+        editModalFooter.onsubmit = async (e) => this.editIssue(e);
+
+        const linkForm = document.getElementById("linkForm");
+        linkForm.onsubmit = (e) => this.selectLink(e);
+
+        this.linkModal._element.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
+
+        const linkFooter = document.getElementById("newLinkModal-footer");
+        linkFooter.onsubmit = (e) => this.createLink(e);
+
+        this.container.onsubmit = (e) => this.addComment(e);
+    }
+
     unmount() {
-        const newButton = document.getElementById("newButton");
-        newButton.classList.add("d-none");
-
-        const editButton = document.getElementById("editButton");
-        editButton.classList.add("d-none");
-
-        const modal = document.getElementById('editModal');
-        modal.removeEventListener('show.bs.modal', this.editModalFunc);
-
         const issueDetails = document.getElementById("issue-details");
         if (!issueDetails) {
             console.error("Error: Could not retrieve issue-details component.");
@@ -554,6 +550,10 @@ export default class IssueDetails {
         this.observer.unobserve(issueDetails);
         this.observer.disconnect();
 
+        NavbarManager.unloadCommonButtons();
+        NavbarManager.dispose(this.new);
+        NavbarManager.dispose(this.edit);
+
         ModalBuilder.dispose(this.linkModal);
         ModalBuilder.dispose(this.editModal);
     }
@@ -561,6 +561,8 @@ export default class IssueDetails {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
+        NavbarManager.loadCommonButtons();
+        this.configure();
         await this.fetchIssue(); // Fetch issue data and render
     }
 

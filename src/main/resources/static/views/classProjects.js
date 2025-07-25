@@ -1,6 +1,7 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
 import NavbarManager from "../shared/NavbarManager.js";
+import Auth from "../shared/Auth.js";
 
 const projectName = "projectName";
 const projectNameFilter = "projectNameFilter";
@@ -166,7 +167,7 @@ export default class Projects {
                 "name": projectName,
                 "description": projectDescription,
                 "archived": false,
-                "ownerID": 1
+                "ownerID": Auth.getCurrentUser().id,
             })
         }).then(async (res) => {
             const modalElement = document.getElementById("modal");

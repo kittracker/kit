@@ -5,6 +5,7 @@ import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
 import edu.kitt.domainmodel.Project
+import edu.kitt.domainmodel.ProjectSummary
 import edu.kitt.domainmodel.User
 import org.jetbrains.exposed.v1.core.ReferenceOption
 import org.jetbrains.exposed.v1.core.Table
@@ -119,6 +120,13 @@ fun mapProjectDAOtoProject(projectDAO: ProjectDAO) = Project(
 )
 
 
+fun mapProjectDAOtoProjectSummary(projectDAO: ProjectDAO) = ProjectSummary(
+    id = projectDAO.id.value,
+    name = projectDAO.name,
+    owner = mapUserDAOtoUser(projectDAO.owner),
+)
+
+
 fun mapCommentDAOtoComment(commentDAO: CommentDAO) = Comment(
     id = commentDAO.id.value,
     author = mapUserDAOtoUser(commentDAO.author),
@@ -132,6 +140,7 @@ fun mapIssueDAOtoIssue(issueDAO: IssueDAO): Issue {
         title = issueDAO.title,
         description = issueDAO.description,
         status = issueDAO.status,
+        project = mapProjectDAOtoProjectSummary(issueDAO.project),
         createdBy = mapUserDAOtoUser(issueDAO.createdBy),
         comments = issueDAO.comments.map(::mapCommentDAOtoComment).toMutableList(),
         links = issueDAO.links.map { linkedIssueDAO ->

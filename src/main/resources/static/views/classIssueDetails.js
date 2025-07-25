@@ -1,6 +1,7 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
 import NavbarManager from "../shared/NavbarManager.js";
+import Auth from "../shared/Auth.js";
 
 export default class IssueDetails {
     constructor(issueId) {
@@ -123,7 +124,7 @@ export default class IssueDetails {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                "author": 2,
+                "author": Auth.getCurrentUser().id,
                 "text": comment,
                 "issueID": this.issue.id
             })
@@ -138,8 +139,6 @@ export default class IssueDetails {
         }).catch((reason) => {
             Notifier.danger("Error", reason);
         });
-
-        // TODO: switch the author ID when proper authentication is done
     }
 
     fillModal() {
@@ -512,30 +511,32 @@ export default class IssueDetails {
     }
 
     configure() {
-        this.new = NavbarManager.newButton("newLink", "NEW LINK");
-        this.new.onclick = () => this.linkModal.show();
+        if (this.issue.createdBy.id === Auth.getCurrentUser().id || this.issue.project.owner.id === Auth.getCurrentUser().id) {
+            this.new = NavbarManager.newButton("newLink", "NEW LINK");
+            this.new.onclick = () => this.linkModal.show();
 
-        const newLinkMobile = document.getElementById("newLink-mobile");
-        newLinkMobile.onclick = () => this.linkModal.show();
+            const newLinkMobile = document.getElementById("newLink-mobile");
+            newLinkMobile.onclick = () => this.linkModal.show();
 
-        this.edit = NavbarManager.newButton("editLink", "EDIT")
-        this.edit.onclick = () => this.editModal.show();
+            this.edit = NavbarManager.newButton("editLink", "EDIT")
+            this.edit.onclick = () => this.editModal.show();
 
-        const editLinkMobile = document.getElementById("editLink-mobile");
-        editLinkMobile.onclick = () => this.editModal.show();
+            const editLinkMobile = document.getElementById("editLink-mobile");
+            editLinkMobile.onclick = () => this.editModal.show();
 
-        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
+            this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
 
-        const editModalFooter = document.getElementById("editModal-footer");
-        editModalFooter.onsubmit = async (e) => this.editIssue(e);
+            const editModalFooter = document.getElementById("editModal-footer");
+            editModalFooter.onsubmit = async (e) => this.editIssue(e);
 
-        const linkForm = document.getElementById("linkForm");
-        linkForm.onsubmit = (e) => this.selectLink(e);
+            const linkForm = document.getElementById("linkForm");
+            linkForm.onsubmit = (e) => this.selectLink(e);
 
-        this.linkModal._element.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
+            this.linkModal._element.addEventListener("hidden.bs.modal", (e) => this.clearLinks(e));
 
-        const linkFooter = document.getElementById("newLinkModal-footer");
-        linkFooter.onsubmit = (e) => this.createLink(e);
+            const linkFooter = document.getElementById("newLinkModal-footer");
+            linkFooter.onsubmit = (e) => this.createLink(e);
+        }
 
         this.container.onsubmit = (e) => this.addComment(e);
     }
@@ -561,9 +562,10 @@ export default class IssueDetails {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
+        await this.fetchIssue(); // Fetch issue data and render
+
         NavbarManager.loadCommonButtons();
         this.configure();
-        await this.fetchIssue(); // Fetch issue data and render
     }
 
 }

@@ -47,16 +47,19 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
     override suspend fun getIssueByID(id: Int): Issue? {
         val issueEntry = issues.firstOrNull { it.id == id }
         if (issueEntry == null) return null
-        return Issue(
-            issueEntry.id,
-            issueEntry.title,
-            issueEntry.description,
-            issueEntry.status,
-            // FIXME: this can throw
-            userRepository.getUserByID(issueEntry.createdBy)!!,
-            commentRepository.getCommentsByIssueID(issueEntry.id!!).toMutableList(),
-            this.getIssueLinks(issueEntry.id!!).toMutableList()
-        )
+
+//        return Issue(
+//            issueEntry.id,
+//            issueEntry.title,
+//            issueEntry.description,
+//            issueEntry.status,
+//            // FIXME: this can throw
+//            userRepository.getUserByID(issueEntry.createdBy)!!,
+//            commentRepository.getCommentsByIssueID(issueEntry.id!!).toMutableList(),
+//            this.getIssueLinks(issueEntry.id!!).toMutableList()
+//        )
+
+        return null
     }
 
     override suspend fun getIssueLinks(id: Int): List<IssueLink> {

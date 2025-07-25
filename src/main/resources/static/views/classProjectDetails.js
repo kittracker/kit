@@ -1,6 +1,7 @@
 import Notifier from "../shared/Notifier.js";
 import ModalBuilder from "../shared/ModalBuilder.js";
 import NavbarManager from "../shared/NavbarManager.js";
+import Auth from "../shared/Auth.js";
 
 export default class ProjectDetails {
     constructor(id) {
@@ -220,7 +221,7 @@ export default class ProjectDetails {
             body: JSON.stringify({
                 "title": issueTitle,
                 "description": issueDescription,
-                "createdBy": 1, // TODO: change this into logged-in user id
+                "createdBy": Auth.getCurrentUser().id,
                 "projectID": this.project.id,
             })
         }).then(async (res) => {
@@ -549,46 +550,52 @@ export default class ProjectDetails {
     }
 
     configure() {
-        this.dropdown = NavbarManager.newDropdown("newDropdown", "NEW", `
-            <li><button class="dropdown-item py-2 px-4 newIssue">ISSUE</button></li>
-            <li><button class="dropdown-item py-2 px-4 newCollaborator">COLLABORATOR</button></li>
-        `);
+        if (this.project.owner.id === Auth.getCurrentUser().id) {
+            this.dropdown = NavbarManager.newDropdown("newDropdown", "NEW", `
+                <li><button class="dropdown-item py-2 px-4 newIssue">ISSUE</button></li>
+                <li><button class="dropdown-item py-2 px-4 newCollaborator">COLLABORATOR</button></li>
+            `);
 
-        this.edit = NavbarManager.newButton("editProject", "EDIT")
-        this.edit.onclick = () => this.editModal.show();
+            this.edit = NavbarManager.newButton("editProject", "EDIT")
+            this.edit.onclick = () => this.editModal.show();
 
-        const editProjectMobile = document.getElementById("editProject-mobile");
-        editProjectMobile.onclick = () => this.editModal.show();
+            const editProjectMobile = document.getElementById("editProject-mobile");
+            editProjectMobile.onclick = () => this.editModal.show();
 
-        const newIssueButtons = document.querySelectorAll(".newIssue");
-        newIssueButtons.forEach(button => { button.onclick = () => this.issueModal.show(); });
+            const newIssueButtons = document.querySelectorAll(".newIssue");
+            newIssueButtons.forEach(button => { button.onclick = () => this.issueModal.show(); });
 
-        const newCollaboratorButtons = document.querySelectorAll(".newCollaborator");
-        newCollaboratorButtons.forEach(button => { button.onclick = () => this.collaboratorsModal.show(); });
+            const newCollaboratorButtons = document.querySelectorAll(".newCollaborator");
+            newCollaboratorButtons.forEach(button => { button.onclick = () => this.collaboratorsModal.show(); });
+
+            const collaboratorsForm = document.getElementById("collaboratorsForm");
+            collaboratorsForm.onsubmit = (e) => this.selectCollaborator(e);
+
+            this.collaboratorsModal._element.addEventListener("hidden.bs.modal", (e) => this.clearNewCollaborators(e));
+
+            const collaboratorsModalFooter = document.getElementById("newCollaboratorsModal-footer");
+            collaboratorsModalFooter.onsubmit = (e) => this.postCollaborators(e);
+
+            this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
+
+            const editModalFooter = document.getElementById("editProjectModal-footer");
+            editModalFooter.onsubmit = async (e) => this.editProject(e);
+
+        } else {
+            this.newIssue = NavbarManager.newButton("newIssue", "NEW ISSUE")
+            this.newIssue.onclick = () => this.issueModal.show();
+
+            const newIssueMobile = document.getElementById("newIssue-mobile");
+            newIssueMobile.onclick = () => this.issueModal.show();
+        }
 
         const issueModalFooter = document.getElementById("newIssueModal-footer");
         issueModalFooter.onsubmit = (e) => this.postIssue(e);
-
-        const collaboratorsForm = document.getElementById("collaboratorsForm");
-        collaboratorsForm.onsubmit = (e) => this.selectCollaborator(e);
-
-        this.collaboratorsModal._element.addEventListener("hidden.bs.modal", (e) => this.clearNewCollaborators(e));
-
-        const collaboratorsModalFooter = document.getElementById("newCollaboratorsModal-footer");
-        collaboratorsModalFooter.onsubmit = (e) => this.postCollaborators(e);
-
-        this.editModal._element.addEventListener('show.bs.modal', this.editModalFunc);
-
-        const editModalFooter = document.getElementById("editProjectModal-footer");
-        editModalFooter.onsubmit = async (e) => this.editProject(e);
 
         this.container.onsubmit = (e) => this.callback(e);
     }
 
     unmount() {
-        const newDropdown = document.getElementById("newDropdown");
-        newDropdown.classList.add("d-none");
-
         const projectTitle = document.getElementById("project-title");
         if (!projectTitle) {
             console.error("Error: Could not retrieve project-title component.");
@@ -599,8 +606,12 @@ export default class ProjectDetails {
         this.observer.disconnect();
 
         NavbarManager.unloadCommonButtons();
-        NavbarManager.dispose(this.dropdown);
-        NavbarManager.dispose(this.edit);
+        if (this.project.owner.id === Auth.getCurrentUser().id) {
+            NavbarManager.dispose(this.dropdown);
+            NavbarManager.dispose(this.edit);
+        } else {
+            NavbarManager.dispose(this.newIssue);
+        }
 
         ModalBuilder.dispose(this.issueModal);
         ModalBuilder.dispose(this.collaboratorsModal);
@@ -610,10 +621,9 @@ export default class ProjectDetails {
     async mount(root) {
         root.innerHTML = ""; // Clear previous content
         root.appendChild(this.container);
+        await this.fetchProject(); // Fetch issue data and render
 
         NavbarManager.loadCommonButtons();
         this.configure();
-
-        await this.fetchProject(); // Fetch issue data and render
     }
 }

@@ -104,7 +104,7 @@ fun Application.module() {
             issue[title] = "Issue 2 for project 2"
             issue[description] = "Description for issue 2"
             issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 2
+            issue[createdBy] = 1
             issue[projectID] = 2
         }
 

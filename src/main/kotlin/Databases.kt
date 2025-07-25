@@ -42,19 +42,20 @@ class Repositories(
     var projectRepository: ProjectRepository
 )
 
-fun Application.initInMemoryRepositories(): Repositories {
-    val userRepository = InMemoryUserRepository()
-    val commentRepository = InMemoryCommentRepository(userRepository)
-    val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
-    val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
-
-    return Repositories(
-        userRepository = userRepository,
-        commentRepository = commentRepository,
-        issueRepository = issueRepository,
-        projectRepository = projectRepository
-    )
-}
+// TODO: since exposed has its own in-memory system, why we should maintain this?
+//fun Application.initInMemoryRepositories(): Repositories {
+//    val userRepository = InMemoryUserRepository()
+//    val commentRepository = InMemoryCommentRepository(userRepository)
+//    val issueRepository = InMemoryIssueRepository(commentRepository, userRepository)
+//    val projectRepository = InMemoryProjectRepository(userRepository, issueRepository)
+//
+//    return Repositories(
+//        userRepository = userRepository,
+//        commentRepository = commentRepository,
+//        issueRepository = issueRepository,
+//        projectRepository = projectRepository
+//    )
+//}
 
 fun Application.initExposedRepositories(): Repositories {
     val userRepository = ExposedUserRepository()

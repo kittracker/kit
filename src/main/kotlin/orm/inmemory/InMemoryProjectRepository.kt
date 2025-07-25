@@ -55,6 +55,10 @@ class InMemoryProjectRepository(val userRepository: UserRepository, val issueRep
         return projects.map { this.getProjectByID(it.id)!! }
     }
 
+    override suspend fun getProjectsByUserID(userID: Int): List<Project> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun createProject(project: ProjectEntryRequest): Project? {
         val new = ProjectEntry(
             id = projects.last().id + 1,

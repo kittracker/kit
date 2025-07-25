@@ -1,16 +1,15 @@
 package edu.kitt.orm
 
 import CollaboratorEntryRequest
-import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
-import edu.kitt.domainmodel.Comment
-import edu.kitt.domainmodel.IssueLink
 import edu.kitt.orm.requests.ProjectEntryRequest
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
 
 class ExposedProjectRepository : ProjectRepository {
@@ -32,6 +31,29 @@ class ExposedProjectRepository : ProjectRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             val projects = ProjectDAO.all()
             projects.map(::mapProjectDAOtoProject)
+        }
+    }
+
+    override suspend fun getProjectsByUserID(userID: Int): List<Project> {
+        return newSuspendedTransaction(Dispatchers.IO) {
+            val ownedProjectIds = Projects
+                .selectAll()
+                .where { Projects.ownerID eq userID }
+                .map { it[Projects.id] }
+
+            val collaboratedProjectIds = Collaborators
+                .selectAll()
+                .where { Collaborators.userID eq userID }
+                .map { it[Collaborators.projectID] }
+
+            val allProjectIds = (ownedProjectIds + collaboratedProjectIds).toSet()
+
+            if (allProjectIds.isEmpty()) {
+                return@newSuspendedTransaction emptyList()
+            }
+
+            ProjectDAO.find { Projects.id inList allProjectIds }
+                .map(::mapProjectDAOtoProject)
         }
     }
 
@@ -84,8 +106,7 @@ class ExposedProjectRepository : ProjectRepository {
     override suspend fun removeCollaboratorToProject(collaborator: CollaboratorEntryRequest): Boolean {
         return newSuspendedTransaction(Dispatchers.IO) {
             val rowsDeleted = Collaborators.deleteWhere {
-                Collaborators.projectID eq collaborator.projectID
-                Collaborators.userID eq collaborator.userID
+                (Collaborators.projectID eq collaborator.projectID) and (Collaborators.userID eq collaborator.userID)
             }
             rowsDeleted == 1
         }

@@ -9,6 +9,7 @@ interface ProjectRepository {
     suspend fun getProjectByID(id: Int): Project?
     suspend fun getCollaboratorsByProjectID(projectId: Int): List<User>
     suspend fun getAllProjects(): List<Project>
+    suspend fun getProjectsByUserID(userID: Int): List<Project>
     suspend fun createProject(project: ProjectEntryRequest): Project?
     suspend fun editProject(project: ProjectEntryRequest): Project?
     suspend fun deleteProject(id: Int): Boolean

@@ -15,7 +15,9 @@ import io.ktor.server.routing.*
 fun Route.projectRoutes(repos: Repositories) {
     route("/projects") {
         get {
-            call.respond(repos.projectRepository.getAllProjects())
+            val principal = call.principal<JWTPrincipal>()
+            val id = principal!!.payload.getClaim("userId").asInt()
+            call.respond(repos.projectRepository.getProjectsByUserID(id))
         }
 
         get("/{id}") {

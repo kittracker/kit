@@ -17,6 +17,10 @@ class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRep
         return comments.removeIf { it.id == id }
     }
 
+    override suspend fun getCommentByID(id: Int): Comment? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
         return comments.filter { it.issueID == id }.map {
             val user = userRepository.getUserByID(it.author);

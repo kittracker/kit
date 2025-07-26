@@ -16,6 +16,17 @@ class ExposedCommentRepository : CommentRepository {
         }
     }
 
+    override suspend fun getCommentByID(id: Int): Comment? {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val commentDAO = CommentDAO.findById(id)
+                if (commentDAO == null) return@transaction null
+
+                mapCommentDAOtoComment(commentDAO)
+            }
+        }
+    }
+
     override suspend fun getCommentsByIssueID(id: Int): List<Comment> {
         return withContext(Dispatchers.IO) {
             transaction {

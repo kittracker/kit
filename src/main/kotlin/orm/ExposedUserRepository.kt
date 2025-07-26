@@ -25,6 +25,9 @@ class ExposedUserRepository : UserRepository {
                     userDAO.id.value,
                     userDAO.emailAddress,
                     userDAO.userName,
+                    userDAO.firstName ?: "",
+                    userDAO.lastName ?: "",
+                    userDAO.notificationsActive
                 )
             } else {
                 return@transaction null
@@ -49,7 +52,10 @@ class ExposedUserRepository : UserRepository {
                 return@newSuspendedTransaction User(
                     userDAO.id.value,
                     userDAO.emailAddress,
-                    userDAO.userName
+                    userDAO.userName,
+                    userDAO.firstName ?: "",
+                    userDAO.lastName ?: "",
+                    userDAO.notificationsActive
                 )
             } else {
                 return@newSuspendedTransaction null

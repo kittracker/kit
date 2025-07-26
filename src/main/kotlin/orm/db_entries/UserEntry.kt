@@ -9,4 +9,7 @@ data class UserEntry(
     val emailAddress: String,
     val username: String,
 
+    val firstName: String,
+    val lastName: String,
+    val notificationsActive: Boolean,
 )

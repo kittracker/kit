@@ -18,6 +18,10 @@ object Users : IntIdTable() {
     val userName = varchar("username", 50).uniqueIndex()
     val emailAddress = varchar("email_address", 255)
     val passwordHash = varchar("password_hash", 255)
+
+    val firstName = varchar("first_name", 255).nullable()
+    val lastName = varchar("last_name", 255).nullable()
+    val notificationsActive = bool("notifications_active")
 }
 
 object Projects : IntIdTable() {
@@ -65,6 +69,10 @@ class UserDAO(id: EntityID<Int>) : IntEntity(id) {
     var userName by Users.userName
     var emailAddress by Users.emailAddress
     var passwordHash by Users.passwordHash
+
+    var firstName by Users.firstName
+    var lastName by Users.lastName
+    var notificationsActive by Users.notificationsActive
 }
 
 class ProjectDAO(id: EntityID<Int>) : IntEntity(id) {
@@ -104,7 +112,10 @@ class CommentDAO(id: EntityID<Int>) : IntEntity(id) {
 fun mapUserDAOtoUser(userDAO: UserDAO) = User(
     id = userDAO.id.value,
     username = userDAO.userName,
-    emailAddress = userDAO.emailAddress
+    emailAddress = userDAO.emailAddress,
+    firstName = userDAO.firstName ?: "",
+    lastName = userDAO.lastName ?: "",
+    notificationsActive = userDAO.notificationsActive,
 )
 
 // Helper to map Project's owner and collaborators, avoiding recursion if issues or collaborators are not needed immediately

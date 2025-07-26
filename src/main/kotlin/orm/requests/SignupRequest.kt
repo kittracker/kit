@@ -6,5 +6,9 @@ import kotlinx.serialization.Serializable
 data class SignupRequest(
     val email: String,
     val username: String,
-    val password: String
+    val password: String,
+
+    val firstName: String,
+    val lastName: String,
+    val notificationsActive: Boolean,
 )

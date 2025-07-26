@@ -5,6 +5,7 @@ import edu.kitt.orm.requests.CommentEntryRequest
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import edu.kitt.orm.requests.ProjectEntryRequest
+import io.ktor.client.call.body
 import io.ktor.http.*
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
@@ -12,7 +13,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.projectRoutes(repos: Repositories) {
+fun Route.projectRoutes(repos: Repositories, mailer: Mailer) {
     route("/projects") {
         get {
             val principal = call.principal<JWTPrincipal>()
@@ -114,7 +115,7 @@ fun Route.projectRoutes(repos: Repositories) {
     }
 }
 
-fun Route.collaboratorRoutes(repos: Repositories) {
+fun Route.collaboratorRoutes(repos: Repositories, mailer: Mailer) {
     route("/collaborators") {
         post {
             val collaborator = call.receive<CollaboratorEntryRequest>()
@@ -169,7 +170,7 @@ fun Route.collaboratorRoutes(repos: Repositories) {
     }
 }
 
-fun Route.issueRoutes(repos: Repositories) {
+fun Route.issueRoutes(repos: Repositories, mailer: Mailer) {
     route("/issues") {
         // get {
         //     call.respond(repos.issueRepository.getAllIssues())
@@ -187,8 +188,10 @@ fun Route.issueRoutes(repos: Repositories) {
                 return@post
             }
 
+            var user = project.collaborators.find { user -> user.id == userId }
+
             if (project.owner.id != userId &&
-                project.collaborators.find { user -> user.id == userId } == null) {
+                user == null) {
 
                 call.respond(HttpStatusCode.Unauthorized, "Not authorized to access this project")
                 return@post
@@ -201,6 +204,23 @@ fun Route.issueRoutes(repos: Repositories) {
             }
 
             call.respond(HttpStatusCode.Created, created)
+
+            if (user != null && project.owner.notificationsActive) {
+                val to = project.owner.emailAddress
+                val subject = "${project.name}: ${user.username} created a new issue"
+                val body = "<h3>${issue.title}</h3><p>${issue.description}</p>"
+
+                val response = mailer.sendEmail(
+                    to,
+                    subject,
+                    body,
+                )
+
+                println("EMAIL: $to -> ${response.status}")
+                if (response.status != HttpStatusCode.OK) {
+                    println(response.body<String>())
+                }
+            }
         }
 
         get("/{id}") {
@@ -308,7 +328,7 @@ fun Route.issueRoutes(repos: Repositories) {
     }
 }
 
-fun Route.linkRoutes(repos: Repositories) {
+fun Route.linkRoutes(repos: Repositories, mailer: Mailer) {
     route("/links") {
         post {
             val link = call.receive<IssueLinkEntryRequest>()
@@ -390,7 +410,7 @@ fun Route.linkRoutes(repos: Repositories) {
     }
 }
 
-fun Route.commentRoutes(repos: Repositories) {
+fun Route.commentRoutes(repos: Repositories, mailer: Mailer) {
     route("/comments") {
         post {
             val comment = call.receive<CommentEntryRequest>()
@@ -484,7 +504,7 @@ fun Route.commentRoutes(repos: Repositories) {
     }
 }
 
-fun Route.userRoutes(repos: Repositories) {
+fun Route.userRoutes(repos: Repositories, mailer: Mailer) {
     route("/users") {
         // get {
         //     call.respond(repos.userRepository.getAllUsers())

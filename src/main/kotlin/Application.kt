@@ -11,13 +11,13 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
-import io.ktor.server.netty.EngineMain
+import io.ktor.server.netty.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.sessions.SameSite
+import io.ktor.server.sessions.*
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.addLogger
@@ -57,18 +57,27 @@ fun Application.module() {
             user[userName] = "spectrev333"
             user[emailAddress] = "spectrev333@kittracker.org"
             user[passwordHash] = hashPassword("spectrev333")
+            user[firstName] = "Leonardo"
+            user[lastName] = "Bessi"
+            user[notificationsActive] = false
         }
 
         Users.insert { user ->
             user[userName] = "cardisk"
             user[emailAddress] = "cardisk@kittracker.org"
             user[passwordHash] = hashPassword("cardisk")
+            user[firstName] = "Matteo"
+            user[lastName] = "Cardinaletti"
+            user[notificationsActive] = false
         }
 
         Users.insert { user ->
             user[userName] = "mircocaneschi"
             user[emailAddress] = "mircocaneschi@kittracker.org"
             user[passwordHash] = hashPassword("mircocaneschi")
+            user[firstName] = "Mirco"
+            user[lastName] = "Caneschi"
+            user[notificationsActive] = false
         }
 
         Projects.insert { project ->
@@ -148,6 +157,7 @@ fun Application.module() {
     }
 
     val repos = initExposedRepositories()
+    val mailer = setUpMailer()
 
     routing {
         post("/login") {
@@ -223,14 +233,14 @@ fun Application.module() {
 
         authenticate("auth-jwt") {
             route("/api") {
-                projectRoutes(repos)
-                collaboratorRoutes(repos)
+                projectRoutes(repos, mailer)
+                collaboratorRoutes(repos, mailer)
 
-                issueRoutes(repos)
-                commentRoutes(repos)
-                linkRoutes(repos)
+                issueRoutes(repos, mailer)
+                commentRoutes(repos, mailer)
+                linkRoutes(repos, mailer)
 
-                userRoutes(repos)
+                userRoutes(repos, mailer)
             }
         }
 

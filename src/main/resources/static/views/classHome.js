@@ -125,7 +125,7 @@ export default class Home {
                                 <i class="bi bi-github"></i>
                                 <b>GITHUB</b>
                             </a>
-                            <a class="btn btn-lg px-4 button">
+                            <a class="btn btn-lg px-4 button" id="reportButton">
                                 <i class="bi bi-file-earmark-arrow-down"></i>
                                 <b>REPORT</b>
                             </a>
@@ -192,6 +192,11 @@ export default class Home {
             <br> <br>
     
         `;
+
+        const report = document.getElementById("reportButton");
+        report.onclick = () => {
+            Notifier.info("Report", "Downloading is not available yet")
+        }
     }
 
     configure() {

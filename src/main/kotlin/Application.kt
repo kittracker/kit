@@ -11,13 +11,14 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
-import io.ktor.server.netty.EngineMain
+import io.ktor.server.netty.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.sessions.SameSite
+import io.ktor.server.sessions.*
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.addLogger
@@ -41,6 +42,18 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            call.application.environment.log.error("Unhandled exception", cause)
+            if (cause is IllegalArgumentException) {
+                call.respondText(text = "400: ${cause.message}" , status = HttpStatusCode.BadRequest)
+            } else {
+                call.respondText(text = "500: ${cause.message}" , status = HttpStatusCode.InternalServerError)
+            }
+        }
+    }
+
     authentication {
         jwt("auth-jwt") {
             jwtConfig.configureKtorFeature(this)

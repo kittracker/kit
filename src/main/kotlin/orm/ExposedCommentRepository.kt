@@ -1,7 +1,6 @@
 package edu.kitt.orm
 
 import edu.kitt.domainmodel.Comment
-import edu.kitt.domainmodel.User
 import edu.kitt.orm.requests.CommentEntryRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,11 +47,11 @@ class ExposedCommentRepository : CommentRepository {
         }
     }
 
-    override suspend fun createComment(entry: CommentEntryRequest): Comment? {
+    override suspend fun createComment(comment: CommentEntryRequest): Comment? {
         return withContext(Dispatchers.IO) {
             transaction {
-                val user = UserDAO.findById(entry.author ?: return@transaction null)
-                val issue = IssueDAO.findById(entry.issueID ?: return@transaction null)
+                val user = UserDAO.findById(comment.author ?: return@transaction null)
+                val issue = IssueDAO.findById(comment.issueID ?: return@transaction null)
 
                 if (user == null || issue == null) {
                     return@transaction null
@@ -60,7 +59,7 @@ class ExposedCommentRepository : CommentRepository {
 
                 val newCommentDAO = CommentDAO.new {
                     author = user
-                    text = entry.text!! // TODO: add proper check before
+                    text = comment.text!! // TODO: add proper check before
                     this.issue = issue
                 }
                 mapCommentDAOtoComment(newCommentDAO)
@@ -68,22 +67,23 @@ class ExposedCommentRepository : CommentRepository {
         }
     }
 
-    override suspend fun editComment(entry: CommentEntryRequest): Comment? {
-        val commentIdToEdit = entry.id ?: return null // ID is mandatory for editing
+    override suspend fun editComment(comment: CommentEntryRequest): Comment? {
+        val commentIdToEdit = comment.id ?: return null // ID is mandatory for editing
 
         return withContext(Dispatchers.IO) {
             transaction {
                 val commentDAO = CommentDAO.findById(commentIdToEdit)
-                val newAuthorDAO = UserDAO.findById(entry.author ?: return@transaction null)
-                val issueDAO = IssueDAO.findById(entry.issueID ?: return@transaction null)
+                val newAuthorDAO = UserDAO.findById(comment.author ?: return@transaction null)
+                val issueDAO = IssueDAO.findById(comment.issueID ?: throw IllegalArgumentException("Issue ID is missing"))
 
                 // If either the comment or the author do not exist, return null
                 if (commentDAO == null || newAuthorDAO == null || issueDAO == null) {
                     // Comment to edit not found
-                    return@transaction null
+                    //return@transaction null
+                    throw IllegalArgumentException("Comment to edit not found")
                 }
 
-                commentDAO.text = entry.text!!
+                commentDAO.text = comment.text!!
                 commentDAO.author = newAuthorDAO
                 commentDAO.issue = issueDAO
 

@@ -443,12 +443,7 @@ fun Route.commentRoutes(repos: Repositories) {
                 return@put
             }
 
-            val edited = try {
-                repos.commentRepository.editComment(entry)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, e.message ?: "Errore sconosciuto durante la modifica del commento")
-                return@put
-            }
+            val edited = repos.commentRepository.editComment(entry)
 
             if (edited == null) {
                 call.respond(HttpStatusCode.NotFound, "Comment requested not found")

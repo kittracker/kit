@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    val jwtConfig: JwtConfig = JwtConfig(
+    val jwtConfig = JwtConfig(
         jwtIssuer = environment.config.property("jwt.issuer").getString(),
         jwtAudience = environment.config.property("jwt.audience").getString(),
         jwtRealm = environment.config.property("jwt.realm").getString(),
@@ -149,6 +149,8 @@ fun Application.module() {
 
     val repos = initExposedRepositories()
 
+    val maxAge = 24 * 60 * 60 // max age for tokens
+
     routing {
         post("/login") {
             val loginRequest = call.receive<LoginRequest>()
@@ -158,12 +160,12 @@ fun Application.module() {
                 return@post
             }
 
-            val token = jwtConfig.generateToken(user.id, user.username)
+            val token = jwtConfig.generateToken(user.id, user.username, maxAge)
 
             val cookie = Cookie(
                 name = "jwt-token",
                 value = token,
-                maxAge = 24 * 60 * 60,
+                maxAge = maxAge,
                 httpOnly = true,
                 // TODO: in production change this line
                 // secure = true,
@@ -202,12 +204,12 @@ fun Application.module() {
                 return@post
             }
 
-            val token = jwtConfig.generateToken(user.id, user.username)
+            val token = jwtConfig.generateToken(user.id, user.username, maxAge)
 
             val cookie = Cookie(
                 name = "jwt-token",
                 value = token,
-                maxAge = 24 * 60 * 60,
+                maxAge = maxAge,
                 httpOnly = true,
                 // TODO: in production change this line
                 // secure = true,

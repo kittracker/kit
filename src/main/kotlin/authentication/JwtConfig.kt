@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.auth.parseAuthorizationHeader
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
 import io.ktor.server.auth.jwt.JWTPrincipal
+import java.util.Date
 
 class JwtConfig (val jwtIssuer: String,
                  val jwtAudience: String,
@@ -23,12 +24,13 @@ class JwtConfig (val jwtIssuer: String,
         .withIssuer(jwtIssuer)
         .build()
 
-    fun generateToken(userId: Int, username: String): String {
+    fun generateToken(userId: Int, username: String, maxAge: Int): String {
         return JWT.create()
             .withAudience(jwtAudience)
             .withIssuer(jwtIssuer)
             .withClaim(CLAIM_USERID, userId) // Aggiungi l'ID utente come claim
             .withClaim(CLAIM_USERNAME, username) // Aggiungi il username come claim
+            .withExpiresAt(Date(System.currentTimeMillis() + maxAge * 1000L))
             .sign(jwtAlgorithm)
     }
 
@@ -37,7 +39,13 @@ class JwtConfig (val jwtIssuer: String,
         realm = jwtRealm
 
         authHeader { call ->
-            call.request.cookies["jwt-token"]?.let { parseAuthorizationHeader("Bearer $it") }
+            call.request.cookies["jwt-token"]?.let {
+                return@authHeader parseAuthorizationHeader("Bearer $it")
+            }
+            call.request.headers["Authorization"]?.let {
+                return@authHeader parseAuthorizationHeader(it)
+            }
+            return@authHeader null
         }
 
         validate { credentials ->
@@ -51,7 +59,4 @@ class JwtConfig (val jwtIssuer: String,
             }
         }
     }
-
-
-
 }

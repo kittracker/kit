@@ -15,7 +15,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTrans
 class ExposedProjectRepository : ProjectRepository {
 
     override suspend fun getProjectByID(id: Int): Project? {
-        return newSuspendedTransaction(Dispatchers.IO) {
+        return newSuspendedTransaction (Dispatchers.IO) {
             ProjectDAO.findById(id)?.let(::mapProjectDAOtoProject)
         }
     }
@@ -58,12 +58,14 @@ class ExposedProjectRepository : ProjectRepository {
     }
 
     override suspend fun createProject(project: ProjectEntryRequest): Project? {
-        return newSuspendedTransaction (Dispatchers.IO){
-        ProjectDAO.new {
-            name = project.name!!
-            description = project.description!!
-            archived = project.archived!!
-            owner = UserDAO.findById(project.ownerID!!)!!
+        return newSuspendedTransaction(Dispatchers.IO) {
+            ProjectDAO.new {
+                name = project.name ?: throw IllegalArgumentException("Project name must be set")
+                description = project.description ?: throw IllegalArgumentException("Project description must be set")
+                archived = project.archived ?: false
+                owner = UserDAO.findById(
+                    project.ownerID ?: throw IllegalArgumentException("Project owner must be set")
+                ) ?: throw IllegalArgumentException("Project owner does not exist")
             }.let(::mapProjectDAOtoProject)
         }
     }
@@ -72,10 +74,12 @@ class ExposedProjectRepository : ProjectRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             val projectDAO = ProjectDAO.findById(project.id!!) ?: return@newSuspendedTransaction null
             projectDAO.apply {
-                name = project.name!!
-                description = project.description!!
-                archived = project.archived!!
-                owner = UserDAO.findById(project.ownerID!!)!!
+                name = project.name ?: projectDAO.name
+                description = project.description ?: projectDAO.description
+                archived = project.archived ?: projectDAO.archived
+                owner = UserDAO.findById(
+                    project.ownerID ?: projectDAO.owner.id.value
+                ) ?: throw IllegalArgumentException("New owner does not exist")
             }
 
             mapProjectDAOtoProject(projectDAO)

@@ -1,10 +1,8 @@
 package edu.kitt.orm
 
-import edu.kitt.domainmodel.Comment
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.domainmodel.User
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import kotlinx.coroutines.Dispatchers
@@ -16,15 +14,16 @@ import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTrans
 class ExposedIssueRepository() : IssueRepository {
     override suspend fun createIssue(issue: IssueEntryRequest): Issue? {
 
-        return newSuspendedTransaction (Dispatchers.IO){
-            val parentProject = ProjectDAO.findById(issue.projectID!!)
-            val owner = UserDAO.findById(issue.createdBy!!)
+        return newSuspendedTransaction(Dispatchers.IO) {
+            val parentProject =
+                ProjectDAO.findById(issue.projectID ?: throw IllegalArgumentException("Project ID must be set"))
+            val owner = UserDAO.findById(issue.createdBy ?: throw IllegalArgumentException("Creator ID must be set"))
 
             if (owner == null || parentProject == null) return@newSuspendedTransaction null
 
             val newIssue = IssueDAO.new {
-                title = issue.title!!
-                description = issue.description!!
+                title = issue.title ?: throw IllegalArgumentException("Title must be set")
+                description = issue.description ?: throw IllegalArgumentException("Description must be set")
                 status = IssueStatus.OPEN
                 createdBy = owner
                 project = parentProject
@@ -49,7 +48,8 @@ class ExposedIssueRepository() : IssueRepository {
 
     override suspend fun getIssueLinks(id: Int): List<IssueLink> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val issue = IssueDAO.findById(id)?.let(::mapIssueDAOtoIssue) ?: return@newSuspendedTransaction listOf<IssueLink>()
+            val issue =
+                IssueDAO.findById(id)?.let(::mapIssueDAOtoIssue) ?: return@newSuspendedTransaction listOf<IssueLink>()
             issue.links
         }
     }
@@ -62,7 +62,9 @@ class ExposedIssueRepository() : IssueRepository {
 
     override suspend fun editIssue(issue: IssueEntryRequest): Issue? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val modifiedIssueDAO = IssueDAO.findById(issue.id!!) ?: return@newSuspendedTransaction null
+            val modifiedIssueDAO = IssueDAO.findById(
+                issue.id ?: throw IllegalArgumentException("Issue ID must be set")
+            ) ?: throw IllegalArgumentException("Issue does not exist")
 
             modifiedIssueDAO.apply {
                 title = issue.title ?: modifiedIssueDAO.title
@@ -82,13 +84,15 @@ class ExposedIssueRepository() : IssueRepository {
     override suspend fun linkIssues(link: IssueLinkEntryRequest): IssueLink? {
         return newSuspendedTransaction(Dispatchers.IO) {
             try {
-                val linkedIssue = IssueDAO.findById(link.linked)!!
+                val linkedIssue =
+                    IssueDAO.findById(link.linked) ?: throw IllegalArgumentException("Linked issue does not exist")
                 IssueLinks.insert {
                     it[linker] = link.linker
                     it[linked] = link.linked
                 }
                 return@newSuspendedTransaction IssueLink(link.linker, linkedIssue.title)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
             null
         }
     }

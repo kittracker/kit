@@ -50,8 +50,8 @@ class ExposedCommentRepository : CommentRepository {
     override suspend fun createComment(comment: CommentEntryRequest): Comment? {
         return withContext(Dispatchers.IO) {
             transaction {
-                val user = UserDAO.findById(comment.author ?: return@transaction null)
-                val issue = IssueDAO.findById(comment.issueID ?: return@transaction null)
+                val user = UserDAO.findById(comment.author ?: throw IllegalArgumentException("Author ID must be set"))
+                val issue = IssueDAO.findById(comment.issueID ?: throw IllegalArgumentException("Issue ID must be set"))
 
                 if (user == null || issue == null) {
                     return@transaction null
@@ -59,7 +59,7 @@ class ExposedCommentRepository : CommentRepository {
 
                 val newCommentDAO = CommentDAO.new {
                     author = user
-                    text = comment.text!! // TODO: add proper check before
+                    text = comment.text?: throw IllegalArgumentException("Text must be set")
                     this.issue = issue
                 }
                 mapCommentDAOtoComment(newCommentDAO)
@@ -73,17 +73,16 @@ class ExposedCommentRepository : CommentRepository {
         return withContext(Dispatchers.IO) {
             transaction {
                 val commentDAO = CommentDAO.findById(commentIdToEdit)
-                val newAuthorDAO = UserDAO.findById(comment.author ?: return@transaction null)
-                val issueDAO = IssueDAO.findById(comment.issueID ?: throw IllegalArgumentException("Issue ID is missing"))
+                val newAuthorDAO = UserDAO.findById(comment.author ?: throw IllegalArgumentException("Author ID must be set"))
+                val issueDAO = IssueDAO.findById(comment.issueID  ?: throw IllegalArgumentException("Issue ID must be set"))
 
                 // If either the comment or the author do not exist, return null
                 if (commentDAO == null || newAuthorDAO == null || issueDAO == null) {
                     // Comment to edit not found
-                    //return@transaction null
-                    throw IllegalArgumentException("Comment to edit not found")
+                    return@transaction null
                 }
 
-                commentDAO.text = comment.text!!
+                commentDAO.text = comment.text ?: commentDAO.text
                 commentDAO.author = newAuthorDAO
                 commentDAO.issue = issueDAO
 

@@ -6,7 +6,6 @@ import edu.kitt.hashPassword
 import edu.kitt.orm.requests.SignupRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -18,19 +17,11 @@ class ExposedUserRepository : UserRepository {
     }
 
     override suspend fun getUserByUsername(username: String): User? {
-        val user = transaction {
+        return newSuspendedTransaction(Dispatchers.IO) {
             val userDAO = UserDAO.find { Users.userName eq username }.firstOrNull()
-            if (userDAO != null) {
-                return@transaction User(
-                    userDAO.id.value,
-                    userDAO.emailAddress,
-                    userDAO.userName,
-                )
-            } else {
-                return@transaction null
-            }
+            if (userDAO == null) return@newSuspendedTransaction null
+            mapUserDAOtoUser(userDAO)
         }
-        return user
     }
 
     override suspend fun getAllUsers(): List<User> = withContext(Dispatchers.IO) {
@@ -46,11 +37,7 @@ class ExposedUserRepository : UserRepository {
             }.firstOrNull()
             if (userDAO == null) return@newSuspendedTransaction null
             if (checkPassword(password, userDAO.passwordHash)) {
-                return@newSuspendedTransaction User(
-                    userDAO.id.value,
-                    userDAO.emailAddress,
-                    userDAO.userName
-                )
+                return@newSuspendedTransaction mapUserDAOtoUser(userDAO)
             } else {
                 return@newSuspendedTransaction null
             }

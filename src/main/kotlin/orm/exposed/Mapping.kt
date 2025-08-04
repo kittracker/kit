@@ -1,4 +1,4 @@
-package edu.kitt.orm
+package edu.kitt.orm.exposed
 
 import edu.kitt.domainmodel.Comment
 import edu.kitt.domainmodel.Issue
@@ -141,7 +141,7 @@ fun mapIssueDAOtoIssue(issueDAO: IssueDAO): Issue {
         description = issueDAO.description,
         status = issueDAO.status,
         project = mapProjectDAOtoProjectSummary(issueDAO.project),
-        createdBy = mapUserDAOtoUser(issueDAO.createdBy),
+        owner = mapUserDAOtoUser(issueDAO.createdBy),
         comments = issueDAO.comments.map(::mapCommentDAOtoComment).toMutableList(),
         links = issueDAO.links.map { linkedIssueDAO ->
             IssueLink(

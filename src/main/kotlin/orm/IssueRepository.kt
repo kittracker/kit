@@ -2,7 +2,6 @@ package edu.kitt.orm
 
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
-import edu.kitt.orm.entries.IssueEntry
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 

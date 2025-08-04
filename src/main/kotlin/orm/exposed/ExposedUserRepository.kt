@@ -1,8 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.orm.exposed
 
 import edu.kitt.checkPassword
 import edu.kitt.domainmodel.User
 import edu.kitt.hashPassword
+import edu.kitt.orm.UserRepository
 import edu.kitt.orm.requests.SignupRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,13 +13,13 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class ExposedUserRepository : UserRepository {
     override suspend fun getUserByID(uid: Int): User? = withContext(Dispatchers.IO) {
         transaction {
-            UserDAO.findById(uid)?.let(::mapUserDAOtoUser)
+            UserDAO.Companion.findById(uid)?.let(::mapUserDAOtoUser)
         }
     }
 
     override suspend fun getUserByUsername(username: String): User? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val userDAO = UserDAO.find { Users.userName eq username }.firstOrNull()
+            val userDAO = UserDAO.Companion.find { Users.userName eq username }.firstOrNull()
             if (userDAO == null) return@newSuspendedTransaction null
             mapUserDAOtoUser(userDAO)
         }
@@ -26,13 +27,13 @@ class ExposedUserRepository : UserRepository {
 
     override suspend fun getAllUsers(): List<User> = withContext(Dispatchers.IO) {
         transaction {
-            UserDAO.all().map(::mapUserDAOtoUser)
+            UserDAO.Companion.all().map(::mapUserDAOtoUser)
         }
     }
 
     override suspend fun getUser(username: String, password: String): User? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val userDAO = UserDAO.find {
+            val userDAO = UserDAO.Companion.find {
                 Users.userName eq username
             }.firstOrNull()
             if (userDAO == null) return@newSuspendedTransaction null
@@ -45,7 +46,7 @@ class ExposedUserRepository : UserRepository {
     }
 
     override suspend fun createUser(request: SignupRequest): User? = newSuspendedTransaction(Dispatchers.IO) {
-        val userDAO = UserDAO.new {
+        val userDAO = UserDAO.Companion.new {
             emailAddress = request.email
             userName = request.username
             passwordHash = hashPassword(request.password)

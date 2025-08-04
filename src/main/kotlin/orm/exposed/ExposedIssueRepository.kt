@@ -1,8 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.orm.exposed
 
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
+import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.requests.IssueEntryRequest
 import edu.kitt.orm.requests.IssueLinkEntryRequest
 import kotlinx.coroutines.Dispatchers
@@ -16,12 +17,12 @@ class ExposedIssueRepository() : IssueRepository {
 
         return newSuspendedTransaction(Dispatchers.IO) {
             val parentProject =
-                ProjectDAO.findById(issue.projectID ?: throw IllegalArgumentException("Project ID must be set"))
-            val owner = UserDAO.findById(issue.createdBy ?: throw IllegalArgumentException("Creator ID must be set"))
+                ProjectDAO.Companion.findById(issue.projectID ?: throw IllegalArgumentException("Project ID must be set"))
+            val owner = UserDAO.Companion.findById(issue.createdBy ?: throw IllegalArgumentException("Creator ID must be set"))
 
             if (owner == null || parentProject == null) return@newSuspendedTransaction null
 
-            val newIssue = IssueDAO.new {
+            val newIssue = IssueDAO.Companion.new {
                 title = issue.title ?: throw IllegalArgumentException("Title must be set")
                 description = issue.description ?: throw IllegalArgumentException("Description must be set")
                 status = IssueStatus.OPEN
@@ -35,34 +36,34 @@ class ExposedIssueRepository() : IssueRepository {
 
     override suspend fun getIssuesByProjectID(id: Int): List<Issue> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val project = ProjectDAO.findById(id)
+            val project = ProjectDAO.Companion.findById(id)
             project?.issues?.map(::mapIssueDAOtoIssue) ?: listOf()
         }
     }
 
     override suspend fun getIssueByID(id: Int): Issue? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            IssueDAO.findById(id)?.let(::mapIssueDAOtoIssue)
+            IssueDAO.Companion.findById(id)?.let(::mapIssueDAOtoIssue)
         }
     }
 
     override suspend fun getIssueLinks(id: Int): List<IssueLink> {
         return newSuspendedTransaction(Dispatchers.IO) {
             val issue =
-                IssueDAO.findById(id)?.let(::mapIssueDAOtoIssue) ?: return@newSuspendedTransaction listOf<IssueLink>()
+                IssueDAO.Companion.findById(id)?.let(::mapIssueDAOtoIssue) ?: return@newSuspendedTransaction listOf<IssueLink>()
             issue.links
         }
     }
 
     override suspend fun getAllIssues(): List<Issue> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            IssueDAO.all().map(::mapIssueDAOtoIssue)
+            IssueDAO.Companion.all().map(::mapIssueDAOtoIssue)
         }
     }
 
     override suspend fun editIssue(issue: IssueEntryRequest): Issue? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val modifiedIssueDAO = IssueDAO.findById(
+            val modifiedIssueDAO = IssueDAO.Companion.findById(
                 issue.id ?: throw IllegalArgumentException("Issue ID must be set")
             ) ?: throw IllegalArgumentException("Issue does not exist")
 
@@ -77,7 +78,7 @@ class ExposedIssueRepository() : IssueRepository {
 
     override suspend fun deleteIssue(id: Int): Boolean {
         return newSuspendedTransaction(Dispatchers.IO) {
-            IssueDAO.findById(id)?.delete() != null
+            IssueDAO.Companion.findById(id)?.delete() != null
         }
     }
 
@@ -85,7 +86,7 @@ class ExposedIssueRepository() : IssueRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             try {
                 val linkedIssue =
-                    IssueDAO.findById(link.linked) ?: throw IllegalArgumentException("Linked issue does not exist")
+                    IssueDAO.Companion.findById(link.linked) ?: throw IllegalArgumentException("Linked issue does not exist")
                 IssueLinks.insert {
                     it[linker] = link.linker
                     it[linked] = link.linked

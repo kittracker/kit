@@ -2,7 +2,12 @@ package edu.kitt
 
 import edu.kitt.authentication.JwtConfig
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.orm.*
+import edu.kitt.orm.exposed.Collaborators
+import edu.kitt.orm.exposed.Comments
+import edu.kitt.orm.exposed.IssueLinks
+import edu.kitt.orm.exposed.Issues
+import edu.kitt.orm.exposed.Projects
+import edu.kitt.orm.exposed.Users
 import edu.kitt.orm.requests.LoginRequest
 import edu.kitt.orm.requests.SignupRequest
 import io.ktor.http.*

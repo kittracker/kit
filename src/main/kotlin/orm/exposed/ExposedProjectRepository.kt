@@ -1,8 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.orm.exposed
 
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
+import edu.kitt.orm.ProjectRepository
 import edu.kitt.orm.requests.ProjectEntryRequest
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
@@ -16,20 +17,20 @@ class ExposedProjectRepository : ProjectRepository {
 
     override suspend fun getProjectByID(id: Int): Project? {
         return newSuspendedTransaction (Dispatchers.IO) {
-            ProjectDAO.findById(id)?.let(::mapProjectDAOtoProject)
+            ProjectDAO.Companion.findById(id)?.let(::mapProjectDAOtoProject)
         }
     }
 
     override suspend fun getCollaboratorsByProjectID(projectId: Int): List<User> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val project = ProjectDAO.findById(projectId)
+            val project = ProjectDAO.Companion.findById(projectId)
             project?.collaborators?.map(::mapUserDAOtoUser) ?: listOf()
         }
     }
 
     override suspend fun getAllProjects(): List<Project> {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val projects = ProjectDAO.all()
+            val projects = ProjectDAO.Companion.all()
             projects.map(::mapProjectDAOtoProject)
         }
     }
@@ -52,18 +53,18 @@ class ExposedProjectRepository : ProjectRepository {
                 return@newSuspendedTransaction emptyList()
             }
 
-            ProjectDAO.find { Projects.id inList allProjectIds }
+            ProjectDAO.Companion.find { Projects.id inList allProjectIds }
                 .map(::mapProjectDAOtoProject)
         }
     }
 
     override suspend fun createProject(project: ProjectEntryRequest): Project? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            ProjectDAO.new {
+            ProjectDAO.Companion.new {
                 name = project.name ?: throw IllegalArgumentException("Project name must be set")
                 description = project.description ?: throw IllegalArgumentException("Project description must be set")
                 archived = project.archived ?: false
-                owner = UserDAO.findById(
+                owner = UserDAO.Companion.findById(
                     project.ownerID ?: throw IllegalArgumentException("Project owner must be set")
                 ) ?: throw IllegalArgumentException("Project owner does not exist")
             }.let(::mapProjectDAOtoProject)
@@ -72,12 +73,12 @@ class ExposedProjectRepository : ProjectRepository {
 
     override suspend fun editProject(project: ProjectEntryRequest): Project? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val projectDAO = ProjectDAO.findById(project.id!!) ?: return@newSuspendedTransaction null
+            val projectDAO = ProjectDAO.Companion.findById(project.id!!) ?: return@newSuspendedTransaction null
             projectDAO.apply {
                 name = project.name ?: projectDAO.name
                 description = project.description ?: projectDAO.description
                 archived = project.archived ?: projectDAO.archived
-                owner = UserDAO.findById(
+                owner = UserDAO.Companion.findById(
                     project.ownerID ?: projectDAO.owner.id.value
                 ) ?: throw IllegalArgumentException("New owner does not exist")
             }
@@ -98,7 +99,7 @@ class ExposedProjectRepository : ProjectRepository {
     // FIXME: Maybe returning boolean makes more sense
     override suspend fun addCollaboratorToProject(collaborator: CollaboratorEntryRequest): User? {
         return newSuspendedTransaction(Dispatchers.IO) {
-            val user = UserDAO.findById(collaborator.userID) ?: return@newSuspendedTransaction null
+            val user = UserDAO.Companion.findById(collaborator.userID) ?: return@newSuspendedTransaction null
             Collaborators.insert {
                 it[projectID] = collaborator.projectID
                 it[userID] = user.id.value

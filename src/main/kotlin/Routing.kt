@@ -254,7 +254,7 @@ fun Route.issueRoutes(repos: Repositories) {
             }
 
             if (project.owner.id != userId &&
-                issue.createdBy.id != userId) {
+                issue.owner.id != userId) {
 
                 call.respond(HttpStatusCode.Unauthorized, "Not authorized to access this issue")
                 return@put
@@ -292,7 +292,7 @@ fun Route.issueRoutes(repos: Repositories) {
             }
 
             if (project.owner.id != userId &&
-                issue.createdBy.id != userId) {
+                issue.owner.id != userId) {
 
                 call.respond(HttpStatusCode.Unauthorized, "Not authorized to access this issue")
                 return@delete
@@ -374,7 +374,7 @@ fun Route.linkRoutes(repos: Repositories) {
             }
 
             if (project.owner.id != userId &&
-                issue.createdBy.id != userId) {
+                issue.owner.id != userId) {
 
                 call.respond(HttpStatusCode.Unauthorized, "Not authorized to access this issue")
                 return@delete

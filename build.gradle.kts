@@ -50,4 +50,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-json:${exposedVersion}")
     implementation("org.jetbrains.exposed:exposed-money:${exposedVersion}")
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:${exposedVersion}")
+
+    testImplementation("io.ktor:ktor-client-content-negotiation")
+    testImplementation("io.ktor:ktor-serialization-kotlinx-json")
 }

@@ -37,7 +37,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
 
     val jwtConfig = JwtConfig(
-        jwtIssuer = environment.config.property("jwt.issuer").getString(),
+        jwtIssuer = environment.config.property("jwt.issuer").getString() ,
         jwtAudience = environment.config.property("jwt.audience").getString(),
         jwtRealm = environment.config.property("jwt.realm").getString(),
         jwtSecret = environment.config.property("jwt.secret").getString()
@@ -65,104 +65,12 @@ fun Application.module() {
         }
     }
 
-    configureDatabases(embedded = true)
+    val useEmbedded = environment.config.property("database.use_embedded").getString().toBoolean()
+    configureDatabases(useEmbedded)
 
-    transaction {
-        addLogger(StdOutSqlLogger)
-        SchemaUtils.create(Users, Projects, Issues, IssueLinks, Comments, Collaborators)
-
-        Users.insert { user ->
-            user[userName] = "spectrev333"
-            user[emailAddress] = "spectrev333@kittracker.org"
-            user[passwordHash] = hashPassword("spectrev333")
-        }
-
-        Users.insert { user ->
-            user[userName] = "cardisk"
-            user[emailAddress] = "cardisk@kittracker.org"
-            user[passwordHash] = hashPassword("cardisk")
-        }
-
-        Users.insert { user ->
-            user[userName] = "mircocaneschi"
-            user[emailAddress] = "mircocaneschi@kittracker.org"
-            user[passwordHash] = hashPassword("mircocaneschi")
-        }
-
-        Projects.insert { project ->
-            project[name] = "Project 1"
-            project[description] = "Description for project 1"
-            project[archived] = false
-            project[ownerID] = 1
-        }
-
-        Projects.insert { project ->
-            project[name] = "Project 2"
-            project[description] = "Description for project 2"
-            project[archived] = false
-            project[ownerID] = 2
-        }
-
-        Projects.insert { project ->
-            project[name] = "Project 3"
-            project[description] = "Description for project 3"
-            project[archived] = false
-            project[ownerID] = 3
-        }
-
-        Issues.insert { issue ->
-            issue[title] = "Issue 1 for project 1"
-            issue[description] = "Description for issue 1"
-            issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 1
-            issue[projectID] = 1
-        }
-
-        Issues.insert { issue ->
-            issue[title] = "Issue 2 for project 2"
-            issue[description] = "Description for issue 2"
-            issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 1
-            issue[projectID] = 2
-        }
-
-        Issues.insert { issue ->
-            issue[title] = "Issue 3 for project 3"
-            issue[description] = "Description for issue 3"
-            issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 3
-            issue[projectID] = 3
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 2
-            collaborator[projectID] = 1
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 3
-            collaborator[projectID] = 1
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 1
-            collaborator[projectID] = 2
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 3
-            collaborator[projectID] = 2
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 1
-            collaborator[projectID] = 3
-        }
-
-        Collaborators.insert { collaborator ->
-            collaborator[userID] = 2
-            collaborator[projectID] = 3
-        }
+    val shouldSeed = environment.config.propertyOrNull("database.seed")?.getString()?.toBoolean() ?: false
+    if (shouldSeed) {
+        seedDatabase()
     }
 
     val repos = initExposedRepositories()

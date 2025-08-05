@@ -75,16 +75,16 @@ class ExposedCommentRepository : CommentRepository {
                 val commentDAO = CommentDAO.findById(commentIdToEdit)
                 val newAuthorDAO = UserDAO.findById(comment.author ?: throw IllegalArgumentException("Author ID must be set"))
                 val issueDAO = IssueDAO.findById(comment.issueID  ?: throw IllegalArgumentException("Issue ID must be set"))
-
+       
                 // If either the comment or the author do not exist, return null
-                if (commentDAO == null || newAuthorDAO == null || issueDAO == null) {
+                if (commentDAO == null) {
                     // Comment to edit not found
                     return@transaction null
                 }
 
                 commentDAO.text = comment.text ?: commentDAO.text
-                commentDAO.author = newAuthorDAO
-                commentDAO.issue = issueDAO
+                commentDAO.author = newAuthorDAO ?: commentDAO.author
+                commentDAO.issue = issueDAO ?: commentDAO.issue
 
                 mapCommentDAOtoComment(commentDAO)
             }

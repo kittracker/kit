@@ -1,0 +1,9 @@
+jwt:
+  secret: "secret"
+  issuer: "http://0.0.0.0:8080/"
+  audience: "http://0.0.0.0:8080/hello"
+  realm: "Access to 'hello'"
+
+database:
+  use_embedded: true
+  seed: true

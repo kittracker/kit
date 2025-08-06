@@ -10,25 +10,11 @@ import edu.kitt.orm.IssueRepository
 import edu.kitt.orm.ProjectRepository
 import edu.kitt.orm.UserRepository
 import edu.kitt.orm.exposed.Collaborators
-import edu.kitt.orm.exposed.Collaborators.projectID
-import edu.kitt.orm.exposed.Collaborators.userID
 import edu.kitt.orm.exposed.Comments
 import edu.kitt.orm.exposed.IssueLinks
 import edu.kitt.orm.exposed.Issues
-import edu.kitt.orm.exposed.Issues.createdBy
-import edu.kitt.orm.exposed.Issues.description
-import edu.kitt.orm.exposed.Issues.projectID
-import edu.kitt.orm.exposed.Issues.status
-import edu.kitt.orm.exposed.Issues.title
 import edu.kitt.orm.exposed.Projects
-import edu.kitt.orm.exposed.Projects.archived
-import edu.kitt.orm.exposed.Projects.description
-import edu.kitt.orm.exposed.Projects.name
-import edu.kitt.orm.exposed.Projects.ownerID
 import edu.kitt.orm.exposed.Users
-import edu.kitt.orm.exposed.Users.emailAddress
-import edu.kitt.orm.exposed.Users.passwordHash
-import edu.kitt.orm.exposed.Users.userName
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -144,7 +130,7 @@ fun seedDatabase() {
             issue[title] = "Issue 1 for project 1"
             issue[description] = "Description for issue 1"
             issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 1
+            issue[owner] = 1
             issue[projectID] = 1
         }
 
@@ -152,7 +138,7 @@ fun seedDatabase() {
             issue[title] = "Issue 2 for project 2"
             issue[description] = "Description for issue 2"
             issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 1
+            issue[owner] = 1
             issue[projectID] = 2
         }
 
@@ -160,7 +146,7 @@ fun seedDatabase() {
             issue[title] = "Issue 3 for project 3"
             issue[description] = "Description for issue 3"
             issue[status] = IssueStatus.OPEN
-            issue[createdBy] = 3
+            issue[owner] = 3
             issue[projectID] = 3
         }
 

@@ -110,7 +110,7 @@ export default class ProjectDetails {
         const element = document.getElementById("searchBar");
 
         let regex = new RegExp(element.value, "i");
-        this.project.issues = this.project.issues.filter(issue => regex.test(issue.title) || regex.test(issue.createdBy.username) || regex.test(issue.description));
+        this.project.issues = this.project.issues.filter(issue => regex.test(issue.title) || regex.test(issue.owner.username) || regex.test(issue.description));
         this.project.collaborators = this.project.collaborators.filter(user => regex.test(user.username) || regex.test(user.emailAddress));
 
         const active = document.getElementById("activeResearch");
@@ -358,7 +358,7 @@ export default class ProjectDetails {
                                     ${this.renderIssueStatus(status)}
                                     <h5 class="card-title d-block text-truncate">${issue.title}</h5>
                                 </div>
-                                <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.createdBy.username}</h6>
+                                <h6 class="card-subtitle mb-2 text-body-tertiary">@${issue.owner.username}</h6>
                             </div>
                             <br />
                             <p class="card-text d-block text-truncate">${issue.description}</p>

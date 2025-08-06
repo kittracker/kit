@@ -446,8 +446,8 @@ export default class IssueDetails {
                                     data-bs-placement="right"
                                     data-bs-trigger="hover focus"
                                     data-bs-custom-class="font-monospace user-popover"
-                                    data-bs-title="@${this.issue.createdBy.username}"
-                                    data-bs-content="${this.issue.createdBy.emailAddress}"
+                                    data-bs-title="@${this.issue.owner.username}"
+                                    data-bs-content="${this.issue.owner.emailAddress}"
                                 ></i>
                             </div>
                             <div class="card flex-grow-1 comment">
@@ -457,9 +457,9 @@ export default class IssueDetails {
                                         data-bs-placement="right"
                                         data-bs-trigger="hover focus"
                                         data-bs-custom-class="font-monospace user-popover"
-                                        data-bs-title="@${this.issue.createdBy.username}"
-                                        data-bs-content="${this.issue.createdBy.emailAddress}"
-                                    >@${this.issue.createdBy.username}</h6>
+                                        data-bs-title="@${this.issue.owner.username}"
+                                        data-bs-content="${this.issue.owner.emailAddress}"
+                                    >@${this.issue.owner.username}</h6>
                                     <h6 class="m-0 p-0 g-0">AUTHOR</h6>
                                 </div>
                                 <div class="card-body">
@@ -511,7 +511,7 @@ export default class IssueDetails {
     }
 
     configure() {
-        if (this.issue.createdBy.id === Auth.getCurrentUser().id || this.issue.project.owner.id === Auth.getCurrentUser().id) {
+        if (this.issue.owner.id === Auth.getCurrentUser().id || this.issue.project.owner.id === Auth.getCurrentUser().id) {
             this.new = NavbarManager.newButton("newLink", "NEW LINK");
             this.new.onclick = () => this.linkModal.show();
 

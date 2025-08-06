@@ -31,7 +31,7 @@ object Issues : IntIdTable() {
     val title = varchar("title", 255)
     val description = text("description")
     val status = enumeration<IssueStatus>("status") // Ensure IssueStatus enum is defined
-    val createdBy = reference("created_by", Users, onDelete = ReferenceOption.RESTRICT) // Or CASCADE
+    val owner = reference("created_by", Users, onDelete = ReferenceOption.RESTRICT) // Or CASCADE
     val projectID = reference("project_id", Projects, onDelete = ReferenceOption.CASCADE)
     // val createdAt = datetime("created_at").clientDefault { org.joda.time.DateTime.now() } // Example for datetime
 }
@@ -84,7 +84,7 @@ class IssueDAO(id: EntityID<Int>) : IntEntity(id) {
     var title by Issues.title
     var description by Issues.description
     var status by Issues.status
-    var createdBy by UserDAO referencedOn Issues.createdBy
+    var owner by UserDAO referencedOn Issues.owner
     var project by ProjectDAO referencedOn Issues.projectID
     val links by IssueDAO.via(IssueLinks.linker, IssueLinks.linked) // This will load Issues
     val comments by CommentDAO referrersOn Comments.issue
@@ -141,7 +141,7 @@ fun mapIssueDAOtoIssue(issueDAO: IssueDAO): Issue {
         description = issueDAO.description,
         status = issueDAO.status,
         project = mapProjectDAOtoProjectSummary(issueDAO.project),
-        owner = mapUserDAOtoUser(issueDAO.createdBy),
+        owner = mapUserDAOtoUser(issueDAO.owner),
         comments = issueDAO.comments.map(::mapCommentDAOtoComment).toMutableList(),
         links = issueDAO.links.map { linkedIssueDAO ->
             IssueLink(

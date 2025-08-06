@@ -2,16 +2,13 @@ package edu.kitt
 
 import edu.kitt.domainmodel.IssueStatus
 import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.LoginRequest
 import edu.kitt.orm.requests.SignupRequest
-import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.testing.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -35,7 +32,7 @@ class IssueRoutesTest {
                     title = "New Issue by Collaborator",
                     description = "A test issue",
                     status = IssueStatus.OPEN,
-                    createdBy = 2, // cardisk's ID
+                    owner = 2, // cardisk's ID
                     projectID = 1  // Project 1
                 )
             )
@@ -66,7 +63,7 @@ class IssueRoutesTest {
                     title = "Malicious Issue",
                     description = "",
                     status = IssueStatus.OPEN,
-                    createdBy = 4, // New user's ID
+                    owner = 4, // New user's ID
                     projectID = 1
                 )
             )
@@ -111,7 +108,7 @@ class IssueRoutesTest {
                     title = "Issue 2 Edited by Creator",
                     description = "Updated description",
                     status = IssueStatus.CLOSED,
-                    createdBy = 1,
+                    owner = 1,
                     projectID = 2
                 )
             )

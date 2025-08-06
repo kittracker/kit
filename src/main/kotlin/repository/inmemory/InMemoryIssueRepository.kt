@@ -30,7 +30,7 @@ class InMemoryIssueRepository(val commentRepository: CommentRepository, val user
             title = issue.title ?: return null,
             description = issue.description ?: return null,
             status = IssueStatus.OPEN,
-            createdBy = issue.createdBy ?: return null,
+            createdBy = issue.owner ?: return null,
             projectID = issue.projectID ?: return null
         )
         issues.add(new)

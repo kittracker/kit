@@ -17,5 +17,5 @@ postgres:
   user: postgres
   password: superadmin
 database:
-  use_embedded: true # if true stores data in H2 database
-  seed: true # if true will attempt to pre-populate the database
+  use_embedded: true
+  seed: true

@@ -144,4 +144,23 @@ class CommentRoutesTest {
         val response = client.delete("/api/comments/$commentId")
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
+
+    @Test
+    fun `test delete comment as project owner`() = testApplicationWithConfig {
+        application { module() }
+        val client = createClient {
+            install(ContentNegotiation) { json() }
+            install(HttpCookies)
+        }
+
+        // User "cardisk" (id=2) creates a comment on Issue 1
+        client.loginAs("cardisk", "cardisk")
+        val commentId = client.createComment(issueId = 1, author = 2, text = "A comment by a collaborator")
+
+        // The owner of Project 1 is "spectrev333" (id=1). They should be able to delete it.
+        client.loginAs("spectrev333", "spectrev333")
+        val response = client.delete("/api/comments/$commentId")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
 }

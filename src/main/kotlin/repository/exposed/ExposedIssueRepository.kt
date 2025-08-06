@@ -18,7 +18,7 @@ class ExposedIssueRepository() : IssueRepository {
         return newSuspendedTransaction(Dispatchers.IO) {
             val parentProject =
                 ProjectDAO.Companion.findById(issue.projectID ?: throw IllegalArgumentException("Project ID must be set"))
-            val owner = UserDAO.Companion.findById(issue.createdBy ?: throw IllegalArgumentException("Creator ID must be set"))
+            val owner = UserDAO.Companion.findById(issue.owner ?: throw IllegalArgumentException("Creator ID must be set"))
 
             if (owner == null || parentProject == null) return@newSuspendedTransaction null
 
@@ -26,7 +26,7 @@ class ExposedIssueRepository() : IssueRepository {
                 title = issue.title ?: throw IllegalArgumentException("Title must be set")
                 description = issue.description ?: throw IllegalArgumentException("Description must be set")
                 status = IssueStatus.OPEN
-                createdBy = owner
+                this.owner = owner
                 project = parentProject
             }
             mapIssueDAOtoIssue(newIssue)

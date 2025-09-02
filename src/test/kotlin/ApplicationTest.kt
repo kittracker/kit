@@ -116,4 +116,18 @@ class ApplicationTest {
         assertTrue(body.contains("\"username\":\"cardisk\""))
         assertTrue(body.contains("\"id\":2"))
     }
+
+    @Test
+    fun `test get user by username`() = testApplicationWithConfig {
+        application { module() }
+        val client = createClient {
+            install(ContentNegotiation) { json() }
+            install(HttpCookies)
+        }
+
+        client.loginAs("cardisk", "cardisk")
+        val response = client.get("/api/users/mircocaneschi")
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains("\"username\":\"mircocaneschi\""))
+    }
 }

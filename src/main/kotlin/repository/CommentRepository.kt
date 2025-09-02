@@ -1,7 +1,7 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.Comment
-import edu.kitt.orm.requests.CommentEntryRequest
+import edu.kitt.repository.requests.CommentEntryRequest
 
 interface CommentRepository {
     suspend fun removeCommentByID(id: Int): Boolean

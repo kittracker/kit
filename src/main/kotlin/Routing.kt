@@ -1,10 +1,10 @@
 package edu.kitt
 
 import CollaboratorEntryRequest
-import edu.kitt.orm.requests.CommentEntryRequest
-import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.IssueLinkEntryRequest
-import edu.kitt.orm.requests.ProjectEntryRequest
+import edu.kitt.repository.requests.CommentEntryRequest
+import edu.kitt.repository.requests.IssueEntryRequest
+import edu.kitt.repository.requests.IssueLinkEntryRequest
+import edu.kitt.repository.requests.ProjectEntryRequest
 import io.ktor.http.*
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal

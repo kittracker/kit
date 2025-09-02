@@ -1,7 +1,7 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.User
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.requests.SignupRequest
 
 interface UserRepository {
     suspend fun getUserByID(uid: Int): User?

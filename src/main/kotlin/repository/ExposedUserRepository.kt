@@ -1,9 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.checkPassword
 import edu.kitt.domainmodel.User
 import edu.kitt.hashPassword
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.requests.SignupRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction

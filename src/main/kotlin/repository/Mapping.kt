@@ -1,4 +1,4 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.Comment
 import edu.kitt.domainmodel.Issue

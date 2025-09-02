@@ -1,10 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
-import edu.kitt.orm.entries.IssueEntry
-import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.IssueLinkEntryRequest
+import edu.kitt.repository.requests.IssueEntryRequest
+import edu.kitt.repository.requests.IssueLinkEntryRequest
 
 interface IssueRepository {
     suspend fun createIssue(issue: IssueEntryRequest): Issue?

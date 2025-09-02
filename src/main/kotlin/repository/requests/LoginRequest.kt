@@ -1,4 +1,4 @@
-package edu.kitt.orm.requests
+package edu.kitt.repository.requests
 
 import kotlinx.serialization.Serializable
 

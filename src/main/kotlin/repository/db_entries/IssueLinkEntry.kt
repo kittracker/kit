@@ -1,6 +1,5 @@
-package edu.kitt.orm.entries
+package edu.kitt.repository.entries
 
-import com.typesafe.config.Optional
 import kotlinx.serialization.Serializable
 
 @Serializable

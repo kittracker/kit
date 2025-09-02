@@ -1,6 +1,5 @@
-package edu.kitt.orm.requests
+package edu.kitt.repository.requests
 
-import com.typesafe.config.Optional
 import edu.kitt.domainmodel.IssueStatus
 
 import kotlinx.serialization.Serializable

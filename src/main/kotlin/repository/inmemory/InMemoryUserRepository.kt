@@ -1,9 +1,9 @@
-package edu.kitt.orm.inmemory
+package edu.kitt.repository.inmemory
 
 import edu.kitt.domainmodel.User
-import edu.kitt.orm.UserRepository
-import edu.kitt.orm.entries.UserEntry
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.UserRepository
+import edu.kitt.repository.entries.UserEntry
+import edu.kitt.repository.requests.SignupRequest
 
 class InMemoryUserRepository : UserRepository {
     private val users = mutableListOf<UserEntry>(

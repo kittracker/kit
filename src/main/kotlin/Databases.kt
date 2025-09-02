@@ -1,20 +1,14 @@
 package edu.kitt
 
-import edu.kitt.orm.CommentRepository
-import edu.kitt.orm.ExposedCommentRepository
-import edu.kitt.orm.ExposedIssueRepository
-import edu.kitt.orm.ExposedProjectRepository
-import edu.kitt.orm.ExposedUserRepository
-import edu.kitt.orm.inmemory.InMemoryUserRepository
-import edu.kitt.orm.IssueRepository
-import edu.kitt.orm.ProjectRepository
-import edu.kitt.orm.UserRepository
-import edu.kitt.orm.inmemory.InMemoryCommentRepository
-import edu.kitt.orm.inmemory.InMemoryIssueRepository
-import edu.kitt.orm.inmemory.InMemoryProjectRepository
+import edu.kitt.repository.CommentRepository
+import edu.kitt.repository.ExposedCommentRepository
+import edu.kitt.repository.ExposedIssueRepository
+import edu.kitt.repository.ExposedProjectRepository
+import edu.kitt.repository.ExposedUserRepository
+import edu.kitt.repository.IssueRepository
+import edu.kitt.repository.ProjectRepository
+import edu.kitt.repository.UserRepository
 import io.ktor.server.application.*
-import java.sql.Connection
-import java.sql.DriverManager
 import org.jetbrains.exposed.v1.jdbc.Database
 
 

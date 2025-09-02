@@ -2,9 +2,9 @@ package edu.kitt
 
 import edu.kitt.authentication.JwtConfig
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.orm.*
-import edu.kitt.orm.requests.LoginRequest
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.*
+import edu.kitt.repository.requests.LoginRequest
+import edu.kitt.repository.requests.SignupRequest
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

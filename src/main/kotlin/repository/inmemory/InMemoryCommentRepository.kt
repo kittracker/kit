@@ -1,10 +1,10 @@
-package edu.kitt.orm.inmemory
+package edu.kitt.repository.inmemory
 
 import edu.kitt.domainmodel.Comment
-import edu.kitt.orm.CommentRepository
-import edu.kitt.orm.UserRepository
-import edu.kitt.orm.entries.CommentEntry
-import edu.kitt.orm.requests.CommentEntryRequest
+import edu.kitt.repository.CommentRepository
+import edu.kitt.repository.UserRepository
+import edu.kitt.repository.entries.CommentEntry
+import edu.kitt.repository.requests.CommentEntryRequest
 
 class InMemoryCommentRepository(val userRepository: UserRepository) : CommentRepository {
     private val comments = mutableListOf(

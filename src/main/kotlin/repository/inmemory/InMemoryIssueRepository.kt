@@ -1,15 +1,15 @@
-package edu.kitt.orm.inmemory
+package edu.kitt.repository.inmemory
 
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.orm.IssueRepository
-import edu.kitt.orm.entries.IssueEntry
-import edu.kitt.orm.entries.IssueLinkEntry
-import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.IssueLinkEntryRequest
-import edu.kitt.orm.CommentRepository
-import edu.kitt.orm.UserRepository
+import edu.kitt.repository.IssueRepository
+import edu.kitt.repository.entries.IssueEntry
+import edu.kitt.repository.entries.IssueLinkEntry
+import edu.kitt.repository.requests.IssueEntryRequest
+import edu.kitt.repository.requests.IssueLinkEntryRequest
+import edu.kitt.repository.CommentRepository
+import edu.kitt.repository.UserRepository
 
 class InMemoryIssueRepository(val commentRepository: CommentRepository, val userRepository: UserRepository) : IssueRepository {
     private val issueLinks = mutableListOf(

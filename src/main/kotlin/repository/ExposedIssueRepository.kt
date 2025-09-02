@@ -1,10 +1,10 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.Issue
 import edu.kitt.domainmodel.IssueLink
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.IssueLinkEntryRequest
+import edu.kitt.repository.requests.IssueEntryRequest
+import edu.kitt.repository.requests.IssueLinkEntryRequest
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere

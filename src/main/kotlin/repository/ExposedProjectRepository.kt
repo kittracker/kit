@@ -1,9 +1,9 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
-import edu.kitt.orm.requests.ProjectEntryRequest
+import edu.kitt.repository.requests.ProjectEntryRequest
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and

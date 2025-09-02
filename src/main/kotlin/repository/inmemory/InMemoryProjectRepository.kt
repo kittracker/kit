@@ -1,14 +1,14 @@
-package edu.kitt.orm.inmemory
+package edu.kitt.repository.inmemory
 
 import CollaboratorEntryRequest
 import edu.kitt.domainmodel.Project
 import edu.kitt.domainmodel.User
-import edu.kitt.orm.IssueRepository
-import edu.kitt.orm.ProjectRepository
-import edu.kitt.orm.UserRepository
-import edu.kitt.orm.entries.CollaboratorEntry
-import edu.kitt.orm.entries.ProjectEntry
-import edu.kitt.orm.requests.ProjectEntryRequest
+import edu.kitt.repository.IssueRepository
+import edu.kitt.repository.ProjectRepository
+import edu.kitt.repository.UserRepository
+import edu.kitt.repository.entries.CollaboratorEntry
+import edu.kitt.repository.entries.ProjectEntry
+import edu.kitt.repository.requests.ProjectEntryRequest
 
 class InMemoryProjectRepository(val userRepository: UserRepository, val issueRepository: IssueRepository) : ProjectRepository {
     private val projectCollaborators = mutableListOf(

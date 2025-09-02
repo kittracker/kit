@@ -1,7 +1,7 @@
-package edu.kitt.orm
+package edu.kitt.repository
 
 import edu.kitt.domainmodel.Comment
-import edu.kitt.orm.requests.CommentEntryRequest
+import edu.kitt.repository.requests.CommentEntryRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction

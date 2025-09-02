@@ -1,6 +1,6 @@
 package edu.kitt
 
-import edu.kitt.orm.requests.LoginRequest
+import edu.kitt.repository.requests.LoginRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

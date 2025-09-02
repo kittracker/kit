@@ -1,13 +1,20 @@
 package edu.kitt
 
+import edu.kitt.domainmodel.IssueStatus
+import edu.kitt.repository.Collaborators
 import edu.kitt.repository.CommentRepository
+import edu.kitt.repository.Comments
 import edu.kitt.repository.ExposedCommentRepository
 import edu.kitt.repository.ExposedIssueRepository
 import edu.kitt.repository.ExposedProjectRepository
 import edu.kitt.repository.ExposedUserRepository
+import edu.kitt.repository.IssueLinks
 import edu.kitt.repository.IssueRepository
+import edu.kitt.repository.Issues
 import edu.kitt.repository.ProjectRepository
+import edu.kitt.repository.Projects
 import edu.kitt.repository.UserRepository
+import edu.kitt.repository.Users
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
 import org.jetbrains.exposed.v1.jdbc.Database

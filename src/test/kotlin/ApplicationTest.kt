@@ -1,7 +1,7 @@
 package edu.kitt
 
-import edu.kitt.orm.requests.LoginRequest
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.requests.LoginRequest
+import edu.kitt.repository.requests.SignupRequest
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.*

@@ -1,7 +1,7 @@
 package edu.kitt
 
-import edu.kitt.orm.requests.CommentEntryRequest
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.requests.CommentEntryRequest
+import edu.kitt.repository.requests.SignupRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*

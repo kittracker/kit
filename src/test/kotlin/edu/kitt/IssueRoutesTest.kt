@@ -1,9 +1,9 @@
 package edu.kitt
 
 import edu.kitt.domainmodel.IssueStatus
-import edu.kitt.orm.requests.IssueEntryRequest
-import edu.kitt.orm.requests.LoginRequest
-import edu.kitt.orm.requests.SignupRequest
+import edu.kitt.repository.requests.IssueEntryRequest
+import edu.kitt.repository.requests.LoginRequest
+import edu.kitt.repository.requests.SignupRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
